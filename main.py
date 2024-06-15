@@ -38,7 +38,6 @@ def send_utility(path):
     return send_from_directory('utilities', path)
 
 
-# Trasa dla plików statycznych (jeśli chcesz mieć dodatkowe ścieżki)
 @app.route('/assets/<path:path>')
 def send_asset(path):
     return send_from_directory('assets', path)
