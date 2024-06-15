@@ -1,21 +1,21 @@
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, redirect, send_from_directory
 
 app = Flask(__name__, static_url_path='/assets', static_folder='assets')
 
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return redirect('/utilities/wizards/horizontal.html')
 
 
 @app.route('/index.html')
 def index_html():
-    return render_template('index.html')
+    return redirect('/utilities/wizards/horizontal.html')
 
 
 @app.route('/landing.html')
 def landing():
-    return render_template('landing.html')
+    return send_from_directory('templates', 'landing.html')
 
 
 @app.route('/dashboards/<path:path>')
@@ -31,6 +31,11 @@ def send_layout(path):
 @app.route('/pages/<path:path>')
 def send_page(path):
     return send_from_directory('pages', path)
+
+
+@app.route('/utilities/<path:path>')
+def send_utility(path):
+    return send_from_directory('utilities', path)
 
 
 # Trasa dla plików statycznych (jeśli chcesz mieć dodatkowe ścieżki)
