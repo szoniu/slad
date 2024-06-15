@@ -1,27 +1,43 @@
-import sqlite3
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/assets', static_folder='assets')
 
 
 @app.route('/')
-def home():
-    return render_template('index.html', title='My Page', heading='Hello, World!', items=['Item 1', 'Item 2', 'Item 3'])
+def index():
+    return render_template('index.html')
 
 
-def get_db_connection():
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row
-    return conn
+@app.route('/index.html')
+def index_html():
+    return render_template('index.html')
 
 
-@app.route('/init_db')
-def init_db():
-    conn = get_db_connection()
-    conn.execute('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT)')
-    conn.close()
-    return "Database initialized!"
+@app.route('/landing.html')
+def landing():
+    return render_template('landing.html')
+
+
+@app.route('/dashboards/<path:path>')
+def send_dashboard(path):
+    return send_from_directory('dashboards', path)
+
+
+@app.route('/layouts/<path:path>')
+def send_layout(path):
+    return send_from_directory('layouts', path)
+
+
+@app.route('/pages/<path:path>')
+def send_page(path):
+    return send_from_directory('pages', path)
+
+
+# Trasa dla plików statycznych (jeśli chcesz mieć dodatkowe ścieżki)
+@app.route('/assets/<path:path>')
+def send_asset(path):
+    return send_from_directory('assets', path)
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(debug=True)
