@@ -1,5 +1,5 @@
 import pandas as pd
-from flask import Flask, redirect, send_from_directory
+from flask import Flask, redirect, send_from_directory, render_template
 from sqlalchemy import inspect
 
 from database import engine
@@ -45,6 +45,23 @@ def send_utility(path):
 @app.route('/assets/<path:path>')
 def send_asset(path):
     return send_from_directory('assets', path)
+
+
+@app.route('/apps/ecommerce/reports/<path:path>')
+def send_report(path):
+    return send_from_directory('apps/ecommerce/reports', path)
+
+
+@app.route('/database')
+def show_database():
+    # Pobierz dane z bazy danych
+    query = "SELECT * FROM excel_data"
+    with engine.connect() as connection:
+        result = connection.execute(query)
+        data = [dict(row) for row in result]
+
+    # Renderuj stronę HTML z danymi
+    return render_template('sales.html', data=data)
 
 
 def load_excel_data():
