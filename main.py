@@ -1,8 +1,7 @@
 import pandas as pd
-from flask import Flask, redirect, send_from_directory, request, jsonify
-from sqlalchemy.orm import Session
+from flask import Flask, redirect, send_from_directory
 
-from database import engine, ExampleTable
+from database import engine
 
 app = Flask(__name__, static_url_path='/assets', static_folder='assets')
 
@@ -47,37 +46,25 @@ def send_asset(path):
     return send_from_directory('assets', path)
 
 
-@app.route('/upload-excel', methods=['POST'])
-def upload_excel():
-    if 'file' not in request.files:
-        return jsonify({"error": "No file part"}), 400
+def load_excel_data():
+    excel_path = 'xls/ghg2023update.xlsx'
 
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
+    # Wczytaj plik Excel z drugiego arkusza (indeks 1)
+    df = pd.read_excel(excel_path, sheet_name=1)
 
-    # Wczytaj plik Excel
-    df = pd.read_excel(file)
+    # Utworzenie dynamicznej tabeli w SQLAlchemy na podstawie kolumn z pliku Excel
+    table_name = 'excel_data'
 
-    # Filtrowanie kolumn po wczytaniu danych
-    if 'name' not in df.columns or 'value' not in df.columns:
-        return jsonify({"error": "Invalid file format"}), 400
-
-    df_filtered = df[['name', 'value']]
-
-    with Session(engine) as session:
-        for index, row in df_filtered.iterrows():
-            new_entry = ExampleTable(name=row['name'], value=row['value'])
-            session.add(new_entry)
-        session.commit()
-
-    return jsonify({"success": "Data uploaded successfully"}), 200
-
-
-@app.route('/upload')
-def upload():
-    return send_from_directory('templates', 'upload.html')
+    # Jeśli tabela nie istnieje, utwórz ją
+    if not engine.dialect.has_table(engine, table_name):
+        df.to_sql(table_name, con=engine, index=False, if_exists='replace')
+    else:
+        with engine.begin() as connection:
+            df.to_sql(table_name, con=connection, index=False, if_exists='append')
 
 
 if __name__ == '__main__':
+    # Odkomentuj poniższą linię, aby załadować dane z pliku Excel
+    # load_excel_data()
+
     app.run(debug=True)
