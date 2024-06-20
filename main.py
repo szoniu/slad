@@ -1,5 +1,6 @@
 import pandas as pd
 from flask import Flask, redirect, send_from_directory
+from sqlalchemy import inspect
 
 from database import engine
 
@@ -52,15 +53,22 @@ def load_excel_data():
     # Wczytaj plik Excel z drugiego arkusza (indeks 1)
     df = pd.read_excel(excel_path, sheet_name=1)
 
+    # Debug: Sprawdź, czy dane zostały wczytane poprawnie
+    print("DataFrame loaded from Excel:")
+    print(df.head())
+
     # Utworzenie dynamicznej tabeli w SQLAlchemy na podstawie kolumn z pliku Excel
     table_name = 'excel_data'
 
-    # Jeśli tabela nie istnieje, utwórz ją
-    if not engine.dialect.has_table(engine, table_name):
+    # Sprawdź, czy tabela istnieje
+    inspector = inspect(engine)
+    if not inspector.has_table(table_name):
         df.to_sql(table_name, con=engine, index=False, if_exists='replace')
+        print(f"Table '{table_name}' created and data inserted.")
     else:
         with engine.begin() as connection:
             df.to_sql(table_name, con=connection, index=False, if_exists='append')
+            print(f"Data appended to existing table '{table_name}'.")
 
 
 if __name__ == '__main__':
