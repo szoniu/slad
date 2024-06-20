@@ -231,7 +231,7 @@ var KTCreateAccount = function () {
 					'business_type': {
 						validators: {
 							notEmpty: {
-								message: 'Busines type is required'
+								message: 'Pole wymagane'
 							}
 						}
 					},
