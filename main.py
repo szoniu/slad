@@ -1,6 +1,6 @@
 import pandas as pd
 from flask import Flask, redirect, send_from_directory, render_template
-from sqlalchemy import inspect
+from sqlalchemy import text
 
 from database import engine
 
@@ -55,10 +55,11 @@ def send_report(path):
 @app.route('/database')
 def show_database():
     # Pobierz dane z bazy danych
-    query = "SELECT * FROM excel_data"
+    query = text("SELECT * FROM excel_data")
     with engine.connect() as connection:
         result = connection.execute(query)
-        data = [dict(row) for row in result]
+        columns = result.keys()
+        data = [dict(zip(columns, row)) for row in result.fetchall()]
 
     # Renderuj stronę HTML z danymi
     return render_template('sales.html', data=data)
@@ -77,15 +78,15 @@ def load_excel_data():
     # Utworzenie dynamicznej tabeli w SQLAlchemy na podstawie kolumn z pliku Excel
     table_name = 'excel_data'
 
-    # Sprawdź, czy tabela istnieje
-    inspector = inspect(engine)
-    if not inspector.has_table(table_name):
-        df.to_sql(table_name, con=engine, index=False, if_exists='replace')
-        print(f"Table '{table_name}' created and data inserted.")
-    else:
-        with engine.begin() as connection:
-            df.to_sql(table_name, con=connection, index=False, if_exists='append')
-            print(f"Data appended to existing table '{table_name}'.")
+    # Zastąpienie istniejącej tabeli nowymi danymi
+    df.to_sql(table_name, con=engine, index=False, if_exists='replace')
+    print(f"Table '{table_name}' created/replaced and data inserted.")
+
+    # Sprawdzenie liczby zaimportowanych wierszy
+    with engine.connect() as connection:
+        result = connection.execute(text(f"SELECT COUNT(*) FROM {table_name}"))
+        row_count = result.scalar()
+        print(f"Liczba wierszy zaimportowanych do tabeli '{table_name}': {row_count}")
 
 
 if __name__ == '__main__':
