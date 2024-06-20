@@ -66,7 +66,7 @@ def show_database():
 
 
 def load_excel_data():
-    excel_path = 'xls/ghg2023update.xlsx'
+    excel_path = 'xls/ghg2023update.en.pl.xlsx'
 
     # Wczytaj plik Excel z drugiego arkusza (indeks 1)
     df = pd.read_excel(excel_path, sheet_name=1)
