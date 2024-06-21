@@ -3,18 +3,23 @@ $(document).ready(function() {
 
     // Dodaj filtry kolumn bez ponownej inicjalizacji tabeli
     table.columns().every(function(index) {
+        // Pomiń pierwszą i ostatnią kolumnę
+        if (index === 0 || index === table.columns().indexes().length - 1) {
+            return;
+        }
+
         var column = this;
 
         // Dodaj selecty do filtrowania z użyciem Select2
         var select = $('select', column.header()).select2({
-            placeholder: "Select a value",
+            placeholder: "Wybierz...",
             allowClear: true,
             width: 'resolve',
             dropdownAutoWidth: true
         });
 
         column.data().unique().sort().each(function(d, j) {
-            select.append('<option value="' + d + '">' + d + '</option>');
+            select.append('<option value="' + d + '">' + d + '</option>')
         });
 
         select.on('change', function() {
@@ -23,7 +28,7 @@ $(document).ready(function() {
         });
 
         // Zatrzymaj propagację zdarzenia kliknięcia dla select2, aby uniknąć sortowania kolumn
-        select.on('click', function(e) {
+        select.on('mousedown', function(e) {
             e.stopPropagation();
         });
 

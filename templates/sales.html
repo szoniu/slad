@@ -1694,50 +1694,74 @@
                                     <!--begin::Table-->
 
 
-                                    <table id="kt_ecommerce_report_sales_table" class="display"  data-page-length='30'>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Scope</th>
-                <th>Level 1</th>
-                <th>Level 2</th>
-                <th>Level 3</th>
-                <th>Level 4</th>
-                <th>Column Text</th>
-                <th>UOM</th>
-                <th>GHG/Unit</th>
-                <th>GHG Conversion Factor 2023</th>
-            </tr>
-            <tr>
-                <th><select class="form-select form-select-sm form-select-solid w-150px me-5 select2"><option value=""></option></select></th>
-                <th><select class="form-select form-select-sm form-select-solid w-150px me-5 select2"><option value=""></option></select></th>
-                <th><select class="form-select form-select-sm form-select-solid w-150px me-5 select2"><option value=""></option></select></th>
-                <th><select class="form-select form-select-sm form-select-solid w-150px me-5 select2"><option value=""></option></select></th>
-                <th><select class="form-select form-select-sm form-select-solid w-150px me-5 select2"><option value=""></option></select></th>
-                <th><select class="form-select form-select-sm form-select-solid w-150px me-5 select2"><option value=""></option></select></th>
-                <th><select class="form-select form-select-sm form-select-solid w-150px me-5 select2"><option value=""></option></select></th>
-                <th><select class="form-select form-select-sm form-select-solid w-150px me-5 select2"><option value=""></option></select></th>
-                <th><select class="form-select form-select-sm form-select-solid w-150px me-5 select2"><option value=""></option></select></th>
-                <th><select class="form-select form-select-sm form-select-solid w-150px me-5 select2"><option value=""></option></select></th>
-            </tr>
-        </thead>
-        <tbody class="fw-semibold text-gray-600">
-            {% for row in data %}
-            <tr>
-                <td>{{ row['ID'] }}</td>
-                <td>{{ row['Scope'] }}</td>
-                <td>{{ row['Level 1'] }}</td>
-                <td>{{ row['Level 2'] }}</td>
-                <td>{{ row['Level 3'] }}</td>
-                <td>{{ row['Level 4'] }}</td>
-                <td>{{ row['Column Text'] }}</td>
-                <td>{{ row['UOM'] }}</td>
-                <td>{{ row['GHG/Unit'] }}</td>
-                <td>{{ row['GHG Conversion Factor 2023'] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                                    <table id="kt_ecommerce_report_sales_table" class="display" data-page-length='30'>
+                                        <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Scope</th>
+                                            <th>Level 1</th>
+                                            <th>Level 2</th>
+                                            <th>Level 3</th>
+                                            <th>Level 4</th>
+                                            <th>Column Text</th>
+                                            <th>UOM</th>
+                                            <th>GHG/Unit</th>
+                                            <th>GHG Conversion Factor 2023</th>
+                                        </tr>
+                                        <tr>
+                                            <th></th>
+                                            <th><select
+                                                    class="form-select form-select-sm form-select-solid w-150px me-5">
+                                                <option value=""></option>
+                                            </select></th>
+                                            <th><select
+                                                    class="form-select form-select-sm form-select-solid w-150px me-5">
+                                                <option value=""></option>
+                                            </select></th>
+                                            <th><select
+                                                    class="form-select form-select-sm form-select-solid w-150px me-5">
+                                                <option value=""></option>
+                                            </select></th>
+                                            <th><select
+                                                    class="form-select form-select-sm form-select-solid w-150px me-5">
+                                                <option value=""></option>
+                                            </select></th>
+                                            <th><select
+                                                    class="form-select form-select-sm form-select-solid w-150px me-5">
+                                                <option value=""></option>
+                                            </select></th>
+                                            <th><select
+                                                    class="form-select form-select-sm form-select-solid w-150px me-5">
+                                                <option value=""></option>
+                                            </select></th>
+                                            <th><select
+                                                    class="form-select form-select-sm form-select-solid w-150px me-5">
+                                                <option value=""></option>
+                                            </select></th>
+                                            <th><select
+                                                    class="form-select form-select-sm form-select-solid w-150px me-5">
+                                                <option value=""></option>
+                                            </select></th>
+                                            <th></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody class="fw-semibold text-gray-600">
+                                        {% for row in data %}
+                                        <tr>
+                                            <td>{{ row['ID'] }}</td>
+                                            <td>{{ row['Scope'] }}</td>
+                                            <td>{{ row['Level 1'] }}</td>
+                                            <td>{{ row['Level 2'] }}</td>
+                                            <td>{{ row['Level 3'] }}</td>
+                                            <td>{{ row['Level 4'] }}</td>
+                                            <td>{{ row['Column Text'] }}</td>
+                                            <td>{{ row['UOM'] }}</td>
+                                            <td>{{ row['GHG/Unit'] }}</td>
+                                            <td>{{ row['GHG Conversion Factor 2023'] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
 
 
                                     <!--end::Table-->
