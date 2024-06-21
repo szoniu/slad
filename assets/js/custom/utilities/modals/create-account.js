@@ -42,7 +42,7 @@ var KTCreateAccount = function() {
                                 text: "Przepraszamy, wygląda na to, że wykryto pewne błędy na formularzu, proszę przejrzeć wymagane pola i spróbować ponownie.",
                                 icon: "error",
                                 buttonsStyling: !1,
-                                confirmButtonText: "Ok, got it!",
+                                confirmButtonText: "Ok, rozumiem!",
                                 customClass: {
                                     confirmButton: "btn btn-light"
                                 }
@@ -231,7 +231,7 @@ var KTCreateAccount = function() {
                             text: "Przepraszamy, wygląda na to, że wykryto pewne błędy na formularzu, proszę przejrzeć wymagane pola i spróbować ponownie.",
                             icon: "error",
                             buttonsStyling: !1,
-                            confirmButtonText: "Ok, got it!",
+                            confirmButtonText: "Ok, rozumiem!",
                             customClass: {
                                 confirmButton: "btn btn-light"
                             }
