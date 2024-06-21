@@ -163,6 +163,8 @@ $(document).ready(function() {
                 }
             } else {
                 additionalOptionsDiv.addClass('d-none'); // Ukrycie sekcji z dodatkowymi opcjami
+                additionalOptions.removeAttr('required'); // Usunięcie atrybutu required
+
             }
         });
     });

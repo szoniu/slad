@@ -276,14 +276,13 @@ License: For each use you must have a valid license purchased only from above li
                                         </div>
                                         <!--end::Nav-->
                                         <!--begin::Form-->
-                                        <form class="mx-auto mw-600px w-100 pt-15 pb-10" novalidate="novalidate"
+                                        <form class="mx-auto mw-600px w-100 pt-15 pb-10"
                                               id="kt_create_account_form">
 
 
                                             <div class="container mt-5">
                                                 <!--begin::Step 1-->
                                                 <div class="current" data-kt-stepper-element="content">
-
                                                     <div class="container mt-5">
                                                         <!--begin::Wrapper-->
                                                         <div class="w-100">
@@ -295,19 +294,17 @@ License: For each use you must have a valid license purchased only from above li
                                                                 </h2>
                                                                 <!--end::Title-->
                                                                 <!--begin::Notice-->
-                                                                <div class="text-muted fw-semibold fs-6">Uzupełnij dane
-                                                                    swojej firmy. Zwróć uwagę na ich poprawność.
-
+                                                                <div class="text-muted fw-semibold fs-6">
+                                                                    Uzupełnij dane swojej firmy. Zwróć uwagę na ich
+                                                                    poprawność.
                                                                     Przygotuj faktury i inne dokumenty, zgodnie z <a
-                                                                            href="#" class="link-primary fw-bold">listą
-                                                                        kontrolną</a>.
-
+                                                                        href="#" class="link-primary fw-bold">listą
+                                                                    kontrolną</a>.
                                                                     Dane w kalkulatorze zapisujemy automatycznie. Możesz
                                                                     je
                                                                     uzupełnić w dowolnym momencie. Dbamy o
                                                                     bezpieczeństwo
                                                                     Twoich danych.
-
                                                                 </div>
                                                                 <!--end::Notice-->
                                                             </div>
@@ -318,25 +315,16 @@ License: For each use you must have a valid license purchased only from above li
                                                                 <div class="row">
                                                                     <!--begin::Col-->
                                                                     <div class="col-lg-12">
-
                                                                         <div class="fv-row mb-10">
                                                                             <!--begin::Label-->
                                                                             <label class="form-label required">Nazwa
-                                                                                firmy
-                                                                                <span class="ms-1"
-                                                                                      data-bs-toggle="tooltip"
-                                                                                      title="Podaj nazwę firmy zgodną z KRS">
-                                        <i class="ki-duotone ki-information-5 text-gray-500 fs-6">
-                                            <span class="path1"></span>
-                                            <span class="path2"></span>
-                                            <span class="path3"></span>
-                                        </i>
-                                    </span></label>
+                                                                                firmy</label>
                                                                             <!--end::Label-->
                                                                             <!--begin::Input-->
-                                                                            <input name="business_name"
+                                                                            <input name="account_name"
+
                                                                                    class="form-control form-control-lg form-control-solid"
-                                                                                   value=""/>
+                                                                                   value="" required/>
                                                                             <!--end::Input-->
                                                                         </div>
 
@@ -346,19 +334,18 @@ License: For each use you must have a valid license purchased only from above li
                                                                                 firmy</label>
                                                                             <!--end::Label-->
                                                                             <!--begin::Input-->
-                                                                            <input name="nip_regon"
+                                                                            <input name="nip_regon" id="nip_regon"
                                                                                    class="form-control form-control-lg form-control-solid"
-                                                                                   value=""/>
+                                                                                   value="" required/>
                                                                             <!--end::Input-->
                                                                         </div>
 
                                                                         <div class="fv-row mb-10">
                                                                             <!--begin::Label-->
                                                                             <label class="form-label required">Branża
-                                                                                <span
-                                                                                        class="ms-1"
-                                                                                        data-bs-toggle="tooltip"
-                                                                                        title="Wskaż główną działalność firmy. Twój wybór będzie miał wpływ na wynik końcowy kalkulacji. Podział na branże jest spójny ze wskaźnikami emisji, które są stosowane do obliczania śladu węglowego firm w danym sektorze">
+                                                                                <span class="ms-1"
+                                                                                      data-bs-toggle="tooltip"
+                                                                                      title="Wskaż główną działalność firmy. Twój wybór będzie miał wpływ na wynik końcowy kalkulacji. Podział na branże jest spójny ze wskaźnikami emisji, które są stosowane do obliczania śladu węglowego firm w danym sektorze">
                                         <i class="ki-duotone ki-information-5 text-gray-500 fs-6">
                                             <span class="path1"></span>
                                             <span class="path2"></span>
@@ -367,19 +354,18 @@ License: For each use you must have a valid license purchased only from above li
                                     </span></label>
                                                                             <!--end::Label-->
                                                                             <!--begin::Input-->
-<!--                                                                            <label for="business_type">Wybierz rodzaj-->
-<!--                                                                                działalności</label>-->
+                                                                            <label for="business_type">Wybierz rodzaj
+                                                                                działalności</label>
                                                                             <select name="business_type"
                                                                                     id="business_type"
                                                                                     class="form-select form-select-lg form-select-solid"
                                                                                     data-control="select2"
                                                                                     data-placeholder="Wybierz..."
                                                                                     data-allow-clear="true"
-                                                                                    data-hide-search="true">
+                                                                                    data-hide-search="true" required>
                                                                                 <option value=""></option>
                                                                                 <option value="1">A. Rolnictwo,
-                                                                                    leśnictwo,
-                                                                                    łowiectwo i rybactwo
+                                                                                    leśnictwo, łowiectwo i rybactwo
                                                                                 </option>
                                                                                 <option value="2">B. Górnictwo i
                                                                                     wydobywanie
@@ -390,13 +376,13 @@ License: For each use you must have a valid license purchased only from above li
                                                                                 <option value="4">D. Wytwarzanie i
                                                                                     zaopatrywanie w energię elektryczną,
                                                                                     gaz, parę wodną, gorącą wodę i
-                                                                                    powietrze
-                                                                                    do układów klimatyzacyjnych
+                                                                                    powietrze do układów
+                                                                                    klimatyzacyjnych
                                                                                 </option>
                                                                                 <option value="5">E. Dostawa wody;
                                                                                     gospodarowanie ściekami i odpadami
-                                                                                    oraz
-                                                                                    działalność związana z rekultywacją
+                                                                                    oraz działalność związana z
+                                                                                    rekultywacją
                                                                                 </option>
                                                                                 <option value="6">F. Budownictwo
                                                                                 </option>
@@ -405,61 +391,52 @@ License: For each use you must have a valid license purchased only from above li
                                                                                     samochodowych, włączając motocykle
                                                                                 </option>
                                                                                 <option value="8">H. Transport i
-                                                                                    gospodarka
-                                                                                    magazynowa
+                                                                                    gospodarka magazynowa
                                                                                 </option>
                                                                                 <option value="9">I. Działalność
-                                                                                    związana z
-                                                                                    zakwaterowaniem i usługami
-                                                                                    gastronomicznymi
+                                                                                    związana z zakwaterowaniem i
+                                                                                    usługami gastronomicznymi
                                                                                 </option>
                                                                                 <option value="10">J. Informacja i
                                                                                     komunikacja
                                                                                 </option>
                                                                                 <option value="11">K. Działalność
-                                                                                    finansowa
-                                                                                    i ubezpieczeniowa
+                                                                                    finansowa i ubezpieczeniowa
                                                                                 </option>
                                                                                 <option value="12">L. Działalność
-                                                                                    związana z
-                                                                                    obsługą rynku nieruchomości
+                                                                                    związana z obsługą rynku
+                                                                                    nieruchomości
                                                                                 </option>
                                                                                 <option value="13">M. Działalność
                                                                                     profesjonalna, naukowa i techniczna
                                                                                 </option>
                                                                                 <option value="14">N. Działalność w
-                                                                                    zakresie
-                                                                                    usług administrowania i działalność
-                                                                                    wspierająca
+                                                                                    zakresie usług administrowania i
+                                                                                    działalność wspierająca
                                                                                 </option>
                                                                                 <option value="15">O. Administracja
                                                                                     publiczna i obrona narodowa;
-                                                                                    obowiązkowe
-                                                                                    zabezpieczenia społeczne
+                                                                                    obowiązkowe zabezpieczenia społeczne
                                                                                 </option>
                                                                                 <option value="16">P. Edukacja</option>
                                                                                 <option value="17">Q. Opieka zdrowotna i
                                                                                     pomoc społeczna
                                                                                 </option>
                                                                                 <option value="18">R. Działalność
-                                                                                    związana z
-                                                                                    kulturą, rozrywką i rekreacją
+                                                                                    związana z kulturą, rozrywką i
+                                                                                    rekreacją
                                                                                 </option>
                                                                                 <option value="19">S. Pozostała
-                                                                                    działalność
-                                                                                    usługowa
+                                                                                    działalność usługowa
                                                                                 </option>
                                                                                 <option value="20">T. Gospodarstwa
-                                                                                    domowe
-                                                                                    zatrudniające pracowników;
-                                                                                    gospodarstwa
-                                                                                    domowe produkujące wyroby i
-                                                                                    świadczące
-                                                                                    usługi na własne potrzeby
+                                                                                    domowe zatrudniające pracowników;
+                                                                                    gospodarstwa domowe produkujące
+                                                                                    wyroby i świadczące usługi na własne
+                                                                                    potrzeby
                                                                                 </option>
                                                                                 <option value="21">U. Organizacje i
-                                                                                    zespoły
-                                                                                    eksterytorialne
+                                                                                    zespoły eksterytorialne
                                                                                 </option>
                                                                             </select>
                                                                             <!--end::Input-->
@@ -467,8 +444,8 @@ License: For each use you must have a valid license purchased only from above li
 
                                                                         <div id="additional_options"
                                                                              class="fv-row mb-10 d-none">
-<!--                                                                            <label for="additional_select">Dodatkowe-->
-<!--                                                                                opcje</label>-->
+                                                                            <label for="additional_select">Dodatkowe
+                                                                                opcje</label>
                                                                             <select name="additional_select"
                                                                                     id="additional_select"
                                                                                     class="form-select form-select-lg form-select-solid"
@@ -499,7 +476,7 @@ License: For each use you must have a valid license purchased only from above li
                                                                                     data-control="select2"
                                                                                     data-placeholder="Wybierz..."
                                                                                     data-allow-clear="true"
-                                                                                    data-hide-search="true">
+                                                                                    data-hide-search="true" required>
                                                                                 <option value=""></option>
                                                                                 <option value="2021">2021</option>
                                                                                 <option value="2022">2022</option>
@@ -525,17 +502,16 @@ License: For each use you must have a valid license purchased only from above li
                                                                             <!--begin::Input-->
                                                                             <input name="employee_count"
                                                                                    class="form-control form-control-lg form-control-solid"
-                                                                                   value=""/>
+                                                                                   value="" required/>
                                                                             <!--end::Input-->
                                                                         </div>
 
                                                                         <div class="fv-row mb-10">
                                                                             <!--begin::Label-->
                                                                             <label class="form-label required">Roczny
-                                                                                obrót
-                                                                                (PLN) <span class="ms-1"
-                                                                                            data-bs-toggle="tooltip"
-                                                                                            title="Wpisz sumę wszystkich wpływów ze sprzedaży produktów oraz usług w danym roku, pomniejszoną o kwotę podatku VAT">
+                                                                                obrót (PLN) <span class="ms-1"
+                                                                                                  data-bs-toggle="tooltip"
+                                                                                                  title="Wpisz sumę wszystkich wpływów ze sprzedaży produktów oraz usług w danym roku, pomniejszoną o kwotę podatku VAT">
                                         <i class="ki-duotone ki-information-5 text-gray-500 fs-6">
                                             <span class="path1"></span>
                                             <span class="path2"></span>
@@ -546,7 +522,7 @@ License: For each use you must have a valid license purchased only from above li
                                                                             <!--begin::Input-->
                                                                             <input name="annual_revenue"
                                                                                    class="form-control form-control-lg form-control-solid"
-                                                                                   value=""/>
+                                                                                   value="" required/>
                                                                             <!--end::Input-->
                                                                         </div>
 
@@ -567,7 +543,7 @@ License: For each use you must have a valid license purchased only from above li
                                                                             <!--begin::Input-->
                                                                             <input name="usable_area"
                                                                                    class="form-control form-control-lg form-control-solid"
-                                                                                   value=""/>
+                                                                                   value="" required/>
                                                                             <!--end::Input-->
                                                                         </div>
                                                                     </div>
@@ -678,7 +654,7 @@ License: For each use you must have a valid license purchased only from above li
                                                         <!--begin::Input-->
                                                         <input type="text"
                                                                class="form-control form-control-lg form-control-solid"
-                                                               name="account_name" placeholder="" value=""/>
+                                                               name="account_name1" placeholder="" value=""/>
                                                         <!--end::Input-->
                                                     </div>
                                                     <!--end::Input group-->
@@ -821,7 +797,7 @@ License: For each use you must have a valid license purchased only from above li
                                                         <label class="form-label required">Business Name</label>
                                                         <!--end::Label-->
                                                         <!--begin::Input-->
-                                                        <input name="business_name"
+                                                        <input name="business_name2"
                                                                class="form-control form-control-lg form-control-solid"
                                                                value="Keenthemes Inc."/>
                                                         <!--end::Input-->
