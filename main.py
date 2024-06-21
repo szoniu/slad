@@ -1,55 +1,15 @@
 import pandas as pd
-from flask import Flask, redirect, send_from_directory, render_template
+from flask import Flask, render_template
 from sqlalchemy import text
 
-from database import engine
+from database import engine  # Import engine z pliku database.py
 
 app = Flask(__name__, static_url_path='/assets', static_folder='assets')
 
 
 @app.route('/')
 def index():
-    return redirect('/utilities/wizards/horizontal.html')
-
-
-@app.route('/index.html')
-def index_html():
-    return redirect('/utilities/wizards/horizontal.html')
-
-
-@app.route('/landing.html')
-def landing():
-    return send_from_directory('templates', 'landing.html')
-
-
-@app.route('/dashboards/<path:path>')
-def send_dashboard(path):
-    return send_from_directory('dashboards', path)
-
-
-@app.route('/layouts/<path:path>')
-def send_layout(path):
-    return send_from_directory('layouts', path)
-
-
-@app.route('/pages/<path:path>')
-def send_page(path):
-    return send_from_directory('pages', path)
-
-
-@app.route('/utilities/<path:path>')
-def send_utility(path):
-    return send_from_directory('utilities', path)
-
-
-@app.route('/assets/<path:path>')
-def send_asset(path):
-    return send_from_directory('assets', path)
-
-
-@app.route('/apps/ecommerce/reports/<path:path>')
-def send_report(path):
-    return send_from_directory('apps/ecommerce/reports', path)
+    return render_template('index.html')
 
 
 @app.route('/database')
@@ -90,7 +50,5 @@ def load_excel_data():
 
 
 if __name__ == '__main__':
-    # Odkomentuj poniższą linię, aby załadować dane z pliku Excel
-    # load_excel_data()
-
+    load_excel_data()  # Odkomentowana linia do załadowania danych z pliku Excel
     app.run(debug=True)

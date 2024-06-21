@@ -1,24 +1,12 @@
 import os
 
-from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
 
-# Ensure the 'data' directory exists
-os.makedirs('data', exist_ok=True)
+# Pobierz wartość zmiennej środowiskowej
+DATABASE_URI = os.getenv('DATABASE_URI')
 
-DATABASE_URL = "sqlite:///data/data.db"
+if not DATABASE_URI:
+    raise ValueError("No DATABASE_URI set for Flask application. Did you forget to set the environment variable?")
 
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-
-
-class ExampleTable(Base):
-    __tablename__ = 'ghg2023update'
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    value = Column(String, index=True)
-
-
-Base.metadata.create_all(bind=engine)
+# Utwórz silnik bazy danych
+engine = create_engine(DATABASE_URI)
