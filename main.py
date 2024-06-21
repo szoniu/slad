@@ -50,5 +50,5 @@ def load_excel_data():
 
 
 if __name__ == '__main__':
-    load_excel_data()  # Odkomentowana linia do załadowania danych z pliku Excel
+    # load_excel_data()
     app.run(debug=True)
