@@ -8,5 +8,8 @@ DATABASE_URI = os.getenv('DATABASE_URI')
 if not DATABASE_URI:
     raise ValueError("No DATABASE_URI set for Flask application. Did you forget to set the environment variable?")
 
+# Debugowanie: Wyświetlenie wartości zmiennej DATABASE_URI
+# print(f"DATABASE_URI: {DATABASE_URI}")
+
 # Utwórz silnik bazy danych
 engine = create_engine(DATABASE_URI)
