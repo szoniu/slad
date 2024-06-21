@@ -3,27 +3,64 @@ var KTCreateAccount = function() {
     var e, t, i, o, a, r, s = [];
     return {
         init: function() {
-            (e = document.querySelector("#kt_modal_create_account")) && new bootstrap.Modal(e), (t = document.querySelector("#kt_create_account_stepper")) && (i = t.querySelector("#kt_create_account_form"), o = t.querySelector('[data-kt-stepper-action="submit"]'), a = t.querySelector('[data-kt-stepper-action="next"]'), (r = new KTStepper(t)).on("kt.stepper.changed", (function(e) {
-                4 === r.getCurrentStepIndex() ? (o.classList.remove("d-none"), o.classList.add("d-inline-block"), a.classList.add("d-none")) : 5 === r.getCurrentStepIndex() ? (o.classList.add("d-none"), a.classList.add("d-none")) : (o.classList.remove("d-inline-block"), o.classList.remove("d-none"), a.classList.remove("d-none"))
-            })), r.on("kt.stepper.next", (function(e) {
-                console.log("stepper.next");
-                var t = s[e.getCurrentStepIndex() - 1];
-                t ? t.validate().then((function(t) {
-                    console.log("validated!"), "Valid" == t ? (e.goNext(), KTUtil.scrollTop()) : Swal.fire({
-                        text: "Sorry, looks like there are some errors detected, please try again.",
-                        icon: "error",
-                        buttonsStyling: !1,
-                        confirmButtonText: "Ok, got it!",
-                        customClass: {
-                            confirmButton: "btn btn-light"
+            console.log("Initializing KTCreateAccount...");
+            (e = document.querySelector("#kt_modal_create_account")) && new bootstrap.Modal(e),
+            (t = document.querySelector("#kt_create_account_stepper")) &&
+            (i = t.querySelector("#kt_create_account_form"),
+            o = t.querySelector('[data-kt-stepper-action="submit"]'),
+            a = t.querySelector('[data-kt-stepper-action="next"]'),
+            (r = new KTStepper(t)).on("kt.stepper.changed", function(e) {
+                console.log("Step changed to: " + r.getCurrentStepIndex());
+                if (r.getCurrentStepIndex() === 4) {
+                    o.classList.remove("d-none");
+                    o.classList.add("d-inline-block");
+                    a.classList.add("d-none");
+                } else if (r.getCurrentStepIndex() === 5) {
+                    o.classList.add("d-none");
+                    a.classList.add("d-none");
+                } else {
+                    o.classList.remove("d-inline-block");
+                    o.classList.remove("d-none");
+                    a.classList.remove("d-none");
+                }
+            }),
+            r.on("kt.stepper.next", function(e) {
+                console.log("Going to the next step...");
+                var currentStepIndex = e.getCurrentStepIndex();
+                console.log("Current step index: " + currentStepIndex);
+                var t = s[currentStepIndex - 1];
+                console.log("Validation object for current step: ", t);
+                if (t) {
+                    t.validate().then(function(t) {
+                        console.log("Validation result: " + t);
+                        if ("Valid" == t) {
+                            e.goNext();
+                            KTUtil.scrollTop();
+                        } else {
+                            Swal.fire({
+                                text: "Sorry, looks like there are some errors detected, please try again.",
+                                icon: "error",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-light"
+                                }
+                            }).then(function() {
+                                KTUtil.scrollTop();
+                            });
                         }
-                    }).then((function() {
-                        KTUtil.scrollTop()
-                    }))
-                })) : (e.goNext(), KTUtil.scrollTop())
-            })), r.on("kt.stepper.previous", (function(e) {
-                console.log("stepper.previous"), e.goPrevious(), KTUtil.scrollTop()
-            })), s.push(FormValidation.formValidation(i, {
+                    });
+                } else {
+                    e.goNext();
+                    KTUtil.scrollTop();
+                }
+            }),
+            r.on("kt.stepper.previous", function(e) {
+                console.log("Going to the previous step...");
+                e.goPrevious();
+                KTUtil.scrollTop();
+            }),
+            s.push(FormValidation.formValidation(i, {
                 fields: {
                     account_type: {
                         validators: {
@@ -41,7 +78,8 @@ var KTCreateAccount = function() {
                         eleValidClass: ""
                     })
                 }
-            })), s.push(FormValidation.formValidation(i, {
+            })),
+            s.push(FormValidation.formValidation(i, {
                 fields: {
                     account_team_size: {
                         validators: {
@@ -73,7 +111,8 @@ var KTCreateAccount = function() {
                         eleValidClass: ""
                     })
                 }
-            })), s.push(FormValidation.formValidation(i, {
+            })),
+            s.push(FormValidation.formValidation(i, {
                 fields: {
                     business_name: {
                         validators: {
@@ -115,7 +154,8 @@ var KTCreateAccount = function() {
                         eleValidClass: ""
                     })
                 }
-            })), s.push(FormValidation.formValidation(i, {
+            })),
+            s.push(FormValidation.formValidation(i, {
                 fields: {
                     card_name: {
                         validators: {
@@ -127,7 +167,7 @@ var KTCreateAccount = function() {
                     card_number: {
                         validators: {
                             notEmpty: {
-                                message: "Card member is required"
+                                message: "Card number is required"
                             },
                             creditCard: {
                                 message: "Card number is not valid"
@@ -172,32 +212,52 @@ var KTCreateAccount = function() {
                         eleValidClass: ""
                     })
                 }
-            })), o.addEventListener("click", (function(e) {
-                s[3].validate().then((function(t) {
-                    console.log("validated!"), "Valid" == t ? (e.preventDefault(), o.disabled = !0, o.setAttribute("data-kt-indicator", "on"), setTimeout((function() {
-                        o.removeAttribute("data-kt-indicator"), o.disabled = !1, r.goNext()
-                    }), 2e3)) : Swal.fire({
-                        text: "Sorry, looks like there are some errors detected, please try again.",
-                        icon: "error",
-                        buttonsStyling: !1,
-                        confirmButtonText: "Ok, got it!",
-                        customClass: {
-                            confirmButton: "btn btn-light"
-                        }
-                    }).then((function() {
-                        KTUtil.scrollTop()
-                    }))
-                }))
-            })), $(i.querySelector('[name="card_expiry_month"]')).on("change", (function() {
-                s[3].revalidateField("card_expiry_month")
-            })), $(i.querySelector('[name="card_expiry_year"]')).on("change", (function() {
-                s[3].revalidateField("card_expiry_year")
-            })), $(i.querySelector('[name="business_type"]')).on("change", (function() {
-                s[2].revalidateField("business_type")
-            })))
+            })),
+            o.addEventListener("click", function(e) {
+                console.log("Submit button clicked...");
+                s[3].validate().then(function(t) {
+                    console.log("Submit validation result: " + t);
+                    if ("Valid" == t) {
+                        e.preventDefault();
+                        o.disabled = !0;
+                        o.setAttribute("data-kt-indicator", "on");
+                        setTimeout(function() {
+                            o.removeAttribute("data-kt-indicator");
+                            o.disabled = !1;
+                            r.goNext();
+                        }, 2000);
+                    } else {
+                        Swal.fire({
+                            text: "Sorry, looks like there are some errors detected, please try again.",
+                            icon: "error",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-light"
+                            }
+                        }).then(function() {
+                            KTUtil.scrollTop();
+                        });
+                    }
+                });
+            }),
+            $(i.querySelector('[name="card_expiry_month"]')).on("change", function() {
+                console.log("card_expiry_month changed");
+                s[3].revalidateField("card_expiry_month");
+            }),
+            $(i.querySelector('[name="card_expiry_year"]')).on("change", function() {
+                console.log("card_expiry_year changed");
+                s[3].revalidateField("card_expiry_year");
+            }),
+            $(i.querySelector('[name="business_type"]')).on("change", function() {
+                console.log("business_type changed");
+                s[2].revalidateField("business_type");
+            }));
+            console.log("Initialization complete");
         }
     }
 }();
-KTUtil.onDOMContentLoaded((function() {
-    KTCreateAccount.init()
-}));
+KTUtil.onDOMContentLoaded(function() {
+    console.log("DOMContentLoaded...");
+    KTCreateAccount.init();
+});
