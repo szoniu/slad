@@ -2,7 +2,7 @@ $(document).ready(function() {
     var table = $('#kt_ecommerce_report_sales_table').DataTable();
 
     // Dodaj filtry kolumn bez ponownej inicjalizacji tabeli
-    table.columns().every(function() {
+    table.columns().every(function(index) {
         var column = this;
 
         // Dodaj selecty do filtrowania z użyciem Select2
@@ -14,7 +14,7 @@ $(document).ready(function() {
         });
 
         column.data().unique().sort().each(function(d, j) {
-            select.append('<option value="' + d + '">' + d + '</option>')
+            select.append('<option value="' + d + '">' + d + '</option>');
         });
 
         select.on('change', function() {
@@ -23,23 +23,15 @@ $(document).ready(function() {
         });
 
         // Zatrzymaj propagację zdarzenia kliknięcia dla select2, aby uniknąć sortowania kolumn
-        select.on('mousedown', function(e) {
+        select.on('click', function(e) {
             e.stopPropagation();
         });
 
-        // Umożliw kliknięcie w kolumnę, aby posortować dane
-        $(column.header()).on('click', function(e) {
-            if (!$(e.target).is('select, .select2-selection, .select2-selection__rendered')) {
-                column.order('asc').draw();
+        // Umożliw kliknięcie w kolumnę, aby posortować dane, z wyjątkiem elementu Select2
+        $(column.header()).off('click').on('click', function(e) {
+            if (!$(e.target).closest('.select2').length) {
+                column.order(column.order()[0][1] === 'asc' ? 'desc' : 'asc').draw();
             }
         });
-    });
-
-    // Dodaj inputy do filtrowania tekstu (jeśli są potrzebne)
-    $('input', table.header()).on('keyup change clear', function() {
-        var column = table.column($(this).parent().index() + ':visible');
-        if (column.search() !== this.value) {
-            column.search(this.value).draw();
-        }
     });
 });
