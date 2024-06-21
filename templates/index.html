@@ -14,7 +14,7 @@ License: For each use you must have a valid license purchased only from above li
 <!--begin::Head-->
 <head>
     <base href="../../"/>
-    <title>Good – Bootstrap 5 HTML Asp.Net Core, Blazor, Django & Flask Admin Dashboard Template by KeenThemes</title>
+    <title>Kalkulator śladu węglowego</title>
     <meta charset="utf-8"/>
     <meta name="description"
           content="Good admin dashboard live demo. Check out all the features of the admin panel. A large number of settings, additional services and widgets."/>
@@ -43,6 +43,8 @@ License: For each use you must have a valid license purchased only from above li
     <script>
         // Frame-busting to prevent site from being loaded within a frame without permission (click-jacking) if (window.top != window.self) { window.top.location.replace(window.self.location.href); }
     </script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.3/js/bootstrap.min.js"></script>
 </head>
 <!--end::Head-->
 <!--begin::Body-->
@@ -276,266 +278,311 @@ License: For each use you must have a valid license purchased only from above li
                                         <!--begin::Form-->
                                         <form class="mx-auto mw-600px w-100 pt-15 pb-10" novalidate="novalidate"
                                               id="kt_create_account_form">
-                                            <!--begin::Step 1-->
-                                            <div class="current" data-kt-stepper-element="content">
-                                                <!--begin::Wrapper-->
-                                                <div class="w-100">
-                                                    <!--begin::Heading-->
-                                                    <div class="pb-10 pb-lg-15">
-                                                        <!--begin::Title-->
-                                                        <h2 class="fw-bold d-flex align-items-center text-gray-900">
-                                                            Uzupełnij profil firmy
-                                                        </h2>
-                                                        <!--end::Title-->
-                                                        <!--begin::Notice-->
-                                                        <div class="text-muted fw-semibold fs-6">Uzupełnij dane swojej
-                                                            firmy. Zwróć uwagę na ich poprawność.
-
-                                                            Przygotuj faktury i inne dokumenty, zgodnie z <a href="#"
-                                                                                                             class="link-primary fw-bold">listą
-                                                                kontrolną</a>.
-
-                                                            Dane w kalkulatorze zapisujemy automatycznie. Możesz je
-                                                            uzupełnić w dowolnym momencie. Dbamy o bezpieczeństwo Twoich
-                                                            danych.
-
-                                                        </div>
-                                                        <!--end::Notice-->
-                                                    </div>
-                                                    <!--end::Heading-->
-                                                    <!--begin::Input group-->
-                                                    <div class="fv-row">
-                                                        <!--begin::Row-->
-                                                        <div class="row">
-                                                            <!--begin::Col-->
-                                                            <div class="col-lg-12">
 
 
-                                                                <div class="fv-row mb-10">
-                                                                    <!--begin::Label-->
-                                                                    <label class="form-label required">Nazwa
-                                                                        firmy <span class="ms-1"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Podaj nazwę firmy zgodną z KRS">
-																	<i class="ki-duotone ki-information-5 text-gray-500 fs-6">
-																		<span class="path1"></span>
-																		<span class="path2"></span>
-																		<span class="path3"></span>
-																	</i>
-																</span></label>
-                                                                    <!--end::Label-->
-                                                                    <!--begin::Input-->
-                                                                    <input name="business_name"
-                                                                           class="form-control form-control-lg form-control-solid"
-                                                                           value=""/>
-                                                                    <!--end::Input-->
+                                            <div class="container mt-5">
+                                                <!--begin::Step 1-->
+                                                <div class="current" data-kt-stepper-element="content">
+
+                                                    <div class="container mt-5">
+                                                        <!--begin::Wrapper-->
+                                                        <div class="w-100">
+                                                            <!--begin::Heading-->
+                                                            <div class="pb-10 pb-lg-15">
+                                                                <!--begin::Title-->
+                                                                <h2 class="fw-bold d-flex align-items-center text-gray-900">
+                                                                    Uzupełnij profil firmy
+                                                                </h2>
+                                                                <!--end::Title-->
+                                                                <!--begin::Notice-->
+                                                                <div class="text-muted fw-semibold fs-6">Uzupełnij dane
+                                                                    swojej firmy. Zwróć uwagę na ich poprawność.
+
+                                                                    Przygotuj faktury i inne dokumenty, zgodnie z <a
+                                                                            href="#" class="link-primary fw-bold">listą
+                                                                        kontrolną</a>.
+
+                                                                    Dane w kalkulatorze zapisujemy automatycznie. Możesz
+                                                                    je
+                                                                    uzupełnić w dowolnym momencie. Dbamy o
+                                                                    bezpieczeństwo
+                                                                    Twoich danych.
+
                                                                 </div>
-
-                                                                <div class="fv-row mb-10">
-                                                                    <!--begin::Label-->
-                                                                    <label class="form-label required">NIP/REGON
-                                                                        firmy</label>
-                                                                    <!--end::Label-->
-                                                                    <!--begin::Input-->
-                                                                    <input name="business_name"
-                                                                           class="form-control form-control-lg form-control-solid"
-                                                                           value=""/>
-                                                                    <!--end::Input-->
-                                                                </div>
-
-
-                                                                <div class="fv-row mb-10">
-                                                                    <!--begin::Label-->
-                                                                    <label class="form-label required">Branża <span
-                                                                            class="ms-1"
-                                                                            data-bs-toggle="tooltip"
-                                                                            title="Wskaż główną działalność firmy. Twój wybór będzie miał wpływ na wynik końcowy kalkulacji. Podział na branże jest spójny ze wskaźnikami emisji, które są stosowane do obliczania śladu węglowego firm w danym sektorze
-">
-																	<i class="ki-duotone ki-information-5 text-gray-500 fs-6">
-																		<span class="path1"></span>
-																		<span class="path2"></span>
-																		<span class="path3"></span>
-																	</i>
-																</span></label>
-                                                                    <!--end::Label-->
-                                                                    <!--begin::Input-->
-                                                                    <select name="business_type"
-                                                                            class="form-select form-select-lg form-select-solid"
-                                                                            data-control="select2"
-                                                                            data-placeholder="Wybierz..."
-                                                                            data-allow-clear="true"
-                                                                            data-hide-search="true">
-                                                                        <option></option>
-                                                                        <option value="1">A. Rolnictwo, leśnictwo,
-                                                                            łowiectwo i rybactwo
-                                                                        </option>
-                                                                        <option value="1">B. Górnictwo i wydobywanie
-                                                                        </option>
-                                                                        <option value="2">C. Przetwórstwo przemysłowe
-                                                                        </option>
-                                                                        <option value="3">D. Wytwarzanie i zaopatrywanie
-                                                                            w energię elektryczną, gaz, parę wodną,
-                                                                            gorącą wodę i powietrze do układów
-                                                                            klimatyzacyjnych
-                                                                        </option>
-                                                                        <option value="4">E. Dostawa wody;
-                                                                            gospodarowanie ściekami i odpadami oraz
-                                                                            działalność związana z rekultywacją
-                                                                        </option>
-                                                                        <option value="5">F. Budownictwo</option>
-                                                                        <option value="5">G. Handel hurtowy i
-                                                                            detaliczny; naprawa pojazdów samochodowych,
-                                                                            włączając motocykle
-                                                                        </option>
-                                                                        <option value="5">H. Transport i gospodarka
-                                                                            magazynowa
-                                                                        </option>
-                                                                        <option value="5">I. Działalność związana z
-                                                                            zakwaterowaniem i usługami gastronomicznymi
-                                                                        </option>
-                                                                        <option value="5">J. Informacja i komunikacja
-                                                                        </option>
-                                                                        <option value="5">K. Działalność finansowa i
-                                                                            ubezpieczeniowa
-                                                                        </option>
-                                                                        <option value="5">L. Działalność związana z
-                                                                            obsługą rynku nieruchomości
-                                                                        </option>
-                                                                        <option value="5">M. Działalność profesjonalna,
-                                                                            naukowa i techniczna
-                                                                        </option>
-                                                                        <option value="5">N. Działalność w zakresie
-                                                                            usług administrowania i działalność
-                                                                            wspierająca
-                                                                        </option>
-                                                                        <option value="5">O. Administracja publiczna i
-                                                                            obrona narodowa; obowiązkowe zabezpieczenia
-                                                                            społeczne
-                                                                        </option>
-                                                                        <option value="5">P. Edukacja</option>
-                                                                        <option value="5">Q. Opieka zdrowotna i pomoc
-                                                                            społeczna
-                                                                        </option>
-                                                                        <option value="5">R. Działalność związana z
-                                                                            kulturą, rozrywką i rekreacją
-                                                                        </option>
-                                                                        <option value="5">S. Pozostała działalność
-                                                                            usługowa
-                                                                        </option>
-                                                                        <option value="5">T. Gospodarstwa domowe
-                                                                            zatrudniające pracowników; gospodarstwa
-                                                                            domowe produkujące wyroby i świadczące
-                                                                            usługi na własne potrzeby
-                                                                        </option>
-                                                                        <option value="5">U. Organizacje i zespoły
-                                                                            eksterytorialne
-                                                                        </option>
-                                                                    </select>
-                                                                    <!--end::Input-->
-                                                                </div>
-
-                                                                <div class="fv-row mb-10">
-                                                                    <!--begin::Label-->
-                                                                    <label class="form-label required">Okres
-                                                                        raportowania <span class="ms-1"
-                                                                                           data-bs-toggle="tooltip"
-                                                                                           title="Wybierz przedział czasowy (rok), dla którego obliczysz ślad węglowy swojej firmy">
-																	<i class="ki-duotone ki-information-5 text-gray-500 fs-6">
-																		<span class="path1"></span>
-																		<span class="path2"></span>
-																		<span class="path3"></span>
-																	</i>
-																</span></label>
-                                                                    <!--end::Label-->
-                                                                    <!--begin::Input-->
-                                                                    <select name="business_type"
-                                                                            class="form-select form-select-lg form-select-solid"
-                                                                            data-control="select2"
-                                                                            data-placeholder="Wybierz..."
-                                                                            data-allow-clear="true"
-                                                                            data-hide-search="true">
-                                                                        <option></option>
-                                                                        <option value="1">2021
-                                                                        </option>
-                                                                        <option value="1">2022
-                                                                        </option>
-                                                                        <option value="2">2023
-                                                                        </option>
-                                                                        <option value="3">2024
-                                                                        </option>
-                                                                    </select>
-                                                                    <!--end::Input-->
-                                                                </div>
-
-                                                                <div class="fv-row mb-10">
-                                                                    <!--begin::Label-->
-                                                                    <label class="form-label required">Liczba
-                                                                        pracowników <span class="ms-1"
-                                                                                          data-bs-toggle="tooltip"
-                                                                                          title="Podaj średnią liczbę osób zatrudnionych w danym roku. Uwzględnij wszystkich pracowników – w tym etatowych, sezonowych, tymczasowych etc.">
-																	<i class="ki-duotone ki-information-5 text-gray-500 fs-6">
-																		<span class="path1"></span>
-																		<span class="path2"></span>
-																		<span class="path3"></span>
-																	</i>
-																</span></label>
-                                                                    <!--end::Label-->
-                                                                    <!--begin::Input-->
-                                                                    <input name="business_name"
-                                                                           class="form-control form-control-lg form-control-solid"
-                                                                           value=""/>
-                                                                    <!--end::Input-->
-                                                                </div>
-
-                                                                <div class="fv-row mb-10">
-                                                                    <!--begin::Label-->
-                                                                    <label class="form-label required">Roczny obrót
-                                                                        (PLN) <span class="ms-1"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    title="Wpisz sumę wszystkich wpływów ze sprzedaży produktów oraz usług w danym roku, pomniejszoną o kwotę podatku VAT">
-																	<i class="ki-duotone ki-information-5 text-gray-500 fs-6">
-																		<span class="path1"></span>
-																		<span class="path2"></span>
-																		<span class="path3"></span>
-																	</i>
-																</span></label>
-                                                                    <!--end::Label-->
-                                                                    <!--begin::Input-->
-                                                                    <input name="business_name"
-                                                                           class="form-control form-control-lg form-control-solid"
-                                                                           value=""/>
-                                                                    <!--end::Input-->
-                                                                </div>
-
-                                                                <div class="fv-row mb-10">
-                                                                    <!--begin::Label-->
-                                                                    <label class="form-label required">Powierzchnia
-                                                                        użytkowa (m<sup>2</sup>) <span class="ms-1"
-                                                                                                       data-bs-toggle="tooltip"
-                                                                                                       title="Podsumuj powierzchnię wszystkich pomieszczeń użytkowych swojej firmy w danym roku (np. biuro, halę produkcyjną). Nie uwzględniaj wind i klatek schodowych">
-																	<i class="ki-duotone ki-information-5 text-gray-500 fs-6">
-																		<span class="path1"></span>
-																		<span class="path2"></span>
-																		<span class="path3"></span>
-																	</i>
-																</span></label>
-                                                                    <!--end::Label-->
-                                                                    <!--begin::Input-->
-                                                                    <input name="business_name"
-                                                                           class="form-control form-control-lg form-control-solid"
-                                                                           value=""/>
-                                                                    <!--end::Input-->
-                                                                </div>
-
+                                                                <!--end::Notice-->
                                                             </div>
+                                                            <!--end::Heading-->
+                                                            <!--begin::Input group-->
+                                                            <div class="fv-row">
+                                                                <!--begin::Row-->
+                                                                <div class="row">
+                                                                    <!--begin::Col-->
+                                                                    <div class="col-lg-12">
+
+                                                                        <div class="fv-row mb-10">
+                                                                            <!--begin::Label-->
+                                                                            <label class="form-label required">Nazwa
+                                                                                firmy
+                                                                                <span class="ms-1"
+                                                                                      data-bs-toggle="tooltip"
+                                                                                      title="Podaj nazwę firmy zgodną z KRS">
+                                        <i class="ki-duotone ki-information-5 text-gray-500 fs-6">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                    </span></label>
+                                                                            <!--end::Label-->
+                                                                            <!--begin::Input-->
+                                                                            <input name="business_name"
+                                                                                   class="form-control form-control-lg form-control-solid"
+                                                                                   value=""/>
+                                                                            <!--end::Input-->
+                                                                        </div>
+
+                                                                        <div class="fv-row mb-10">
+                                                                            <!--begin::Label-->
+                                                                            <label class="form-label required">NIP/REGON
+                                                                                firmy</label>
+                                                                            <!--end::Label-->
+                                                                            <!--begin::Input-->
+                                                                            <input name="nip_regon"
+                                                                                   class="form-control form-control-lg form-control-solid"
+                                                                                   value=""/>
+                                                                            <!--end::Input-->
+                                                                        </div>
+
+                                                                        <div class="fv-row mb-10">
+                                                                            <!--begin::Label-->
+                                                                            <label class="form-label required">Branża
+                                                                                <span
+                                                                                        class="ms-1"
+                                                                                        data-bs-toggle="tooltip"
+                                                                                        title="Wskaż główną działalność firmy. Twój wybór będzie miał wpływ na wynik końcowy kalkulacji. Podział na branże jest spójny ze wskaźnikami emisji, które są stosowane do obliczania śladu węglowego firm w danym sektorze">
+                                        <i class="ki-duotone ki-information-5 text-gray-500 fs-6">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                    </span></label>
+                                                                            <!--end::Label-->
+                                                                            <!--begin::Input-->
+<!--                                                                            <label for="business_type">Wybierz rodzaj-->
+<!--                                                                                działalności</label>-->
+                                                                            <select name="business_type"
+                                                                                    id="business_type"
+                                                                                    class="form-select form-select-lg form-select-solid"
+                                                                                    data-control="select2"
+                                                                                    data-placeholder="Wybierz..."
+                                                                                    data-allow-clear="true"
+                                                                                    data-hide-search="true">
+                                                                                <option value=""></option>
+                                                                                <option value="1">A. Rolnictwo,
+                                                                                    leśnictwo,
+                                                                                    łowiectwo i rybactwo
+                                                                                </option>
+                                                                                <option value="2">B. Górnictwo i
+                                                                                    wydobywanie
+                                                                                </option>
+                                                                                <option value="3">C. Przetwórstwo
+                                                                                    przemysłowe
+                                                                                </option>
+                                                                                <option value="4">D. Wytwarzanie i
+                                                                                    zaopatrywanie w energię elektryczną,
+                                                                                    gaz, parę wodną, gorącą wodę i
+                                                                                    powietrze
+                                                                                    do układów klimatyzacyjnych
+                                                                                </option>
+                                                                                <option value="5">E. Dostawa wody;
+                                                                                    gospodarowanie ściekami i odpadami
+                                                                                    oraz
+                                                                                    działalność związana z rekultywacją
+                                                                                </option>
+                                                                                <option value="6">F. Budownictwo
+                                                                                </option>
+                                                                                <option value="7">G. Handel hurtowy i
+                                                                                    detaliczny; naprawa pojazdów
+                                                                                    samochodowych, włączając motocykle
+                                                                                </option>
+                                                                                <option value="8">H. Transport i
+                                                                                    gospodarka
+                                                                                    magazynowa
+                                                                                </option>
+                                                                                <option value="9">I. Działalność
+                                                                                    związana z
+                                                                                    zakwaterowaniem i usługami
+                                                                                    gastronomicznymi
+                                                                                </option>
+                                                                                <option value="10">J. Informacja i
+                                                                                    komunikacja
+                                                                                </option>
+                                                                                <option value="11">K. Działalność
+                                                                                    finansowa
+                                                                                    i ubezpieczeniowa
+                                                                                </option>
+                                                                                <option value="12">L. Działalność
+                                                                                    związana z
+                                                                                    obsługą rynku nieruchomości
+                                                                                </option>
+                                                                                <option value="13">M. Działalność
+                                                                                    profesjonalna, naukowa i techniczna
+                                                                                </option>
+                                                                                <option value="14">N. Działalność w
+                                                                                    zakresie
+                                                                                    usług administrowania i działalność
+                                                                                    wspierająca
+                                                                                </option>
+                                                                                <option value="15">O. Administracja
+                                                                                    publiczna i obrona narodowa;
+                                                                                    obowiązkowe
+                                                                                    zabezpieczenia społeczne
+                                                                                </option>
+                                                                                <option value="16">P. Edukacja</option>
+                                                                                <option value="17">Q. Opieka zdrowotna i
+                                                                                    pomoc społeczna
+                                                                                </option>
+                                                                                <option value="18">R. Działalność
+                                                                                    związana z
+                                                                                    kulturą, rozrywką i rekreacją
+                                                                                </option>
+                                                                                <option value="19">S. Pozostała
+                                                                                    działalność
+                                                                                    usługowa
+                                                                                </option>
+                                                                                <option value="20">T. Gospodarstwa
+                                                                                    domowe
+                                                                                    zatrudniające pracowników;
+                                                                                    gospodarstwa
+                                                                                    domowe produkujące wyroby i
+                                                                                    świadczące
+                                                                                    usługi na własne potrzeby
+                                                                                </option>
+                                                                                <option value="21">U. Organizacje i
+                                                                                    zespoły
+                                                                                    eksterytorialne
+                                                                                </option>
+                                                                            </select>
+                                                                            <!--end::Input-->
+                                                                        </div>
+
+                                                                        <div id="additional_options"
+                                                                             class="fv-row mb-10 d-none">
+<!--                                                                            <label for="additional_select">Dodatkowe-->
+<!--                                                                                opcje</label>-->
+                                                                            <select name="additional_select"
+                                                                                    id="additional_select"
+                                                                                    class="form-select form-select-lg form-select-solid"
+                                                                                    data-control="select2"
+                                                                                    data-placeholder="Wybierz..."
+                                                                                    data-allow-clear="true"
+                                                                                    data-hide-search="true">
+                                                                                <!-- Dynamiczne opcje będą tutaj wstawiane -->
+                                                                            </select>
+                                                                        </div>
+
+                                                                        <div class="fv-row mb-10">
+                                                                            <!--begin::Label-->
+                                                                            <label class="form-label required">Okres
+                                                                                raportowania <span class="ms-1"
+                                                                                                   data-bs-toggle="tooltip"
+                                                                                                   title="Wybierz przedział czasowy (rok), dla którego obliczysz ślad węglowy swojej firmy">
+                                        <i class="ki-duotone ki-information-5 text-gray-500 fs-6">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                    </span></label>
+                                                                            <!--end::Label-->
+                                                                            <!--begin::Input-->
+                                                                            <select name="reporting_period"
+                                                                                    class="form-select form-select-lg form-select-solid"
+                                                                                    data-control="select2"
+                                                                                    data-placeholder="Wybierz..."
+                                                                                    data-allow-clear="true"
+                                                                                    data-hide-search="true">
+                                                                                <option value=""></option>
+                                                                                <option value="2021">2021</option>
+                                                                                <option value="2022">2022</option>
+                                                                                <option value="2023">2023</option>
+                                                                                <option value="2024">2024</option>
+                                                                            </select>
+                                                                            <!--end::Input-->
+                                                                        </div>
+
+                                                                        <div class="fv-row mb-10">
+                                                                            <!--begin::Label-->
+                                                                            <label class="form-label required">Liczba
+                                                                                pracowników <span class="ms-1"
+                                                                                                  data-bs-toggle="tooltip"
+                                                                                                  title="Podaj średnią liczbę osób zatrudnionych w danym roku. Uwzględnij wszystkich pracowników – w tym etatowych, sezonowych, tymczasowych etc.">
+                                        <i class="ki-duotone ki-information-5 text-gray-500 fs-6">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                    </span></label>
+                                                                            <!--end::Label-->
+                                                                            <!--begin::Input-->
+                                                                            <input name="employee_count"
+                                                                                   class="form-control form-control-lg form-control-solid"
+                                                                                   value=""/>
+                                                                            <!--end::Input-->
+                                                                        </div>
+
+                                                                        <div class="fv-row mb-10">
+                                                                            <!--begin::Label-->
+                                                                            <label class="form-label required">Roczny
+                                                                                obrót
+                                                                                (PLN) <span class="ms-1"
+                                                                                            data-bs-toggle="tooltip"
+                                                                                            title="Wpisz sumę wszystkich wpływów ze sprzedaży produktów oraz usług w danym roku, pomniejszoną o kwotę podatku VAT">
+                                        <i class="ki-duotone ki-information-5 text-gray-500 fs-6">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                    </span></label>
+                                                                            <!--end::Label-->
+                                                                            <!--begin::Input-->
+                                                                            <input name="annual_revenue"
+                                                                                   class="form-control form-control-lg form-control-solid"
+                                                                                   value=""/>
+                                                                            <!--end::Input-->
+                                                                        </div>
+
+                                                                        <div class="fv-row mb-10">
+                                                                            <!--begin::Label-->
+                                                                            <label class="form-label required">Powierzchnia
+                                                                                użytkowa (m<sup>2</sup>) <span
+                                                                                        class="ms-1"
+                                                                                        data-bs-toggle="tooltip"
+                                                                                        title="Podsumuj powierzchnię wszystkich pomieszczeń użytkowych swojej firmy w danym roku (np. biuro, halę produkcyjną). Nie uwzględniaj wind i klatek schodowych">
+                                        <i class="ki-duotone ki-information-5 text-gray-500 fs-6">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                    </span></label>
+                                                                            <!--end::Label-->
+                                                                            <!--begin::Input-->
+                                                                            <input name="usable_area"
+                                                                                   class="form-control form-control-lg form-control-solid"
+                                                                                   value=""/>
+                                                                            <!--end::Input-->
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <!--end::Row-->
+                                                            </div>
+                                                            <!--end::Input group-->
                                                         </div>
-                                                        <!--end::Row-->
+                                                        <!--end::Wrapper-->
                                                     </div>
-                                                    <!--end::Input group-->
                                                 </div>
-                                                <!--end::Wrapper-->
+                                                <!--end::Step 1-->
                                             </div>
-                                            <!--end::Step 1-->
+
+
                                             <!--begin::Step 2-->
                                             <div data-kt-stepper-element="content">
                                                 <!--begin::Wrapper-->
@@ -1166,13 +1213,7 @@ License: For each use you must have a valid license purchased only from above li
                             <li class="menu-item">
                                 <a href="/database" class="menu-link px-2">Baza danych</a>
                             </li>
-                            <!--                            <li class="menu-item">-->
-                            <!--                                <a href="https://devs.keenthemes.com" target="_blank" class="menu-link px-2">Support</a>-->
-                            <!--                            </li>-->
-                            <!--                            <li class="menu-item">-->
-                            <!--                                <a href="https://themes.getbootstrap.com/product/good-bootstrap-5-admin-dashboard-template"-->
-                            <!--                                   target="_blank" class="menu-link px-2">Purchase</a>-->
-                            <!--                            </li>-->
+
                         </ul>
                         <!--end::Menu-->
                     </div>
@@ -6058,7 +6099,10 @@ License: For each use you must have a valid license purchased only from above li
 <script src="assets/js/custom/utilities/modals/create-project/complete.js"></script>
 <script src="assets/js/custom/utilities/modals/create-project/main.js"></script>
 <script src="assets/js/custom/utilities/modals/users-search.js"></script>
+
+
 <!--end::Custom Javascript-->
+<script src="assets/js/custom/custom.js"></script>
 <!--end::Javascript-->
 </body>
 <!--end::Body-->
