@@ -62,10 +62,52 @@ var KTCreateAccount = function() {
             }),
             s.push(FormValidation.formValidation(i, {
                 fields: {
-                    account_type: {
+                    business_name: {
                         validators: {
                             notEmpty: {
-                                message: "Account type is required"
+                                message: "Nazwa firmy jest wymagana"
+                            }
+                        }
+                    },
+                    nip_regon: {
+                        validators: {
+                            notEmpty: {
+                                message: "NIP/REGON firmy jest wymagany"
+                            }
+                        }
+                    },
+                    business_type: {
+                        validators: {
+                            notEmpty: {
+                                message: "Branża jest wymagana"
+                            }
+                        }
+                    },
+                    reporting_period: {
+                        validators: {
+                            notEmpty: {
+                                message: "Okres raportowania jest wymagany"
+                            }
+                        }
+                    },
+                    employee_count: {
+                        validators: {
+                            notEmpty: {
+                                message: "Liczba pracowników jest wymagana"
+                            }
+                        }
+                    },
+                    annual_revenue: {
+                        validators: {
+                            notEmpty: {
+                                message: "Roczny obrót jest wymagany"
+                            }
+                        }
+                    },
+                    usable_area: {
+                        validators: {
+                            notEmpty: {
+                                message: "Powierzchnia użytkowa jest wymagana"
                             }
                         }
                     }
@@ -215,7 +257,7 @@ var KTCreateAccount = function() {
             })),
             o.addEventListener("click", function(e) {
                 console.log("Submit button clicked...");
-                s[3].validate().then(function(t) {
+                s[0].validate().then(function(t) {
                     console.log("Submit validation result: " + t);
                     if ("Valid" == t) {
                         e.preventDefault();
@@ -251,7 +293,8 @@ var KTCreateAccount = function() {
             }),
             $(i.querySelector('[name="business_type"]')).on("change", function() {
                 console.log("business_type changed");
-                s[2].revalidateField("business_type");
+                console.log("Current value of business_type: ", $(this).val());
+                s[0].revalidateField("business_type");
             }));
             console.log("Initialization complete");
         }
