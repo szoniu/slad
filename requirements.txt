@@ -3,3 +3,4 @@ pandas
 sqlalchemy
 openpyxl
 litecli
+psycopg2
