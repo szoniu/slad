@@ -31,6 +31,7 @@ var KTCreateAccount = function() {
                 var t = s[currentStepIndex - 1];
                 console.log("Validation object for current step: ", t);
                 if (t) {
+                    console.log("Current value of business_type before validation: ", i.querySelector('[name="business_type"]').value);
                     t.validate().then(function(t) {
                         console.log("Validation result: " + t);
                         if ("Valid" == t) {
@@ -113,7 +114,7 @@ var KTCreateAccount = function() {
                     }
                 },
                 plugins: {
-                    trigger: new FormValidation.plugins.Trigger,
+                    trigger: new FormValidation.plugins.Trigger(),
                     bootstrap: new FormValidation.plugins.Bootstrap5({
                         rowSelector: ".fv-row",
                         eleInvalidClass: "",
@@ -146,50 +147,7 @@ var KTCreateAccount = function() {
                     }
                 },
                 plugins: {
-                    trigger: new FormValidation.plugins.Trigger,
-                    bootstrap: new FormValidation.plugins.Bootstrap5({
-                        rowSelector: ".fv-row",
-                        eleInvalidClass: "",
-                        eleValidClass: ""
-                    })
-                }
-            })),
-            s.push(FormValidation.formValidation(i, {
-                fields: {
-                    business_name: {
-                        validators: {
-                            notEmpty: {
-                                message: "Busines name is required"
-                            }
-                        }
-                    },
-                    business_descriptor: {
-                        validators: {
-                            notEmpty: {
-                                message: "Busines descriptor is required"
-                            }
-                        }
-                    },
-                    business_type: {
-                        validators: {
-                            notEmpty: {
-                                message: "Busines type is required"
-                            }
-                        }
-                    },
-                    business_email: {
-                        validators: {
-                            notEmpty: {
-                                message: "Busines email is required"
-                            },
-                            emailAddress: {
-                                message: "The value is not a valid email address"
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    trigger: new FormValidation.plugins.Trigger,
+                    trigger: new FormValidation.plugins.Trigger(),
                     bootstrap: new FormValidation.plugins.Bootstrap5({
                         rowSelector: ".fv-row",
                         eleInvalidClass: "",
@@ -247,7 +205,7 @@ var KTCreateAccount = function() {
                     }
                 },
                 plugins: {
-                    trigger: new FormValidation.plugins.Trigger,
+                    trigger: new FormValidation.plugins.Trigger(),
                     bootstrap: new FormValidation.plugins.Bootstrap5({
                         rowSelector: ".fv-row",
                         eleInvalidClass: "",
@@ -295,12 +253,34 @@ var KTCreateAccount = function() {
                 console.log("business_type changed");
                 console.log("Current value of business_type: ", $(this).val());
                 s[0].revalidateField("business_type");
+            }),
+            $(i.querySelector('[name="reporting_period"]')).on("change", function() {
+                console.log("reporting_period changed");
+                s[0].revalidateField("reporting_period");
+            }),
+            $(i.querySelector('[name="employee_count"]')).on("input", function() {
+                console.log("employee_count changed");
+                s[0].revalidateField("employee_count");
+            }),
+            $(i.querySelector('[name="annual_revenue"]')).on("input", function() {
+                console.log("annual_revenue changed");
+                s[0].revalidateField("annual_revenue");
+            }),
+            $(i.querySelector('[name="usable_area"]')).on("input", function() {
+                console.log("usable_area changed");
+                s[0].revalidateField("usable_area");
+            }),
+            $(i.querySelector('[name="business_name"]')).on("input", function() {
+                console.log("business_name changed");
+                s[0].revalidateField("business_name");
+            }),
+            $(i.querySelector('[name="nip_regon"]')).on("input", function() {
+                console.log("nip_regon changed");
+                s[0].revalidateField("nip_regon");
             }));
-            console.log("Initialization complete");
         }
     }
 }();
 KTUtil.onDOMContentLoaded(function() {
-    console.log("DOMContentLoaded...");
     KTCreateAccount.init();
 });
