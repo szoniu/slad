@@ -206,10 +206,10 @@ $(document).ready(function() {
             const namePrefix = "data[" + index + "]";
 
             // Add validators
-            validator.addField(namePrefix + "[name]", {
+            validator.addField(namePrefix + "[select2_input]", {
                 validators: {
                     notEmpty: {
-                        message: "Text input is required"
+                        message: "Select2 input is required"
                     }
                 }
             });
@@ -232,13 +232,21 @@ $(document).ready(function() {
                     }
                 }
             });
+
+            // Initialize Select2
+            $('[name="' + namePrefix + '[select2_input]"]').select2({
+                placeholder: 'Select an option',
+                width: '100%'
+            }).on('change', function () {
+                validator.revalidateField(namePrefix + '[select2_input]');
+            });
         };
 
         const removeFields = function(index) {
             console.log("Removing fields for index:", index);
             const namePrefix = "data[" + index + "]";
 
-            validator.removeField(namePrefix + "[name]");
+            validator.removeField(namePrefix + "[select2_input]");
             validator.removeField(namePrefix + "[email]");
             validator.removeField(namePrefix + "[primary][]");
         }
@@ -314,3 +322,4 @@ $(document).ready(function() {
         console.log("Form element not found");
     }
 });
+
