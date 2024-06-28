@@ -175,8 +175,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const form = document.getElementById("kt_docs_repeater_form");
 
     if (form) {
-        // Check if Dropzone is already attached
-        if (!Dropzone.instances.length) {
+        // Check if Dropzone is already attached to the specific element
+        const dropzoneElement = document.querySelector("#my-dropzone-element");
+        if (dropzoneElement && !dropzoneElement.dropzone) {
             const myDropzone = new Dropzone("#my-dropzone-element", {
                 paramName: "file",
                 maxFilesize: 2, // MB
@@ -318,3 +319,5 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 });
+
+

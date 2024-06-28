@@ -1,6 +1,7 @@
 "use strict";
 var KTAppInvoicesCreate = function () {
     var e, t = function () {
+            if (!e) return;
             var t = [].slice.call(e.querySelectorAll('[data-kt-element="items"] [data-kt-element="item"]')),
                 a = 0,
                 n = wNumb({
@@ -17,6 +18,7 @@ var KTAppInvoicesCreate = function () {
             })), e.querySelector('[data-kt-element="sub-total"]').innerText = n.to(a), e.querySelector('[data-kt-element="grand-total"]').innerText = n.to(a)
         },
         a = function () {
+            if (!e) return;
             if (0 === e.querySelectorAll('[data-kt-element="items"] [data-kt-element="item"]').length) {
                 var t = e.querySelector('[data-kt-element="empty-template"] tr').cloneNode(!0);
                 e.querySelector('[data-kt-element="items"] tbody').appendChild(t)
@@ -24,24 +26,47 @@ var KTAppInvoicesCreate = function () {
         };
     return {
         init: function (n) {
-            (e = document.querySelector("#kt_invoice_form")).querySelector('[data-kt-element="items"] [data-kt-element="add-item"]').addEventListener("click", (function (n) {
-                n.preventDefault();
-                var l = e.querySelector('[data-kt-element="item-template"] tr').cloneNode(!0);
-                e.querySelector('[data-kt-element="items"] tbody').appendChild(l), a(), t()
-            })), KTUtil.on(e, '[data-kt-element="items"] [data-kt-element="remove-item"]', "click", (function (e) {
-                e.preventDefault(), KTUtil.remove(this.closest('[data-kt-element="item"]')), a(), t()
-            })), KTUtil.on(e, '[data-kt-element="items"] [data-kt-element="quantity"], [data-kt-element="items"] [data-kt-element="price"]', "change", (function (e) {
+            e = document.querySelector("#kt_invoice_form");
+            if (!e) return;
+
+            var addItemButton = e.querySelector('[data-kt-element="items"] [data-kt-element="add-item"]');
+            if (addItemButton) {
+                addItemButton.addEventListener("click", function (n) {
+                    n.preventDefault();
+                    var l = e.querySelector('[data-kt-element="item-template"] tr').cloneNode(!0);
+                    e.querySelector('[data-kt-element="items"] tbody').appendChild(l), a(), t()
+                });
+            }
+
+            KTUtil.on(e, '[data-kt-element="items"] [data-kt-element="remove-item"]', "click", function (e) {
+                e.preventDefault();
+                KTUtil.remove(this.closest('[data-kt-element="item"]')), a(), t()
+            });
+
+            KTUtil.on(e, '[data-kt-element="items"] [data-kt-element="quantity"], [data-kt-element="items"] [data-kt-element="price"]', "change", function (e) {
                 e.preventDefault(), t()
-            })), $(e.querySelector('[name="invoice_date"]')).flatpickr({
-                enableTime: !1,
-                dateFormat: "d, M Y"
-            }), $(e.querySelector('[name="invoice_due_date"]')).flatpickr({
-                enableTime: !1,
-                dateFormat: "d, M Y"
-            }), t()
+            });
+
+            var invoiceDate = e.querySelector('[name="invoice_date"]');
+            if (invoiceDate) {
+                $(invoiceDate).flatpickr({
+                    enableTime: !1,
+                    dateFormat: "d, M Y"
+                });
+            }
+
+            var invoiceDueDate = e.querySelector('[name="invoice_due_date"]');
+            if (invoiceDueDate) {
+                $(invoiceDueDate).flatpickr({
+                    enableTime: !1,
+                    dateFormat: "d, M Y"
+                });
+            }
+
+            t()
         }
     }
 }();
-KTUtil.onDOMContentLoaded((function () {
+KTUtil.onDOMContentLoaded(function () {
     KTAppInvoicesCreate.init()
-}));
+});
