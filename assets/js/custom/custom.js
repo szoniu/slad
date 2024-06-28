@@ -169,157 +169,166 @@ $(document).ready(function() {
         });
     });
 
-//    Step2
+console.log("custom.js loaded");
+
 $(document).ready(function() {
     console.log("Document ready");
 
-    // Define form element
-    const form = document.getElementById("kt_docs_repeater_form");
+    function initializeRepeaterAndValidation() {
+        console.log("Initializing repeater and validation");
 
-    if (form) {
-        console.log("Form element found");
+        // Define form element
+        const form = document.getElementById("kt_docs_repeater_form");
 
-        // Init form validation rules. For more info check the FormValidation plugin's official documentation:https://formvalidation.io/
-        var validator = FormValidation.formValidation(
-            form,
-            {
-                plugins: {
-                    trigger: new FormValidation.plugins.Trigger(),
-                    bootstrap: new FormValidation.plugins.Bootstrap5({
-                        rowSelector: ".fv-row",
-                        eleInvalidClass: "",
-                        eleValidClass: ""
-                    }),
-                    excluded: new FormValidation.plugins.Excluded({
-                        excluded: function (field, ele, eles) {
-                            if (form.querySelector('[name="' + field + '"]') === null) {
-                                return true;
-                            }
-                        },
-                    }),
-                }
-            }
-        );
+        if (form) {
+            console.log("Form element found");
 
-        const addFields = function(index) {
-            console.log("Adding fields for index:", index);
-            const namePrefix = "data[" + index + "]";
-
-            // Add validators
-            validator.addField(namePrefix + "[select2_input]", {
-                validators: {
-                    notEmpty: {
-                        message: "Select2 input is required"
-                    }
-                }
-            });
-
-            validator.addField(namePrefix + "[email]", {
-                validators: {
-                    emailAddress: {
-                        message: "The value is not a valid email address"
-                    },
-                    notEmpty: {
-                        message: "Email address is required"
-                    }
-                }
-            });
-
-            validator.addField(namePrefix + "[primary][]", {
-                validators: {
-                    notEmpty: {
-                        message: "Required"
-                    }
-                }
-            });
-
-            // Initialize Select2
-            $('[name="' + namePrefix + '[select2_input]"]').select2({
-                placeholder: 'Select an option',
-                width: '100%'
-            }).on('change', function () {
-                validator.revalidateField(namePrefix + '[select2_input]');
-            });
-        };
-
-        const removeFields = function(index) {
-            console.log("Removing fields for index:", index);
-            const namePrefix = "data[" + index + "]";
-
-            validator.removeField(namePrefix + "[select2_input]");
-            validator.removeField(namePrefix + "[email]");
-            validator.removeField(namePrefix + "[primary][]");
-        }
-
-        $(form).repeater({
-            initEmpty: false,
-
-            show: function () {
-                console.log("Show function called");
-                $(this).slideDown();
-
-                const index = $(this).closest("[data-repeater-item]").index();
-                console.log("Item added at index:", index);
-
-                addFields(index);
-            },
-
-            hide: function (deleteElement) {
-                console.log("Hide function called");
-                $(this).slideUp(deleteElement);
-            }
-        });
-
-        // Initial fields
-        addFields(0);
-
-        // Submit button handler
-        const submitButton = document.getElementById("kt_docs_repeater_button");
-        submitButton.addEventListener("click", function (e) {
-            // Prevent default button action
-            e.preventDefault();
-            console.log("Submit button clicked");
-
-            // Validate form before submit
-            if (validator) {
-                validator.validate().then(function (status) {
-                    if (status == "Valid") {
-                        console.log("Form is valid");
-                        // Show loading indication
-                        submitButton.setAttribute("data-kt-indicator", "on");
-
-                        // Disable button to avoid multiple click
-                        submitButton.disabled = true;
-
-                        // Simulate form submission. For more info check the plugin's official documentation:https://sweetalert2.github.io/
-                        setTimeout(function () {
-                            // Remove loading indication
-                            submitButton.removeAttribute("data-kt-indicator");
-
-                            // Enable button
-                            submitButton.disabled = false;
-
-                            // Show popup confirmation
-                            Swal.fire({
-                                text: "Form has been successfully submitted!",
-                                icon: "success",
-                                buttonsStyling: false,
-                                confirmButtonText: "Ok, got it!",
-                                customClass: {
-                                    confirmButton: "btn btn-primary"
+            // Init form validation rules. For more info check the FormValidation plugin's official documentation:https://formvalidation.io/
+            var validator = FormValidation.formValidation(
+                form,
+                {
+                    plugins: {
+                        trigger: new FormValidation.plugins.Trigger(),
+                        bootstrap: new FormValidation.plugins.Bootstrap5({
+                            rowSelector: ".fv-row",
+                            eleInvalidClass: "",
+                            eleValidClass: ""
+                        }),
+                        excluded: new FormValidation.plugins.Excluded({
+                            excluded: function (field, ele, eles) {
+                                if (form.querySelector('[name="' + field + '"]') === null) {
+                                    return true;
                                 }
-                            });
+                            },
+                        }),
+                    }
+                }
+            );
 
-                            //form.submit(); // Submit form
-                        }, 2000);
-                    } else {
-                        console.log("Form is invalid");
+            const addFields = function(index) {
+                console.log("Adding fields for index:", index);
+                const namePrefix = "data[" + index + "]";
+
+                // Add validators
+                validator.addField(namePrefix + "[select2_input]", {
+                    validators: {
+                        notEmpty: {
+                            message: "Select2 input is required"
+                        }
                     }
                 });
+
+                validator.addField(namePrefix + "[email]", {
+                    validators: {
+                        emailAddress: {
+                            message: "The value is not a valid email address"
+                        },
+                        notEmpty: {
+                            message: "Email address is required"
+                        }
+                    }
+                });
+
+                validator.addField(namePrefix + "[primary][]", {
+                    validators: {
+                        notEmpty: {
+                            message: "Required"
+                        }
+                    }
+                });
+
+                // Initialize Select2
+                $('[name="' + namePrefix + '[select2_input]"]').select2({
+                    placeholder: 'Select an option',
+                    width: '100%'
+                }).on('change', function () {
+                    validator.revalidateField(namePrefix + '[select2_input]');
+                });
+            };
+
+            const removeFields = function(index) {
+                console.log("Removing fields for index:", index);
+                const namePrefix = "data[" + index + "]";
+
+                validator.removeField(namePrefix + "[select2_input]");
+                validator.removeField(namePrefix + "[email]");
+                validator.removeField(namePrefix + "[primary][]");
             }
-        });
-    } else {
-        console.log("Form element not found");
+
+            $(form).repeater({
+                initEmpty: false,
+
+                show: function () {
+                    console.log("Show function called");
+                    $(this).slideDown();
+
+                    const index = $(this).closest("[data-repeater-item]").index();
+                    console.log("Item added at index:", index);
+
+                    addFields(index);
+                },
+
+                hide: function (deleteElement) {
+                    console.log("Hide function called");
+                    $(this).slideUp(deleteElement);
+                }
+            });
+
+            // Initial fields
+            addFields(0);
+
+            // Submit button handler
+            const submitButton = document.getElementById("kt_docs_repeater_button");
+            submitButton.addEventListener("click", function (e) {
+                // Prevent default button action
+                e.preventDefault();
+                console.log("Submit button clicked");
+
+                // Validate form before submit
+                if (validator) {
+                    validator.validate().then(function (status) {
+                        if (status == "Valid") {
+                            console.log("Form is valid");
+                            // Show loading indication
+                            submitButton.setAttribute("data-kt-indicator", "on");
+
+                            // Disable button to avoid multiple click
+                            submitButton.disabled = true;
+
+                            // Simulate form submission. For more info check the plugin's official documentation:https://sweetalert2.github.io/
+                            setTimeout(function () {
+                                // Remove loading indication
+                                submitButton.removeAttribute("data-kt-indicator");
+
+                                // Enable button
+                                submitButton.disabled = false;
+
+                                // Show popup confirmation
+                                Swal.fire({
+                                    text: "Form has been successfully submitted!",
+                                    icon: "success",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Ok, got it!",
+                                    customClass: {
+                                        confirmButton: "btn btn-primary"
+                                    }
+                                });
+
+                                //form.submit(); // Submit form
+                            }, 2000);
+                        } else {
+                            console.log("Form is invalid");
+                        }
+                    });
+                }
+            });
+        } else {
+            console.log("Form element not found");
+        }
     }
+
+    // Initial setup if required
+    initializeRepeaterAndValidation();
 });
+
 

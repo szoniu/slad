@@ -26,7 +26,7 @@ var KTCreateAccount = function() {
             }),
             r.on("kt.stepper.next", function(e) {
                 console.log("Going to the next step...");
-                var currentStepIndex = e.getCurrentStepIndex();
+                var currentStepIndex = r.getCurrentStepIndex();
                 console.log("Current step index: " + currentStepIndex);
                 var t = s[currentStepIndex - 1];
                 console.log("Validation object for current step: ", t);
@@ -37,6 +37,10 @@ var KTCreateAccount = function() {
                         if ("Valid" == t) {
                             e.goNext();
                             KTUtil.scrollTop();
+                            if (currentStepIndex === 2) {
+                                console.log("Initializing repeater and validation for step 2...");
+                                initializeRepeaterAndValidation();
+                            }
                         } else {
                             Swal.fire({
                                 text: "Przepraszamy, wygląda na to, że wykryto pewne błędy na formularzu, proszę przejrzeć wymagane pola i spróbować ponownie.",
