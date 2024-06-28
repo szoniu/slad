@@ -170,20 +170,14 @@ $(document).ready(function() {
     });
 
 //    Step2
-document.addEventListener("DOMContentLoaded", function() {
+$(document).ready(function() {
+    console.log("Document ready");
+
     // Define form element
     const form = document.getElementById("kt_docs_repeater_form");
 
     if (form) {
-        // Check if Dropzone is already attached to the specific element
-        const dropzoneElement = document.querySelector("#my-dropzone-element");
-        if (dropzoneElement && !dropzoneElement.dropzone) {
-            const myDropzone = new Dropzone("#my-dropzone-element", {
-                paramName: "file",
-                maxFilesize: 2, // MB
-                acceptedFiles: ".jpeg,.jpg,.png,.gif"
-            });
-        }
+        console.log("Form element found");
 
         // Init form validation rules. For more info check the FormValidation plugin's official documentation:https://formvalidation.io/
         var validator = FormValidation.formValidation(
@@ -208,13 +202,14 @@ document.addEventListener("DOMContentLoaded", function() {
         );
 
         const addFields = function(index) {
+            console.log("Adding fields for index:", index);
             const namePrefix = "data[" + index + "]";
 
             // Add validators
-            validator.addField(namePrefix + "[select2_input]", {
+            validator.addField(namePrefix + "[name]", {
                 validators: {
                     notEmpty: {
-                        message: "Select2 input is required"
+                        message: "Text input is required"
                     }
                 }
             });
@@ -237,20 +232,13 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 }
             });
-
-            // Initialize Select2
-            $('[name="' + namePrefix + '[select2_input]"]').select2({
-                placeholder: 'Select an option',
-                width: '100%'
-            }).on('change', function () {
-                validator.revalidateField(namePrefix + '[select2_input]');
-            });
         };
 
         const removeFields = function(index) {
+            console.log("Removing fields for index:", index);
             const namePrefix = "data[" + index + "]";
 
-            validator.removeField(namePrefix + "[select2_input]");
+            validator.removeField(namePrefix + "[name]");
             validator.removeField(namePrefix + "[email]");
             validator.removeField(namePrefix + "[primary][]");
         }
@@ -259,17 +247,18 @@ document.addEventListener("DOMContentLoaded", function() {
             initEmpty: false,
 
             show: function () {
+                console.log("Show function called");
                 $(this).slideDown();
 
                 const index = $(this).closest("[data-repeater-item]").index();
+                console.log("Item added at index:", index);
 
                 addFields(index);
             },
 
             hide: function (deleteElement) {
+                console.log("Hide function called");
                 $(this).slideUp(deleteElement);
-                const index = $(this).closest("[data-repeater-item]").index();
-                removeFields(index);
             }
         });
 
@@ -281,11 +270,13 @@ document.addEventListener("DOMContentLoaded", function() {
         submitButton.addEventListener("click", function (e) {
             // Prevent default button action
             e.preventDefault();
+            console.log("Submit button clicked");
 
             // Validate form before submit
             if (validator) {
                 validator.validate().then(function (status) {
                     if (status == "Valid") {
+                        console.log("Form is valid");
                         // Show loading indication
                         submitButton.setAttribute("data-kt-indicator", "on");
 
@@ -313,11 +304,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
                             //form.submit(); // Submit form
                         }, 2000);
+                    } else {
+                        console.log("Form is invalid");
                     }
                 });
             }
         });
+    } else {
+        console.log("Form element not found");
     }
 });
-
-

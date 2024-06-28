@@ -614,11 +614,9 @@ License: For each use you must have a valid license purchased only from above li
                                                                             <div class="form-check form-check-custom form-check-solid mt-2 mt-md-11">
                                                                                 <input class="form-check-input"
                                                                                        type="checkbox" name="primary"
-                                                                                       value="1"/>
+                                                                                       id="form_checkbox_1" value="1"/>
                                                                                 <label class="form-check-label"
-                                                                                       for="form_checkbox">
-                                                                                    Primary
-                                                                                </label>
+                                                                                       for="form_checkbox_1">Primary</label>
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-md-4">
@@ -5963,16 +5961,26 @@ License: For each use you must have a valid license purchased only from above li
 <!--end::Modals-->
 <!--begin::Javascript-->
 <script>var hostUrl = "assets/";</script>
+<!--begin::Javascript-->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.3/js/bootstrap.min.js"></script>
-<!--begin::Global Javascript Bundle(mandatory for all pages)-->
+
+<!-- Global Javascript Bundle (mandatory for all pages) -->
 <script src="assets/plugins/global/plugins.bundle.js"></script>
 <script src="assets/js/scripts.bundle.js"></script>
-<!--end::Global Javascript Bundle-->
-<!--begin::Vendors Javascript(used for this page only)-->
+
+<!-- Vendors Javascript (used for this page only) -->
 <script src="assets/plugins/custom/datatables/datatables.bundle.js"></script>
-<!--end::Vendors Javascript-->
-<!--begin::Custom Javascript(used for this page only)-->
+
+<!-- jQuery repeater -->
+<script src="https://cdn.jsdelivr.net/npm/jquery.repeater@1.2.1/jquery.repeater.min.js"></script>
+
+<!-- FormValidation plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/formvalidation/1.9.0/js/FormValidation.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/formvalidation/1.9.0/js/plugins/Bootstrap5.min.js"></script>
+
+
+<!-- Custom Javascript (used for this page only) -->
 <script src="assets/js/custom/utilities/modals/create-account.js"></script>
 <script src="assets/js/widgets.bundle.js"></script>
 <script src="assets/js/custom/widgets.js"></script>
@@ -5988,12 +5996,8 @@ License: For each use you must have a valid license purchased only from above li
 <script src="assets/js/custom/utilities/modals/create-project/main.js"></script>
 <script src="assets/js/custom/utilities/modals/users-search.js"></script>
 <script src="assets/js/custom/apps/invoices/create.js"></script>
-<script src="assets/js/widgets.bundle.js"></script>
-<script src="assets/js/custom/widgets.js"></script>
-<script src="assets/js/custom/apps/chat/chat.js"></script>
 
-
-<!--end::Custom Javascript-->
+<!-- Custom JS at the end -->
 <script src="assets/js/custom/custom.js"></script>
 <!--end::Javascript-->
 </body>
