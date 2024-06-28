@@ -330,5 +330,3 @@ $(document).ready(function() {
     // Initial setup if required
     initializeRepeaterAndValidation();
 });
-
-
