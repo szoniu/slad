@@ -1,6 +1,161 @@
 "use strict";
 var KTCreateAccount = function() {
     var e, t, i, o, a, r, s = [];
+
+    // Funkcja do inicjalizacji repeatera
+    function initRepeater() {
+        console.log("Initializing repeater and validation");
+
+        // Define form element
+        const form = document.getElementById("kt_docs_repeater_form");
+
+        if (form) {
+            console.log("Form element found for repeater initialization");
+
+            // Init form validation rules. For more info check the FormValidation plugin's official documentation:https://formvalidation.io/
+            var validator = FormValidation.formValidation(
+                form,
+                {
+                    plugins: {
+                        trigger: new FormValidation.plugins.Trigger(),
+                        bootstrap: new FormValidation.plugins.Bootstrap5({
+                            rowSelector: ".fv-row",
+                            eleInvalidClass: "",
+                            eleValidClass: ""
+                        }),
+                        excluded: new FormValidation.plugins.Excluded({
+                            excluded: function (field, ele, eles) {
+                                if (form.querySelector('[name="' + field + '"]') === null) {
+                                    return true;
+                                }
+                            },
+                        }),
+                    }
+                }
+            );
+
+            const addFields = function(index) {
+                console.log("Adding fields for index:", index);
+                const namePrefix = "data[" + index + "]";
+
+                // Add validators
+                validator.addField(namePrefix + "[select2_input]", {
+                    validators: {
+                        notEmpty: {
+                            message: "Select2 input is required"
+                        }
+                    }
+                });
+
+                validator.addField(namePrefix + "[email]", {
+                    validators: {
+                        emailAddress: {
+                            message: "The value is not a valid email address"
+                        },
+                        notEmpty: {
+                            message: "Email address is required"
+                        }
+                    }
+                });
+
+                validator.addField(namePrefix + "[primary][]", {
+                    validators: {
+                        notEmpty: {
+                            message: "Required"
+                        }
+                    }
+                });
+
+                // Initialize Select2
+                $('[name="' + namePrefix + '[select2_input]"]').select2({
+                    placeholder: 'Select an option',
+                    width: '100%'
+                }).on('change', function () {
+                    validator.revalidateField(namePrefix + '[select2_input]');
+                });
+            };
+
+            const removeFields = function(index) {
+                console.log("Removing fields for index:", index);
+                const namePrefix = "data[" + index + "]";
+
+                validator.removeField(namePrefix + "[select2_input]");
+                validator.removeField(namePrefix + "[email]");
+                validator.removeField(namePrefix + "[primary][]");
+            }
+
+            $(form).repeater({
+                initEmpty: false,
+
+                show: function () {
+                    console.log("Show function called");
+                    $(this).slideDown();
+
+                    const index = $(this).closest("[data-repeater-item]").index();
+                    console.log("Item added at index:", index);
+
+                    addFields(index);
+                },
+
+                hide: function (deleteElement) {
+                    console.log("Hide function called");
+                    $(this).slideUp(deleteElement);
+                }
+            });
+
+            // Initial fields
+            addFields(0);
+
+            // Submit button handler
+            const submitButton = document.getElementById("kt_docs_repeater_button");
+            submitButton.addEventListener("click", function (e) {
+                // Prevent default button action
+                e.preventDefault();
+                console.log("Submit button clicked");
+
+                // Validate form before submit
+                if (validator) {
+                    validator.validate().then(function (status) {
+                        if (status == "Valid") {
+                            console.log("Form is valid");
+                            // Show loading indication
+                            submitButton.setAttribute("data-kt-indicator", "on");
+
+                            // Disable button to avoid multiple click
+                            submitButton.disabled = true;
+
+                            // Simulate form submission. For more info check the plugin's official documentation:https://sweetalert2.github.io/
+                            setTimeout(function () {
+                                // Remove loading indication
+                                submitButton.removeAttribute("data-kt-indicator");
+
+                                // Enable button
+                                submitButton.disabled = false;
+
+                                // Show popup confirmation
+                                Swal.fire({
+                                    text: "Form has been successfully submitted!",
+                                    icon: "success",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Ok, got it!",
+                                    customClass: {
+                                        confirmButton: "btn btn-primary"
+                                    }
+                                });
+
+                                //form.submit(); // Submit form
+                            }, 2000);
+                        } else {
+                            console.log("Form is invalid");
+                        }
+                    });
+                }
+            });
+        } else {
+            console.log("Form element not found");
+        }
+    }
+
     return {
         init: function() {
             console.log("Initializing KTCreateAccount...");
@@ -11,6 +166,12 @@ var KTCreateAccount = function() {
             a = t.querySelector('[data-kt-stepper-action="next"]'),
             (r = new KTStepper(t)).on("kt.stepper.changed", function(e) {
                 console.log("Step changed to: " + r.getCurrentStepIndex());
+
+                if (r.getCurrentStepIndex() === 2) { // Step 2
+                    console.log("Initializing repeater and validation for step 2...");
+                    initRepeater(); // Initialize the repeater when we are on step 2
+                }
+
                 if (r.getCurrentStepIndex() === 4) {
                     o.classList.remove("d-none");
                     o.classList.add("d-inline-block");
@@ -26,7 +187,7 @@ var KTCreateAccount = function() {
             }),
             r.on("kt.stepper.next", function(e) {
                 console.log("Going to the next step...");
-                var currentStepIndex = r.getCurrentStepIndex();
+                var currentStepIndex = e.getCurrentStepIndex();
                 console.log("Current step index: " + currentStepIndex);
                 var t = s[currentStepIndex - 1];
                 console.log("Validation object for current step: ", t);
@@ -37,10 +198,6 @@ var KTCreateAccount = function() {
                         if ("Valid" == t) {
                             e.goNext();
                             KTUtil.scrollTop();
-                            if (currentStepIndex === 2) {
-                                console.log("Initializing repeater and validation for step 2...");
-                                initializeRepeaterAndValidation();
-                            }
                         } else {
                             Swal.fire({
                                 text: "Przepraszamy, wygląda na to, że wykryto pewne błędy na formularzu, proszę przejrzeć wymagane pola i spróbować ponownie.",
