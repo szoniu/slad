@@ -3,7 +3,7 @@ var KTCreateAccount = function() {
     var e, t, i, o, a, r, s = [];
 
     function initRepeater() {
-        const form = document.getElementById("kt_docs_repeater_form");
+        const form = document.querySelector("#kt_docs_repeater_form");
         if (form) {
             console.log("Form element found for repeater initialization");
 
@@ -148,7 +148,7 @@ var KTCreateAccount = function() {
 
                 if (r.getCurrentStepIndex() === 2) { // Step 2
                     console.log("Initializing repeater and validation for step 2...");
-                    initRepeater(); // Initialize the repeater when we are on step 2
+                    setTimeout(initRepeater, 100); // Delay to ensure the form is rendered
                 }
 
                 if (r.getCurrentStepIndex() === 4) {
