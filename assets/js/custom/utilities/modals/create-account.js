@@ -2,149 +2,137 @@
 var KTCreateAccount = function() {
     var e, t, i, o, a, r, s = [];
 
-    function observeForm(callback) {
-        const observer = new MutationObserver((mutations, observerInstance) => {
-            const form = document.getElementById("kt_docs_repeater_form");
-            console.log("Mutation observed. Checking for form:", form);
-            if (form) {
-                console.log("Form found:", form);
-                observerInstance.disconnect(); // stop observing
-                callback(form);
-            }
-        });
+    function initRepeater() {
+        const form = document.getElementById("kt_docs_repeater_form");
+        if (form) {
+            console.log("Form element found for repeater initialization");
 
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-    }
-
-    function initRepeater(form) {
-        console.log("Initializing repeater and validation");
-
-        var validator = FormValidation.formValidation(
-            form,
-            {
-                plugins: {
-                    trigger: new FormValidation.plugins.Trigger(),
-                    bootstrap: new FormValidation.plugins.Bootstrap5({
-                        rowSelector: ".fv-row",
-                        eleInvalidClass: "",
-                        eleValidClass: ""
-                    }),
-                    excluded: new FormValidation.plugins.Excluded({
-                        excluded: function (field, ele, eles) {
-                            if (form.querySelector('[name="' + field + '"]') === null) {
-                                return true;
-                            }
-                        },
-                    }),
-                }
-            }
-        );
-
-        const addFields = function(index) {
-            console.log("Adding fields for index:", index);
-            const namePrefix = "data[" + index + "]";
-
-            validator.addField(namePrefix + "[select2_input]", {
-                validators: {
-                    notEmpty: {
-                        message: "Select2 input is required"
-                    }
-                }
-            });
-
-            validator.addField(namePrefix + "[email]", {
-                validators: {
-                    emailAddress: {
-                        message: "The value is not a valid email address"
-                    },
-                    notEmpty: {
-                        message: "Email address is required"
-                    }
-                }
-            });
-
-            validator.addField(namePrefix + "[primary][]", {
-                validators: {
-                    notEmpty: {
-                        message: "Required"
-                    }
-                }
-            });
-
-            $('[name="' + namePrefix + '[select2_input]"]').select2({
-                placeholder: 'Select an option',
-                width: '100%'
-            }).on('change', function () {
-                validator.revalidateField(namePrefix + '[select2_input]');
-            });
-        };
-
-        const removeFields = function(index) {
-            console.log("Removing fields for index:", index);
-            const namePrefix = "data[" + index + "]";
-
-            validator.removeField(namePrefix + "[select2_input]");
-            validator.removeField(namePrefix + "[email]");
-            validator.removeField(namePrefix + "[primary][]");
-        }
-
-        $(form).repeater({
-            initEmpty: false,
-
-            show: function () {
-                console.log("Show function called");
-                $(this).slideDown();
-
-                const index = $(this).closest("[data-repeater-item]").index();
-                console.log("Item added at index:", index);
-
-                addFields(index);
-            },
-
-            hide: function (deleteElement) {
-                console.log("Hide function called");
-                $(this).slideUp(deleteElement);
-            }
-        });
-
-        addFields(0);
-
-        const submitButton = document.getElementById("kt_docs_repeater_button");
-        submitButton.addEventListener("click", function (e) {
-            e.preventDefault();
-            console.log("Submit button clicked");
-
-            if (validator) {
-                validator.validate().then(function (status) {
-                    if (status == "Valid") {
-                        console.log("Form is valid");
-                        submitButton.setAttribute("data-kt-indicator", "on");
-                        submitButton.disabled = true;
-
-                        setTimeout(function () {
-                            submitButton.removeAttribute("data-kt-indicator");
-                            submitButton.disabled = false;
-
-                            Swal.fire({
-                                text: "Form has been successfully submitted!",
-                                icon: "success",
-                                buttonsStyling: false,
-                                confirmButtonText: "Ok, got it!",
-                                customClass: {
-                                    confirmButton: "btn btn-primary"
+            var validator = FormValidation.formValidation(
+                form,
+                {
+                    plugins: {
+                        trigger: new FormValidation.plugins.Trigger(),
+                        bootstrap: new FormValidation.plugins.Bootstrap5({
+                            rowSelector: ".fv-row",
+                            eleInvalidClass: "",
+                            eleValidClass: ""
+                        }),
+                        excluded: new FormValidation.plugins.Excluded({
+                            excluded: function (field, ele, eles) {
+                                if (form.querySelector('[name="' + field + '"]') === null) {
+                                    return true;
                                 }
-                            });
+                            },
+                        }),
+                    }
+                }
+            );
 
-                        }, 2000);
-                    } else {
-                        console.log("Form is invalid");
+            const addFields = function(index) {
+                console.log("Adding fields for index:", index);
+                const namePrefix = "data[" + index + "]";
+
+                validator.addField(namePrefix + "[select2_input]", {
+                    validators: {
+                        notEmpty: {
+                            message: "Select2 input is required"
+                        }
                     }
                 });
+
+                validator.addField(namePrefix + "[email]", {
+                    validators: {
+                        emailAddress: {
+                            message: "The value is not a valid email address"
+                        },
+                        notEmpty: {
+                            message: "Email address is required"
+                        }
+                    }
+                });
+
+                validator.addField(namePrefix + "[primary][]", {
+                    validators: {
+                        notEmpty: {
+                            message: "Required"
+                        }
+                    }
+                });
+
+                $('[name="' + namePrefix + '[select2_input]"]').select2({
+                    placeholder: 'Select an option',
+                    width: '100%'
+                }).on('change', function () {
+                    validator.revalidateField(namePrefix + '[select2_input]');
+                });
+            };
+
+            const removeFields = function(index) {
+                console.log("Removing fields for index:", index);
+                const namePrefix = "data[" + index + "]";
+
+                validator.removeField(namePrefix + "[select2_input]");
+                validator.removeField(namePrefix + "[email]");
+                validator.removeField(namePrefix + "[primary][]");
             }
-        });
+
+            $(form).repeater({
+                initEmpty: false,
+
+                show: function () {
+                    console.log("Show function called");
+                    $(this).slideDown();
+
+                    const index = $(this).closest("[data-repeater-item]").index();
+                    console.log("Item added at index:", index);
+
+                    addFields(index);
+                },
+
+                hide: function (deleteElement) {
+                    console.log("Hide function called");
+                    $(this).slideUp(deleteElement);
+                }
+            });
+
+            addFields(0);
+
+            const submitButton = document.getElementById("kt_docs_repeater_button");
+            submitButton.addEventListener("click", function (e) {
+                e.preventDefault();
+                console.log("Submit button clicked");
+
+                if (validator) {
+                    validator.validate().then(function (status) {
+                        if (status == "Valid") {
+                            console.log("Form is valid");
+                            submitButton.setAttribute("data-kt-indicator", "on");
+                            submitButton.disabled = true;
+
+                            setTimeout(function () {
+                                submitButton.removeAttribute("data-kt-indicator");
+                                submitButton.disabled = false;
+
+                                Swal.fire({
+                                    text: "Form has been successfully submitted!",
+                                    icon: "success",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Ok, got it!",
+                                    customClass: {
+                                        confirmButton: "btn btn-primary"
+                                    }
+                                });
+
+                            }, 2000);
+                        } else {
+                            console.log("Form is invalid");
+                        }
+                    });
+                }
+            });
+        } else {
+            console.log("Form element not found");
+        }
     }
 
     return {
@@ -160,7 +148,7 @@ var KTCreateAccount = function() {
 
                 if (r.getCurrentStepIndex() === 2) { // Step 2
                     console.log("Initializing repeater and validation for step 2...");
-                    observeForm(initRepeater); // Initialize the repeater when we are on step 2
+                    initRepeater(); // Initialize the repeater when we are on step 2
                 }
 
                 if (r.getCurrentStepIndex() === 4) {
