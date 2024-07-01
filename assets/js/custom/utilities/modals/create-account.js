@@ -6,20 +6,19 @@ var KTCreateAccount = function() {
         const maxAttempts = 10;
         let attempts = 0;
 
-        const interval = setInterval(() => {
+        setTimeout(function tryFindingForm() {
             const form = document.getElementById("kt_docs_repeater_form");
             console.log("Attempting to find form... attempt:", attempts);
 
-            if (form || attempts >= maxAttempts) {
-                clearInterval(interval);
-                if (form) {
-                    console.log("Form found:", form);
-                    callback(form);
-                } else {
-                    console.log("Form not found after", maxAttempts, "attempts.");
-                }
+            if (form) {
+                console.log("Form found:", form);
+                callback(form);
+            } else if (attempts < maxAttempts) {
+                attempts++;
+                setTimeout(tryFindingForm, 300);
+            } else {
+                console.log("Form not found after", maxAttempts, "attempts.");
             }
-            attempts++;
         }, 300);
     }
 
