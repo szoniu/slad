@@ -144,6 +144,22 @@ var KTCreateAccount = function() {
         }
     }
 
+    function waitForRepeaterForm(callback) {
+        const observer = new MutationObserver((mutations, me) => {
+            const form = document.getElementById("kt_docs_repeater_form");
+            if (form) {
+                callback();
+                me.disconnect(); // stop observing
+                return;
+            }
+        });
+
+        observer.observe(document, {
+            childList: true,
+            subtree: true
+        });
+    }
+
     return {
         init: function() {
             console.log("Initializing KTCreateAccount...");
@@ -157,10 +173,7 @@ var KTCreateAccount = function() {
 
                 if (r.getCurrentStepIndex() === 2) { // Step 2
                     console.log("Initializing repeater and validation for step 2...");
-                    setTimeout(function() {
-                        console.log(document.getElementById("kt_docs_repeater_form"));
-                        initRepeater(); // Initialize the repeater when we are on step 2
-                    }, 500); // Add a delay to ensure the form is loaded
+                    waitForRepeaterForm(initRepeater);
                 }
 
                 if (r.getCurrentStepIndex() === 4) {
