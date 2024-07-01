@@ -13,11 +13,13 @@ var KTCreateAccount = function() {
                 console.log("Form element still not found");
             }
         }
+        console.log("ensureFormHasId: form found", form);
         return form;
     }
 
     function initRepeater() {
         const form = ensureFormHasId();
+        console.log("initRepeater: form", form);
         if (form) {
             console.log("Form element found for repeater initialization");
 
@@ -112,6 +114,7 @@ var KTCreateAccount = function() {
             addFields(0);
 
             const submitButton = document.getElementById("kt_docs_repeater_button");
+            console.log("Submit button", submitButton);
             submitButton.addEventListener("click", function (e) {
                 e.preventDefault();
                 console.log("Submit button clicked");
