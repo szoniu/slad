@@ -1,236 +1,62 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamiczne Listy Rozwijane</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <!-- Bootstrap JS -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <title>Repeater Example</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.repeater/1.2.1/jquery.repeater.min.js"></script>
 </head>
 <body>
-
-<div class="container mt-5">
-    <h2 class="fw-bold d-flex align-items-center text-gray-900">
-        Uzupełnij profil firmy
-    </h2>
-    <div class="text-muted fw-semibold fs-6">
-        Uzupełnij dane swojej firmy. Zwróć uwagę na ich poprawność. Przygotuj faktury i inne dokumenty, zgodnie z <a
-            href="#" class="link-primary fw-bold">listą kontrolną</a>. Dane w kalkulatorze zapisujemy automatycznie.
-        Możesz je uzupełnić w dowolnym momencie. Dbamy o bezpieczeństwo Twoich danych.
+    <div class="container">
+        <form>
+            <div class="repeater">
+                <div data-repeater-list="group">
+                    <div data-repeater-item>
+                        <div class="form-group">
+                            <label for="name">Name:</label>
+                            <input type="text" name="name" class="form-control"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" name="email" class="form-control"/>
+                        </div>
+                        <div class="form-group">
+                            <a href="javascript:;" data-repeater-delete class="btn btn-danger">
+                                <i class="ki-duotone ki-minus fs-3"></i> Delete
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <a href="javascript:;" data-repeater-create class="btn btn-flex flex-center btn-light-primary">
+                        <i class="ki-duotone ki-plus fs-3"></i> Add
+                    </a>
+                </div>
+            </div>
+        </form>
     </div>
 
-    <div class="fv-row mb-10">
-        <label class="form-label required">Nazwa firmy <span class="ms-1" data-bs-toggle="tooltip"
-                                                             title="Podaj nazwę firmy zgodną z KRS">
-            <i class="ki-duotone ki-information-5 text-gray-500 fs-6">
-                <span class="path1"></span>
-                <span class="path2"></span>
-                <span class="path3"></span>
-            </i>
-        </span></label>
-        <input name="business_name" class="form-control form-control-lg form-control-solid" value=""/>
-    </div>
+    <script>
+        $(document).ready(function () {
+            $('.repeater').repeater({
+                initEmpty: false,
 
-    <div class="fv-row mb-10">
-        <label class="form-label required">NIP/REGON firmy</label>
-        <input name="nip_regon" class="form-control form-control-lg form-control-solid" value=""/>
-    </div>
+                defaultValues: {
+                    'name': '',
+                    'email': ''
+                },
 
-    <div class="fv-row mb-10">
-        <label class="form-label required">Branża <span class="ms-1" data-bs-toggle="tooltip"
-                                                        title="Wskaż główną działalność firmy. Twój wybór będzie miał wpływ na wynik końcowy kalkulacji. Podział na branże jest spójny ze wskaźnikami emisji, które są stosowane do obliczania śladu węglowego firm w danym sektorze">
-            <i class="ki-duotone ki-information-5 text-gray-500 fs-6">
-                <span class="path1"></span>
-                <span class="path2"></span>
-                <span class="path3"></span>
-            </i>
-        </span></label>
-        <select name="business_type" id="business_type" class="form-select form-select-lg form-select-solid"
-                data-control="select2" data-placeholder="Wybierz..." data-allow-clear="true" data-hide-search="true">
-            <option value=""></option>
-            <option value="1">A. Rolnictwo, leśnictwo, łowiectwo i rybactwo</option>
-            <option value="2">B. Górnictwo i wydobywanie</option>
-            <option value="3">C. Przetwórstwo przemysłowe</option>
-            <option value="4">D. Wytwarzanie i zaopatrywanie w energię elektryczną, gaz, parę wodną, gorącą wodę i
-                powietrze do układów klimatyzacyjnych
-            </option>
-            <option value="5">E. Dostawa wody; gospodarowanie ściekami i odpadami oraz działalność związana z
-                rekultywacją
-            </option>
-            <option value="6">F. Budownictwo</option>
-            <option value="7">G. Handel hurtowy i detaliczny; naprawa pojazdów samochodowych, włączając motocykle
-            </option>
-            <option value="8">H. Transport i gospodarka magazynowa</option>
-            <option value="9">I. Działalność związana z zakwaterowaniem i usługami gastronomicznymi</option>
-            <option value="10">J. Informacja i komunikacja</option>
-            <option value="11">K. Działalność finansowa i ubezpieczeniowa</option>
-            <option value="12">L. Działalność związana z obsługą rynku nieruchomości</option>
-            <option value="13">M. Działalność profesjonalna, naukowa i techniczna</option>
-            <option value="14">N. Działalność w zakresie usług administrowania i działalność wspierająca</option>
-            <option value="15">O. Administracja publiczna i obrona narodowa; obowiązkowe zabezpieczenia społeczne
-            </option>
-            <option value="16">P. Edukacja</option>
-            <option value="17">Q. Opieka zdrowotna i pomoc społeczna</option>
-            <option value="18">R. Działalność związana z kulturą, rozrywką i rekreacją</option>
-            <option value="19">S. Pozostała działalność usługowa</option>
-            <option value="20">T. Gospodarstwa domowe zatrudniające pracowników; gospodarstwa domowe produkujące wyroby
-                i świadczące usługi na własne potrzeby
-            </option>
-            <option value="21">U. Organizacje i zespoły eksterytorialne</option>
-        </select>
-    </div>
+                show: function () {
+                    $(this).slideDown();
+                },
 
-    <div id="additional_options" class="fv-row mb-10 d-none">
-        <label for="additional_select">Dodatkowe opcje</label>
-        <select name="additional_select" id="additional_select" class="form-select form-select-lg form-select-solid"
-                data-control="select2" data-placeholder="Wybierz..." data-allow-clear="true" data-hide-search="true">
-            <!-- Dynamiczne opcje będą tutaj wstawiane -->
-        </select>
-    </div>
-
-    <div class="fv-row mb-10">
-        <label class="form-label required">Okres raportowania <span class="ms-1" data-bs-toggle="tooltip"
-                                                                    title="Wybierz przedział czasowy (rok), dla którego obliczysz ślad węglowy swojej firmy">
-            <i class="ki-duotone ki-information-5 text-gray-500 fs-6">
-                <span class="path1"></span>
-                <span class="path2"></span>
-                <span class="path3"></span>
-            </i>
-        </span></label>
-        <select name="reporting_period" class="form-select form-select-lg form-select-solid" data-control="select2"
-                data-placeholder="Wybierz..." data-allow-clear="true" data-hide-search="true">
-            <option value=""></option>
-            <option value="2021">2021</option>
-            <option value="2022">2022</option>
-            <option value="2023">2023</option>
-            <option value="2024">2024</option>
-        </select>
-    </div>
-
-    <div class="fv-row mb-10">
-        <label class="form-label required">Liczba pracowników <span class="ms-1" data-bs-toggle="tooltip"
-                                                                    title="Podaj średnią liczbę osób zatrudnionych w danym roku. Uwzględnij wszystkich pracowników – w tym etatowych, sezonowych, tymczasowych etc.">
-            <i class="ki-duotone ki-information-5 text-gray-500 fs-6">
-                <span class="path1"></span>
-                <span class="path2"></span>
-                <span class="path3"></span>
-            </i>
-        </span></label>
-        <input name="employee_count" class="form-control form-control-lg form-control-solid" value=""/>
-    </div>
-
-    <div class="fv-row mb-10">
-        <label class="form-label required">Roczny obrót (PLN) <span class="ms-1" data-bs-toggle="tooltip"
-                                                                    title="Wpisz sumę wszystkich wpływów ze sprzedaży produktów oraz usług w danym roku, pomniejszoną o kwotę podatku VAT">
-            <i class="ki-duotone ki-information-5 text-gray-500 fs-6">
-                <span class="path1"></span>
-                <span class="path2"></span>
-                <span class="path3"></span>
-            </i>
-        </span></label>
-        <input name="annual_revenue" class="form-control form-control-lg form-control-solid" value=""/>
-    </div>
-
-    <div class="fv-row mb-10">
-        <label class="form-label required">Powierzchnia użytkowa (m<sup>2</sup>) <span class="ms-1"
-                                                                                       data-bs-toggle="tooltip"
-                                                                                       title="Podsumuj powierzchnię wszystkich pomieszczeń użytkowych swojej firmy w danym roku (np. biuro, halę produkcyjną). Nie uwzględniaj wind i klatek schodowych">
-            <i class="ki-duotone ki-information-5 text-gray-500 fs-6">
-                <span class="path1"></span>
-                <span class="path2"></span>
-                <span class="path3"></span>
-            </i>
-        </span></label>
-        <input name="usable_area" class="form-control form-control-lg form-control-solid" value=""/>
-    </div>
-</div>
-
-<script>
-    $(document).ready(function() {
-        $('#business_type').on('change', function() {
-            var selectedValue = $(this).val();
-            var additionalOptions = $('#additional_select');
-            var additionalOptionsDiv = $('#additional_options');
-            additionalOptions.empty(); // Czyszczenie poprzednich opcji
-
-            if (selectedValue) {
-                additionalOptionsDiv.removeClass('d-none'); // Pokazanie sekcji z dodatkowymi opcjami
-
-                // W zależności od wybranego elementu, dodawanie nowych opcji
-                if (selectedValue == '1') {
-                    additionalOptions.append('<option value="a1">Opcja A1</option>');
-                    additionalOptions.append('<option value="a2">Opcja A2</option>');
-                } else if (selectedValue == '2') {
-                    additionalOptions.append('<option value="b1">Opcja B1</option>');
-                    additionalOptions.append('<option value="b2">Opcja B2</option>');
-                } else if (selectedValue == '3') {
-                    additionalOptions.append('<option value="c1">Opcja C1</option>');
-                    additionalOptions.append('<option value="c2">Opcja C2</option>');
-                } else if (selectedValue == '4') {
-                    additionalOptions.append('<option value="d1">Opcja D1</option>');
-                    additionalOptions.append('<option value="d2">Opcja D2</option>');
-                } else if (selectedValue == '5') {
-                    additionalOptions.append('<option value="e1">Opcja E1</option>');
-                    additionalOptions.append('<option value="e2">Opcja E2</option>');
-                } else if (selectedValue == '6') {
-                    additionalOptions.append('<option value="f1">Opcja F1</option>');
-                    additionalOptions.append('<option value="f2">Opcja F2</option>');
-                } else if (selectedValue == '7') {
-                    additionalOptions.append('<option value="g1">Opcja G1</option>');
-                    additionalOptions.append('<option value="g2">Opcja G2</option>');
-                } else if (selectedValue == '8') {
-                    additionalOptions.append('<option value="h1">Opcja H1</option>');
-                    additionalOptions.append('<option value="h2">Opcja H2</option>');
-                } else if (selectedValue == '9') {
-                    additionalOptions.append('<option value="i1">Opcja I1</option>');
-                    additionalOptions.append('<option value="i2">Opcja I2</option>');
-                } else if (selectedValue == '10') {
-                    additionalOptions.append('<option value="j1">Opcja J1</option>');
-                    additionalOptions.append('<option value="j2">Opcja J2</option>');
-                } else if (selectedValue == '11') {
-                    additionalOptions.append('<option value="k1">Opcja K1</option>');
-                    additionalOptions.append('<option value="k2">Opcja K2</option>');
-                } else if (selectedValue == '12') {
-                    additionalOptions.append('<option value="l1">Opcja L1</option>');
-                    additionalOptions.append('<option value="l2">Opcja L2</option>');
-                } else if (selectedValue == '13') {
-                    additionalOptions.append('<option value="m1">Opcja M1</option>');
-                    additionalOptions.append('<option value="m2">Opcja M2</option>');
-                } else if (selectedValue == '14') {
-                    additionalOptions.append('<option value="n1">Opcja N1</option>');
-                    additionalOptions.append('<option value="n2">Opcja N2</option>');
-                } else if (selectedValue == '15') {
-                    additionalOptions.append('<option value="o1">Opcja O1</option>');
-                    additionalOptions.append('<option value="o2">Opcja O2</option>');
-                } else if (selectedValue == '16') {
-                    additionalOptions.append('<option value="p1">Opcja P1</option>');
-                    additionalOptions.append('<option value="p2">Opcja P2</option>');
-                } else if (selectedValue == '17') {
-                    additionalOptions.append('<option value="q1">Opcja Q1</option>');
-                    additionalOptions.append('<option value="q2">Opcja Q2</option>');
-                } else if (selectedValue == '18') {
-                    additionalOptions.append('<option value="r1">Opcja R1</option>');
-                    additionalOptions.append('<option value="r2">Opcja R2</option>');
-                } else if (selectedValue == '19') {
-                    additionalOptions.append('<option value="s1">Opcja S1</option>');
-                    additionalOptions.append('<option value="s2">Opcja S2</option>');
-                } else if (selectedValue == '20') {
-                    additionalOptions.append('<option value="t1">Opcja T1</option>');
-                    additionalOptions.append('<option value="t2">Opcja T2</option>');
-                } else if (selectedValue == '21') {
-                    additionalOptions.append('<option value="u1">Opcja U1</option>');
-                    additionalOptions.append('<option value="u2">Opcja U2</option>');
+                hide: function (deleteElement) {
+                    $(this).slideUp(deleteElement);
                 }
-            } else {
-                additionalOptionsDiv.addClass('d-none'); // Ukrycie sekcji z dodatkowymi opcjami
-            }
+            });
         });
-    });
-</script>
-
+    </script>
 </body>
 </html>
