@@ -2,30 +2,26 @@
 var KTCreateAccount = function() {
     var e, t, i, o, a, r, s = [];
 
-    function waitForRepeaterForm(callback) {
-        const maxAttempts = 10;
-        let attempts = 0;
-
-        setTimeout(function tryFindingForm() {
+    function observeForm(callback) {
+        const observer = new MutationObserver((mutations, observerInstance) => {
             const form = document.getElementById("kt_docs_repeater_form");
-            console.log("Attempting to find form... attempt:", attempts);
-
             if (form) {
                 console.log("Form found:", form);
+                observerInstance.disconnect(); // stop observing
                 callback(form);
-            } else if (attempts < maxAttempts) {
-                attempts++;
-                setTimeout(tryFindingForm, 300);
-            } else {
-                console.log("Form not found after", maxAttempts, "attempts.");
             }
-        }, 300);
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
     }
 
     function initRepeater() {
         console.log("Initializing repeater and validation");
 
-        waitForRepeaterForm(function(form) {
+        observeForm(function(form) {
             if (form) {
                 console.log("Form element found for repeater initialization");
 
@@ -392,12 +388,12 @@ var KTCreateAccount = function() {
                     } else {
                         Swal.fire({
                             text: "Przepraszamy, wygląda na to, że wykryto pewne błędy na formularzu, proszę przejrzeć wymagane pola i spróbować ponownie.",
-                            icon: "error",
-                            buttonsStyling: !1,
-                            confirmButtonText: "Ok, rozumiem!",
-                            customClass: {
-                                confirmButton: "btn btn-light"
-                            }
+                                icon: "error",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, rozumiem!",
+                                customClass: {
+                                    confirmButton: "btn btn-light"
+                                }
                         }).then(function() {
                             KTUtil.scrollTop();
                         });
