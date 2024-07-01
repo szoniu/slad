@@ -5,6 +5,7 @@ var KTCreateAccount = function() {
     function observeForm(callback) {
         const observer = new MutationObserver((mutations, observerInstance) => {
             const form = document.getElementById("kt_docs_repeater_form");
+            console.log("Mutation observed. Checking for form:", form);
             if (form) {
                 console.log("Form found:", form);
                 observerInstance.disconnect(); // stop observing
