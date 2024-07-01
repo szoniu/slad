@@ -2,107 +2,125 @@
 var KTCreateAccount = function() {
     var e, t, i, o, a, r, s = [];
 
+    function waitForRepeaterForm(callback) {
+        const maxAttempts = 10;
+        let attempts = 0;
+
+        const interval = setInterval(() => {
+            const form = document.getElementById("kt_docs_repeater_form");
+            console.log("Attempting to find form... attempt:", attempts);
+
+            if (form || attempts >= maxAttempts) {
+                clearInterval(interval);
+                if (form) {
+                    console.log("Form found:", form);
+                    callback(form);
+                } else {
+                    console.log("Form not found after", maxAttempts, "attempts.");
+                }
+            }
+            attempts++;
+        }, 300);
+    }
+
     function initRepeater() {
         console.log("Initializing repeater and validation");
 
-        const form = document.getElementById("kt_docs_repeater_form");
+        waitForRepeaterForm(function(form) {
+            if (form) {
+                console.log("Form element found for repeater initialization");
 
-        if (form) {
-            console.log("Form element found for repeater initialization");
+                var validator = FormValidation.formValidation(
+                    form,
+                    {
+                        plugins: {
+                            trigger: new FormValidation.plugins.Trigger(),
+                            bootstrap: new FormValidation.plugins.Bootstrap5({
+                                rowSelector: ".fv-row",
+                                eleInvalidClass: "",
+                                eleValidClass: ""
+                            }),
+                            excluded: new FormValidation.plugins.Excluded({
+                                excluded: function (field, ele, eles) {
+                                    if (form.querySelector('[name="' + field + '"]') === null) {
+                                        return true;
+                                    }
+                                },
+                            }),
+                        }
+                    }
+                );
 
-            var validator = FormValidation.formValidation(
-                form,
-                {
-                    plugins: {
-                        trigger: new FormValidation.plugins.Trigger(),
-                        bootstrap: new FormValidation.plugins.Bootstrap5({
-                            rowSelector: ".fv-row",
-                            eleInvalidClass: "",
-                            eleValidClass: ""
-                        }),
-                        excluded: new FormValidation.plugins.Excluded({
-                            excluded: function (field, ele, eles) {
-                                if (form.querySelector('[name="' + field + '"]') === null) {
-                                    return true;
-                                }
+                const addFields = function(index) {
+                    console.log("Adding fields for index:", index);
+                    const namePrefix = "data[" + index + "]";
+
+                    validator.addField(namePrefix + "[select2_input]", {
+                        validators: {
+                            notEmpty: {
+                                message: "Select2 input is required"
+                            }
+                        }
+                    });
+
+                    validator.addField(namePrefix + "[email]", {
+                        validators: {
+                            emailAddress: {
+                                message: "The value is not a valid email address"
                             },
-                        }),
-                    }
+                            notEmpty: {
+                                message: "Email address is required"
+                            }
+                        }
+                    });
+
+                    validator.addField(namePrefix + "[primary][]", {
+                        validators: {
+                            notEmpty: {
+                                message: "Required"
+                            }
+                        }
+                    });
+
+                    $('[name="' + namePrefix + '[select2_input]"]').select2({
+                        placeholder: 'Select an option',
+                        width: '100%'
+                    }).on('change', function () {
+                        validator.revalidateField(namePrefix + '[select2_input]');
+                    });
+                };
+
+                const removeFields = function(index) {
+                    console.log("Removing fields for index:", index);
+                    const namePrefix = "data[" + index + "]";
+
+                    validator.removeField(namePrefix + "[select2_input]");
+                    validator.removeField(namePrefix + "[email]");
+                    validator.removeField(namePrefix + "[primary][]");
                 }
-            );
 
-            const addFields = function(index) {
-                console.log("Adding fields for index:", index);
-                const namePrefix = "data[" + index + "]";
+                $(form).repeater({
+                    initEmpty: false,
 
-                validator.addField(namePrefix + "[select2_input]", {
-                    validators: {
-                        notEmpty: {
-                            message: "Select2 input is required"
-                        }
+                    show: function () {
+                        console.log("Show function called");
+                        $(this).slideDown();
+
+                        const index = $(this).closest("[data-repeater-item]").index();
+                        console.log("Item added at index:", index);
+
+                        addFields(index);
+                    },
+
+                    hide: function (deleteElement) {
+                        console.log("Hide function called");
+                        $(this).slideUp(deleteElement);
                     }
                 });
 
-                validator.addField(namePrefix + "[email]", {
-                    validators: {
-                        emailAddress: {
-                            message: "The value is not a valid email address"
-                        },
-                        notEmpty: {
-                            message: "Email address is required"
-                        }
-                    }
-                });
+                addFields(0);
 
-                validator.addField(namePrefix + "[primary][]", {
-                    validators: {
-                        notEmpty: {
-                            message: "Required"
-                        }
-                    }
-                });
-
-                $('[name="' + namePrefix + '[select2_input]"]').select2({
-                    placeholder: 'Select an option',
-                    width: '100%'
-                }).on('change', function () {
-                    validator.revalidateField(namePrefix + '[select2_input]');
-                });
-            };
-
-            const removeFields = function(index) {
-                console.log("Removing fields for index:", index);
-                const namePrefix = "data[" + index + "]";
-
-                validator.removeField(namePrefix + "[select2_input]");
-                validator.removeField(namePrefix + "[email]");
-                validator.removeField(namePrefix + "[primary][]");
-            }
-
-            $(form).repeater({
-                initEmpty: false,
-
-                show: function () {
-                    console.log("Show function called");
-                    $(this).slideDown();
-
-                    const index = $(this).closest("[data-repeater-item]").index();
-                    console.log("Item added at index:", index);
-
-                    addFields(index);
-                },
-
-                hide: function (deleteElement) {
-                    console.log("Hide function called");
-                    $(this).slideUp(deleteElement);
-                }
-            });
-
-            // Initial fields
-            addFields(0);
-
-            const submitButton = document.getElementById("kt_docs_repeater_button");
-            if (submitButton) {
+                const submitButton = document.getElementById("kt_docs_repeater_button");
                 submitButton.addEventListener("click", function (e) {
                     e.preventDefault();
                     console.log("Submit button clicked");
@@ -128,7 +146,6 @@ var KTCreateAccount = function() {
                                         }
                                     });
 
-                                    //form.submit(); // Submit form
                                 }, 2000);
                             } else {
                                 console.log("Form is invalid");
@@ -137,26 +154,8 @@ var KTCreateAccount = function() {
                     }
                 });
             } else {
-                console.log("Submit button not found");
+                console.log("Form element not found");
             }
-        } else {
-            console.log("Form element not found");
-        }
-    }
-
-    function waitForRepeaterForm(callback) {
-        const observer = new MutationObserver((mutations, me) => {
-            const form = document.getElementById("kt_docs_repeater_form");
-            if (form) {
-                callback();
-                me.disconnect(); // stop observing
-                return;
-            }
-        });
-
-        observer.observe(document, {
-            childList: true,
-            subtree: true
         });
     }
 
@@ -173,7 +172,7 @@ var KTCreateAccount = function() {
 
                 if (r.getCurrentStepIndex() === 2) { // Step 2
                     console.log("Initializing repeater and validation for step 2...");
-                    waitForRepeaterForm(initRepeater);
+                    initRepeater(); // Initialize the repeater when we are on step 2
                 }
 
                 if (r.getCurrentStepIndex() === 4) {
