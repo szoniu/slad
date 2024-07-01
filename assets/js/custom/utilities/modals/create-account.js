@@ -2,8 +2,22 @@
 var KTCreateAccount = function() {
     var e, t, i, o, a, r, s = [];
 
+    function ensureFormHasId() {
+        let form = document.querySelector("#kt_docs_repeater_form");
+        if (!form) {
+            form = document.querySelector(".form[data-kt-stepper-element='content'] form");
+            if (form) {
+                form.id = "kt_docs_repeater_form";
+                console.log("Form ID added dynamically");
+            } else {
+                console.log("Form element still not found");
+            }
+        }
+        return form;
+    }
+
     function initRepeater() {
-        const form = document.querySelector("#kt_docs_repeater_form");
+        const form = ensureFormHasId();
         if (form) {
             console.log("Form element found for repeater initialization");
 
@@ -146,8 +160,8 @@ var KTCreateAccount = function() {
             (r = new KTStepper(t)).on("kt.stepper.changed", function(e) {
                 console.log("Step changed to: " + r.getCurrentStepIndex());
 
-                if (r.getCurrentStepIndex() === 2) { // Step 2
-                    console.log("Initializing repeater and validation for step 2...");
+                if (r.getCurrentStepIndex() === 1) { // Step 1 (Zmieniłem z 2 na 1, ponieważ teraz to jest krok pierwszy)
+                    console.log("Initializing repeater and validation for step 1...");
                     setTimeout(initRepeater, 100); // Delay to ensure the form is rendered
                 }
 
