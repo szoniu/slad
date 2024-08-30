@@ -161,6 +161,7 @@ $(document).ready(function() {
 // Repeater
 
 $(document).ready(function() {
+
     // Inicjalizacja dla stacjonarnych źródeł emisji
     $('#kt_docs_repeater_stacjonarne').repeater({
         initEmpty: false,
@@ -182,4 +183,79 @@ $(document).ready(function() {
             $(this).slideUp(deleteElement);
         }
     });
+
+    // Inicjalizacja dla energii elektrycznej
+    $('#kt_docs_repeater_energia_elektryczna').repeater({
+        initEmpty: false,
+        show: function () {
+            $(this).slideDown();
+        },
+        hide: function (deleteElement) {
+            $(this).slideUp(deleteElement);
+        }
+    });
+
+    // Inicjalizacja dla energii cieplnej
+    $('#kt_docs_repeater_energia_cieplna').repeater({
+        initEmpty: false,
+        show: function () {
+            $(this).slideDown();
+        },
+        hide: function (deleteElement) {
+            $(this).slideUp(deleteElement);
+        }
+    });
 });
+
+// Wykresy:
+
+ var ctxPie = document.getElementById('pieChart').getContext('2d');
+    var ctxBar = document.getElementById('barChart').getContext('2d');
+
+    var pieChart = new Chart(ctxPie, {
+        type: 'doughnut',
+        data: {
+            labels: ['Zakres 1', 'Zakres 2'],
+            datasets: [{
+                data: [2.97, 124.75],
+                backgroundColor: ['#4caf50', '#ff9800']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+            }
+        }
+    });
+
+    var barChart = new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+            labels: ['Energia elektryczna', 'Energia cieplna'],
+            datasets: [{
+                label: 'Zakres 2 - location-based',
+                data: [80810, 43940],
+                backgroundColor: '#3e95cd'
+            }, {
+                label: 'Zakres 2 - market-based',
+                data: [70000, 30000], // Przykładowe dane
+                backgroundColor: '#8e5ea2'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+            }
+        }
+    });
