@@ -620,6 +620,84 @@
                 </div>
             </div>
 
+            <!-- Ramka z informacjami o redukcji -->
+            <div class="row mb-5 p-4" style="background-color: #f2f2f9; border-radius: 8px;">
+                <div class="col-md-8">
+                    <h3 class="fw-bold">Podejmij akcje, zacznij redukować emisje</h3>
+                    <p class="text-muted">W zakresie w jakim podlegam przepisom o ochronie danych osobowych:</p>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="consent1">
+                        <label class="form-check-label" for="consent1">
+                            Wyrażam zgodę na udostępnienie przez ING Usługi dla Biznesu S.A. moich danych osobowych (tj.
+                            NIP, nazwa firmy, imię, nazwisko oraz adres e-mail) do ING Bank Śląski S.A. w celu oceny
+                            ryzyka transformacji.
+                        </label>
+                    </div>
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="consent2">
+                        <label class="form-check-label" for="consent2">
+                            Wyrażam zgodę na udostępnienie przez ING Usługi dla Biznesu S.A. moich danych osobowych (tj.
+                            NIP, nazwa firmy, imię, nazwisko oraz adres e-mail) do Fundacji Climate Strategies Poland z
+                            siedzibą w Gdańsku, w celu przekazywania mi oraz reprezentowanemu przeze mnie podmiotowi
+                            informacji branżowych, dotyczących konkurencyjności klimatycznej przedsiębiorstw oraz
+                            aktualizacji o wydarzeniach organizowanych przez Fundację Climate Strategies Poland.
+                        </label>
+                    </div>
+                    <p class="text-muted">Wiem, że mam prawo w dowolnym momencie wycofać zgodę. Wycofanie zgody nie
+                        wpływa na zgodność z prawem przetwarzania, którego dokonano na podstawie zgody przed jej
+                        wycofaniem.</p>
+                    <button type="button" class="btn btn-success"
+                            onclick="window.location.href='{{ url_for('generate_pdf') }}'">Pobierz raport PDF
+                    </button>
+                    <button type="button" class="btn btn-primary">Umów się na konsultację</button>
+                </div>
+                <div class="col-md-4 text-end">
+                    <h3 class="fw-bold text-gray-900">Emisje po redukcji</h3>
+                    <h1 class="display-5 fw-bold text-primary">46.91 <span class="fs-4">t CO2e/rok</span></h1>
+                    <p class="fw-bold">Redukcja <span class="text-primary">63.27%</span></p>
+                </div>
+            </div>
+
+            <!-- Opisy dotyczące metodologii -->
+            <div class="row mb-5">
+                <div class="col-md-12">
+                    <p class="text-muted">
+                        Kalkulację należy traktować wyłącznie jako estymację śladu węglowego. Nie stanowi ona wyłącznej
+                        metodyki obliczeń dokonywanych przez Fundację Climate Strategies Poland oraz nie uwzględnia w
+                        sposób wyczerpujący wszystkich okoliczności mających wpływ na obliczenie śladu węglowego.
+                    </p>
+                    <p class="text-muted">
+                        Wykorzystany w opracowaniu wskaźnik emisji GHG, spośród powszechnie dostępnych, charakteryzuje
+                        się istotnością:
+                    </p>
+                    <ul class="text-muted">
+                        <li>czasową – wskaźniki adekwatne/najbliższe dla okresu, dla którego liczony jest ślad
+                            węglowy,
+                        </li>
+                        <li>geograficzną – wskaźniki reprezentatywne dla obszaru, dla którego liczony jest ślad
+                            węglowy,
+                        </li>
+                        <li>technologiczną – wskaźniki uwzględniające stosowaną technologię, dla której liczony jest
+                            ślad węglowy.
+                        </li>
+                    </ul>
+                    <p class="text-muted">
+                        Polegamy na współczynnikach z uznanych, recenzowanych, oficjalnie publikowanych źródeł:
+                    </p>
+                    <ul class="text-muted">
+                        <li>krajowych i międzynarodowych ośrodków badawczych,</li>
+                        <li>stowarzyszeń branżowych,</li>
+                        <li>ośrodków odpowiedzialnych za regulacje prawne, monitoring, statystyki w dedykowanych
+                            obszarach.
+                        </li>
+                    </ul>
+                    <p class="text-muted">
+                        Nasze podejście jest zgodne z zapisami metodyk GHG Protocol, IPCC, a także wskazanych norm. 1
+                        12006 IPCC Guidelines for National Greenhouse Gas Inventories. Chapter 2: Approaches to Data
+                        Collection; GHG Protocol: A Corporate Accounting and Reporting Standard; PAS 2050:2011.
+                    </p>
+                </div>
+            </div>
             <!-- Step navigation buttons -->
             <button type="button" class="btn btn-secondary prev-step">Wstecz</button>
             <button type="button" class="btn btn-primary next-step">Następny krok</button>
@@ -628,13 +706,124 @@
 
         <!-- Step 5 (Hidden by default) -->
         <div class="step d-none" data-step="5">
-            <div class="mb-4">
-                <label class="form-label required">Kolejne kroki</label>
-                <textarea name="next_steps" class="form-control form-control-lg" rows="4" required></textarea>
+            <!-- Sekcje A1 i A2 -->
+            <div class="row mb-5">
+                <div class="col-md-12">
+                    <h3 class="fw-bold text-gray-900">Gratulacje! Wiesz już, jaki ślad węglowy generuje działalność
+                        Twojej firmy w zakresie 1 i 2 GHG.</h3>
+                    <p>To pierwszy krok w kierunku obniżenia emisji gazów cieplarnianych. Co dalej? W przygotowaniu i
+                        wdrożeniu strategii redukcji emisyjności pomogą Ci dźwignie redukcji śladu węglowego. Są to
+                        działania, które doprowadzą do obniżenia emisji ze źródeł, które mają duży udział w całkowitym
+                        śladzie węglowym przedsiębiorstwa.</p>
+                </div>
             </div>
-            <button type="button" class="btn btn-secondary" id="prev-step">Poprzedni krok</button>
+
+            <!-- Zakresy -->
+            <div class="row mb-5">
+                <div class="col-md-12">
+                    <h4 class="fw-bold text-gray-900">Zakres 1</h4>
+                    <ul>
+                        <li>Wybieraj pojazdy o niższym śladzie węglowym, np. korzystaj z wózka widłowego zasilanego
+                            energią elektryczną pochodzącą z OZE.
+                        </li>
+                        <li>Wymień samochody spalinowe na takie, które są zasilane energią elektryczną pochodzącą ze
+                            źródeł odnawialnych.
+                        </li>
+                        <li>Postaw na naturalne czynniki chłodnicze w klimatyzacji.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="row mb-5">
+                <div class="col-md-12">
+                    <h4 class="fw-bold text-gray-900">Zakres 2</h4>
+                    <ul>
+                        <li>Korzystaj z energii elektrycznej, która pochodzi z odnawialnych źródeł emisji, np. zielonej
+                            energii elektrycznej.
+                        </li>
+                        <li>Redukuj zużycie mediów.</li>
+                        <li>Wprowadź elektryczne ogrzewanie w budynkach.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="row mb-5">
+                <div class="col-md-12">
+                    <h4 class="fw-bold text-gray-900">Zakres 3</h4>
+                    <ul>
+                        <li>Ograniczaj zakup materiałów i dobór kapitałowych.</li>
+                        <li>Redukuj zużycie surowców dzięki optymalizacji procesów.</li>
+                        <li>Weryfikuj łańcuch dostaw, czyli sprawdzaj skąd pochodzą surowce i jak są transportowane.
+                        </li>
+                        <li>Uświadamiaj pracowników w zakresie proekologicznych zachowań (np. wyboru roweru zamiast
+                            samochodu).
+                        </li>
+                        <li>Segreguj odpady.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="row mb-5">
+                <div class="col-md-12">
+                    <h4 class="fw-bold text-gray-900">Co dalej? Jak możesz wykorzystać estymację śladu węglowego swojej
+                        firmy?</h4>
+                    <ol>
+                        <li><strong>Sprawdź poprawność danych w formularzu:</strong> Podstawę do zewnętrznego
+                            raportowania informacji na temat wyliczonego śladu węglowego stanowi zgodność obliczeń ze
+                            standardem kalkulacji gazów cieplarnianych GHG Protocol. Indywidualna konsultacja z naszym
+                            ekspertem pozwoli Ci zweryfikować, czy wprowadzone w kalkulatorze dane zostały wprowadzone
+                            poprawnie.
+                        </li>
+                        <li><strong>Zaprojektuj strategię redukcji emisji:</strong> Dobrze przygotowana strategia to
+                            skomplikowany i powiązany system regulacyjno – społeczno – gospodarczy, w który zaangażowani
+                            są praktycznie wszyscy interesariusze. Wymaga on kilku milowych kroków i zdefiniowania
+                            najważniejszych założeń tj. zmapowania obszarów działalności czy potencjalnych sposobów
+                            osiągania neutralności klimatycznej. Pomagamy odpowiednio zaplanować i sukcesywnie wdrażać
+                            te działania, by przyniosły jak największe korzyści.
+                        </li>
+                        <li><strong>Redukuj emisje gazów cieplarnianych:</strong> Po obliczeniu śladu węglowego firmy
+                            pojawia się pytanie: co dalej? To jest ten moment, kiedy należy zastanowić się nad
+                            możliwością stworzenia i wdrożenia planu redukcji emisji oraz strategii unikania emisji
+                            zarówno we własnym zakresie, jak i w całym łańcuchu wartości. Dobrą praktyką jest, by
+                            ograniczanie emisji rozpocząć od najprostszych kroków, które nie wymagają od nas większego
+                            wysiłku, i stopniowo przechodzić do najbardziej skomplikowanych i czasochłonnych procesów.
+                        </li>
+                        <li><strong>Kompensuj ślad węglowy:</strong> Kolejnym krokiem po wdrożeniu działań
+                            ograniczających emisje gazów cieplarnianych jest kompensacja emisji, których nie da się
+                            zredukować. Wybór działań offsetowych jest trudnym tematem, wokół którego pojawia się
+                            mnóstwo sprzecznych informacji. Łatwo wpaść w pułapkę i nawet mając najlepsze zamiary –
+                            zostać posądzonym o greenwashing. Dlatego bazując na doświadczeniu naszych ekspertów,
+                            pomagamy przedsiębiorstwom podjąć najlepsze dla nich decyzje.
+                        </li>
+                        <li><strong>Opracuj strategię komunikacji wewnętrznej i zewnętrznej:</strong> Nawet
+                            najrzetelniej przygotowana strategia redukcji i kompensacji emisji może przysporzyć
+                            problemów, jeśli nie będzie odpowiednio komunikowana. W pracy z firmami kładziemy nacisk na
+                            odpowiedzialną komunikację klimatyczną, pokazywanie działań firmy w szerszym kontekście i
+                            adresowanie obszarów jej największej emisyjności. Prowadzimy warsztaty w obszarze
+                            greenwashingu w deklaracjach klimatycznych.
+                        </li>
+                        <li><strong>Pokaż się światu:</strong> Jednym ze sposobów zaprezentowania i zweryfikowania
+                            środowiskowej polityki firmy jest sprawozdanie wyników emisyjności i działań
+                            proklimatycznych w raportach globalnego projektu CDP. Takie raportowanie pomaga zmierzyć
+                            postępy, ale też pozycjonuje firmę na tle danej branży oraz firm podobnej wielkości, zarówno
+                            w Polsce, Europie jak i na świecie. Do tej pory swoje wyniki opublikowało tu ponad 10
+                            tysięcy zaangażowanych klimatycznie firm, miast i regionów. Zgłaszając się do CDP, można
+                            uzyskać przewagę nad konkurencją. Ujawnianie wyników pomaga również wyprzedzić zmiany
+                            regulacyjne i polityczne. Niesie to możliwość znalezienia nowych strumieni działania,
+                            których wymagają inwestorzy i klienci na całym świecie. Proces opracowania wyników pod kątem
+                            raportowania do CDP jest żmudny i czasochłonny. Nasza Fundacja pomaga w systematyzacji i ich
+                            ujawnieniu względem CDP.
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Step navigation buttons -->
+            <button type="button" class="btn btn-secondary prev-step">Wstecz</button>
             <button type="submit" class="btn btn-success">Zakończ i zapisz</button>
         </div>
+
+
     </form>
 </div>
 </form>
