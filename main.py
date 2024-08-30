@@ -1,15 +1,35 @@
 import pandas as pd
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 from sqlalchemy import text
 
 from database import engine  # Import engine z pliku database.py
 
-app = Flask(__name__, static_url_path='/assets', static_folder='assets')
+app = Flask(__name__, static_url_path='/static', static_folder='static')
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
+    if request.method == 'POST':
+        # Odbierz dane z formularza
+        company_name = request.form.get('company_name')
+        company_nip = request.form.get('company_nip')
+        business_type = request.form.get('business_type')
+        # Pobrane dane możesz teraz przetworzyć lub zapisać do bazy danych
+        # Zwróć użytkownikowi odpowiednią odpowiedź
+        return redirect(url_for('index'))
     return render_template('index.html')
+
+
+@app.route('/save_company_profile', methods=['POST'])
+def save_company_profile():
+    # Odbierz dane z formularza
+    company_name = request.form.get('company_name')
+    company_nip = request.form.get('company_nip')
+    business_type = request.form.get('business_type')
+    # Pobrane dane możesz teraz przetworzyć lub zapisać do bazy danych
+
+    # Zwróć użytkownikowi odpowiednią odpowiedź
+    return redirect(url_for('index'))
 
 
 @app.route('/database')
