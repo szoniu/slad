@@ -157,3 +157,29 @@ $(document).ready(function() {
     // Initialize step 1 as visible
     showStep(currentStep);
 });
+
+// Repeater
+
+$(document).ready(function() {
+    // Inicjalizacja dla stacjonarnych źródeł emisji
+    $('#kt_docs_repeater_stacjonarne').repeater({
+        initEmpty: false,
+        show: function () {
+            $(this).slideDown();
+        },
+        hide: function (deleteElement) {
+            $(this).slideUp(deleteElement);
+        }
+    });
+
+    // Inicjalizacja dla mobilnych źródeł emisji
+    $('#kt_docs_repeater_mobilne').repeater({
+        initEmpty: false,
+        show: function () {
+            $(this).slideDown();
+        },
+        hide: function (deleteElement) {
+            $(this).slideUp(deleteElement);
+        }
+    });
+});

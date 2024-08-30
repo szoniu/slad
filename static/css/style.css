@@ -1,34 +1,19 @@
 .stepper-nav {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start; /* Ustawiamy, aby elementy były wyrównane do góry */
     position: relative;
     margin-top: 20px;
-    padding: 0 10px; /* Zmniejszenie odstępu po bokach */
-}
-
-.stepper-nav::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: calc(12px + 10px); /* Zaczyna się od środka pierwszego kółka, plus padding */
-    right: calc(12px + 10px); /* Kończy się na środku ostatniego kółka, minus padding */
-    height: 2px;
-    background-color: #28a745;
-    z-index: -1;
-    transform: translateY(-50%);
 }
 
 .stepper-item {
     flex: 1;
     text-align: center;
     position: relative;
-}
-
-.stepper-item h3 {
-    margin-bottom: 0;
-    font-size: 1rem;
-    margin-top: 1rem;
+    min-height: 60px; /* Minimalna wysokość elementu, aby wszystkie kropki były na tej samej wysokości */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .stepper-item .circle {
@@ -37,13 +22,20 @@
     background-color: #fff;
     border: 2px solid #28a745;
     border-radius: 50%;
-    margin: 0 auto 10px auto; /* Dostosowanie marginesu */
+    margin-bottom: 8px; /* Dodajemy odstęp między kropką a tekstem */
     position: relative;
     z-index: 1;
 }
 
 .stepper-item.current .circle {
     background-color: #28a745;
+}
+
+.stepper-item h3 {
+    font-weight: normal;
+    color: #000;
+    margin-top: 0;
+    font-size: 1rem;
 }
 
 .stepper-item.current h3 {

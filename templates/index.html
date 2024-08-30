@@ -202,13 +202,158 @@
 
         <!-- Step 2 (Hidden by default) -->
         <div class="step d-none" data-step="2">
-            <div class="mb-4">
-                <label class="form-label required">Zakres 1: emisje bezpośrednie</label>
-                <input type="text" name="emissions_direct" class="form-control form-control-lg" required/>
+            <div class="w-100">
+                <!-- Stacjonarne źródła emisji -->
+                <div class="pb-10 pb-lg-15">
+                    <h2 class="fw-bold d-flex align-items-center text-gray-900">Stacjonarne źródła emisji</h2>
+                    <div class="text-muted fw-semibold fs-6">
+                        Uzupełnij dane dotyczące wszystkich rodzajów paliw zużywanych w źródłach stacjonarnych.
+                        Uwzględnij spalanie paliw stałych (np. węgiel, drewno, pellet), gazowych (np. gaz ziemny na
+                        ogrzewanie budynku)
+                        oraz ciekłych (np. benzyna do agregatów). Podaj emisje powstałe w wyniku procesów
+                        technologicznych oraz ulatniających się czynników chłodniczych z klimatyzacji.
+                    </div>
+                </div>
+
+                <!-- Repeater for Stacjonarne źródła emisji -->
+                <div id="kt_docs_repeater_stacjonarne">
+                    <div class="form-group">
+                        <div data-repeater-list="stacjonarne_emissions">
+                            <div data-repeater-item>
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Paliwo:</label>
+                                        <select class="form-select" name="paliwo" data-control="select2"
+                                                data-placeholder="Select an option">
+                                            <option></option>
+                                            <option value="węgiel">Węgiel</option>
+                                            <option value="gaz">Gaz ziemny</option>
+                                            <option value="drewno">Drewno</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Zużycie:</label>
+                                        <input type="text" class="form-control" name="zuzycie"
+                                               placeholder="Wprowadź zużycie"/>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Jednostka:</label>
+                                        <select class="form-select" name="jednostka" data-control="select2"
+                                                data-placeholder="Select an option">
+                                            <option></option>
+                                            <option value="kWh">kWh</option>
+                                            <option value="m3">m³</option>
+                                            <option value="litry">litry</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <a href="javascript:;" data-repeater-delete
+                                           class="btn btn-sm btn-light-danger mt-3">
+                                            <i class="ki-duotone ki-trash fs-5"></i> Usuń
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-5">
+                        <a href="javascript:;" data-repeater-create class="btn btn-light-primary">
+                            <i class="ki-duotone ki-plus fs-3"></i> Dodaj źródło emisji
+                        </a>
+                    </div>
+                </div>
+
+                <div class="separator my-5"></div>
+
+                <!-- Mobilne źródła emisji -->
+                <div class="pb-10 pb-lg-15">
+                    <h2 class="fw-bold d-flex align-items-center text-gray-900">Mobilne źródła emisji</h2>
+                    <div class="text-muted fw-semibold fs-6">
+                        Wpisz dane dotyczące firmowych pojazdów. Uwzględnij wszystkie auta, które są własnością lub
+                        podlegają nadzorowi firmy, w tym pojazdy leasingowane.
+                    </div>
+                </div>
+
+                <!-- Repeater for Mobilne źródła emisji -->
+                <div id="kt_docs_repeater_mobilne">
+                    <div class="form-group">
+                        <div data-repeater-list="mobilne_emissions">
+                            <div data-repeater-item>
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Liczba pojazdów:</label>
+                                        <input type="number" class="form-control" name="liczba_pojazdow"
+                                               placeholder="Wprowadź liczbę pojazdów" required/>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Rodzaj pojazdu:</label>
+                                        <select class="form-select" name="rodzaj_pojazdu" required>
+                                            <option></option>
+                                            <option value="Samochód osobowy">Samochód osobowy</option>
+                                            <option value="Samochód ciężarowy">Samochód ciężarowy</option>
+                                            <option value="Motocykl">Motocykl</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Sposób zasilania:</label>
+                                        <select class="form-select" name="sposob_zasilania" required>
+                                            <option></option>
+                                            <option value="Benzyna">Benzyna</option>
+                                            <option value="Diesel">Diesel</option>
+                                            <option value="Elektryczny">Elektryczny</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Zużycie paliwa:</label>
+                                        <input type="number" class="form-control" name="zuzycie_paliwa"
+                                               placeholder="Wprowadź zużycie paliwa" required/>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Jednostka:</label>
+                                        <select class="form-select" name="jednostka" required>
+                                            <option></option>
+                                            <option value="l/rok">l/rok</option>
+                                            <option value="km/rok">km/rok</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Sposób podania danych o zużyciu paliwa:</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="sposob_podania"
+                                                   value="litry" required>
+                                            <label class="form-check-label">litry</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="sposob_podania"
+                                                   value="kilometry" required>
+                                            <label class="form-check-label">kilometry</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mt-4">
+                                        <a href="javascript:;" data-repeater-delete
+                                           class="btn btn-sm btn-light-danger mt-3">
+                                            <i class="ki-duotone ki-trash fs-5"></i> Usuń
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-5">
+                        <a href="javascript:;" data-repeater-create class="btn btn-light-primary">
+                            <i class="ki-duotone ki-plus fs-3"></i> Dodaj pojazd
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Stepper Navigation Buttons -->
+                <button type="button" class="btn btn-secondary prev-step">Poprzedni krok</button>
+                <button type="button" class="btn btn-primary next-step">Następny krok</button>
             </div>
-            <button type="button" class="btn btn-secondary prev-step">Poprzedni krok</button>
-            <button type="button" class="btn btn-primary next-step">Następny krok</button>
         </div>
+
 
         <!-- Step 3 (Hidden by default) -->
         <div class="step d-none" data-step="3">
@@ -249,6 +394,8 @@
 
 <!-- jQuery (opcjonalnie) -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery.repeater@1.2.1/jquery.repeater.min.js"></script>
+
 
 <!-- Custom JS (opcjonalnie) -->
 <script src="{{ url_for('static', filename='js/form.js') }}"></script>
