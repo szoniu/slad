@@ -582,7 +582,6 @@
             <div class="row mb-5">
                 <div class="col-md-6">
                     <h5 class="fw-bold text-gray-900">Porównanie emisji przedsiębiorstwa</h5>
-                    <!-- Tutaj można umieścić ikonki z krótkimi opisami, jak na screenie -->
                     <ul class="list-unstyled">
                         <li>218 osób można rocznie zaopatrzyć w energię elektryczną</li>
                         <li>90 osób musiałoby przesiąść się z samochodu na rower, żeby skompensować te emisje</li>
@@ -590,19 +589,15 @@
                         <li>15 razy można okrążyć Ziemię samochodem</li>
                     </ul>
                 </div>
-                <div class="col-md-6">
-                    <div id="pieChart" class="d-flex justify-content-center">
-                        <!-- Miejsce na wykres kołowy -->
-                    </div>
+                <div class="col-md-6 d-flex justify-content-center align-items-center" style="height: 300px;">
+                    <canvas id="pieChart"></canvas>
                 </div>
             </div>
 
             <!-- Wykres słupkowy -->
             <div class="row mb-5">
-                <div class="col-md-12">
-                    <div id="barChart" class="d-flex justify-content-center">
-                        <!-- Miejsce na wykres słupkowy -->
-                    </div>
+                <div class="col-md-12" style="height: 200px;">
+                    <canvas id="barChart"></canvas>
                 </div>
             </div>
 

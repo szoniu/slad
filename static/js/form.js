@@ -209,7 +209,8 @@ $(document).ready(function() {
 
 // Wykresy:
 
- var ctxPie = document.getElementById('pieChart').getContext('2d');
+document.addEventListener('DOMContentLoaded', function() {
+    var ctxPie = document.getElementById('pieChart').getContext('2d');
     var ctxBar = document.getElementById('barChart').getContext('2d');
 
     var pieChart = new Chart(ctxPie, {
@@ -223,6 +224,7 @@ $(document).ready(function() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     position: 'bottom',
@@ -247,6 +249,7 @@ $(document).ready(function() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true
@@ -259,3 +262,4 @@ $(document).ready(function() {
             }
         }
     });
+});
