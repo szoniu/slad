@@ -142,6 +142,9 @@ $(document).ready(function() {
 
         $('.stepper-item').removeClass('current');
         $('.stepper-item[data-step="' + step + '"]').addClass('current');
+
+        // Przewiń stronę do góry przy przejściu na nowy krok
+        window.scrollTo(0, 0);
     }
 
     $('.next-step').on('click', function() {
@@ -157,6 +160,7 @@ $(document).ready(function() {
     // Initialize step 1 as visible
     showStep(currentStep);
 });
+
 
 // Repeater
 
