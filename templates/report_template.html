@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Raport śladu węglowego</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h1, h2, h3 { color: #2d2d2d; }
+        .report-header { text-align: center; margin-bottom: 40px; }
+        .report-section { margin-bottom: 30px; }
+        .report-section h2 { border-bottom: 2px solid #2d2d2d; padding-bottom: 10px; }
+        .data { margin-left: 20px; }
+        .data p { margin: 5px 0; }
+        .emissions { text-align: center; margin: 20px 0; }
+    </style>
+</head>
+<body>
+<div class="report-header">
+    <h1>Raport z kalkulacji śladu węglowego</h1>
+    <h2>Nazwa firmy: {{ data.company_name }}</h2>
+    <p>Okres raportowania: {{ data.reporting_period }}</p>
+</div>
+
+<div class="report-section">
+    <h2>Emisje łącznie</h2>
+    <div class="emissions">
+        <h3>{{ data.total_emissions }}</h3>
+    </div>
+</div>
+
+<div class="report-section">
+    <h2>Dane szczegółowe</h2>
+    <div class="data">
+        <p>Emisje na m²: {{ data.emissions_per_m2 }}</p>
+        <p>Emisje na pracownika: {{ data.emissions_per_employee }}</p>
+        <p>Emisje na obrót firmy: {{ data.emissions_per_revenue }}</p>
+    </div>
+</div>
+
+<div class="report-section">
+    <h2>Zakres 1 (emisje bezpośrednie)</h2>
+    <div class="data">
+        {% for emission in data.direct_emissions %}
+        <p>{{ emission.type }} - {{ emission.value }} ({{ emission.percentage }})</p>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="report-section">
+    <h2>Zakres 2 (emisje pośrednie)</h2>
+    <div class="data">
+        {% for emission in data.indirect_emissions %}
+        <p>{{ emission.type }} - {{ emission.value }} ({{ emission.percentage }})</p>
+        {% endfor %}
+    </div>
+</div>
+</body>
+</html>

@@ -1,6 +1,7 @@
 import pandas as pd
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, make_response
 from sqlalchemy import text
+import pdfkit
 
 from database import engine  # Import engine z pliku database.py
 
@@ -67,6 +68,40 @@ def load_excel_data():
         result = connection.execute(text(f"SELECT COUNT(*) FROM {table_name}"))
         row_count = result.scalar()
         print(f"Liczba wierszy zaimportowanych do tabeli '{table_name}': {row_count}")
+
+
+@app.route('/generate_pdf')
+def generate_pdf():
+    # Pobierz dane z formularza lub bazy danych
+    # Tutaj przykładowe dane, które normalnie byś pobierał dynamicznie
+    data = {
+        'company_name': request.args.get('company_name', 'Firma XYZ'),
+        'reporting_period': request.args.get('reporting_period', '2022'),
+        'total_emissions': '127.72 t CO2e/rok',
+        'emissions_per_m2': '2.55 t CO2e/rok',
+        'emissions_per_employee': '127.72 t CO2e/rok na pracownika',
+        'emissions_per_revenue': '1.28 t CO2e/rok na 1000 zł obrotu',
+        'direct_emissions': [
+            {'type': 'Olej opałowy', 'value': '0.01 t CO2e/rok', 'percentage': '0.01%'},
+            {'type': 'Gaz ziemny', 'value': '0.01 t CO2e/rok', 'percentage': '0.01%'},
+            {'type': 'Paliwo w samochodach', 'value': '2.96 t CO2e/rok', 'percentage': '2.31%'},
+        ],
+        'indirect_emissions': [
+            {'type': 'Energia elektryczna', 'value': '80.81 t CO2e/rok', 'percentage': '63.27%'},
+            {'type': 'Energia cieplna', 'value': '43.94 t CO2e/rok', 'percentage': '34.40%'},
+        ],
+    }
+
+    # Renderowanie HTML do PDF
+    html_content = render_template('report_template.html', data=data)
+    pdf = pdfkit.from_string(html_content, False)
+
+    # Przygotowanie odpowiedzi z plikiem PDF
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=raport_weglowy.pdf'
+
+    return response
 
 
 if __name__ == '__main__':

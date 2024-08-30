@@ -4,3 +4,4 @@ sqlalchemy
 openpyxl
 litecli
 psycopg2
+pdfkit
