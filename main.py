@@ -44,15 +44,34 @@ def save_company_profile():
 
 @app.route('/database')
 def show_database():
-    # Pobierz dane z bazy danych
+    # Pobranie danych z bazy
     query = text("SELECT * FROM excel_data")
     with engine_excel.connect() as connection:
         result = connection.execute(query)
         columns = result.keys()
         data = [dict(zip(columns, row)) for row in result.fetchall()]
 
-    # Renderuj stronę HTML z danymi
-    return render_template('database.html', data=data)
+    # Tworzenie unikalnych wartości dla każdej kolumny
+    unique_scopes = sorted(set(row['Scope'] for row in data))
+    unique_level1 = sorted(set(row['Level 1'] for row in data))
+    unique_level2 = sorted(set(row['Level 2'] for row in data))
+    unique_level3 = sorted(set(row['Level 3'] for row in data))
+    unique_level4 = sorted(set(row['Level 4'] for row in data))
+    unique_column_text = sorted(set(row['Column Text'] for row in data))
+    unique_uom = sorted(set(row['UOM'] for row in data))
+    unique_ghg_unit = sorted(set(row['GHG/Unit'] for row in data))
+
+    # Renderowanie szablonu HTML z przekazanymi danymi i unikalnymi wartościami
+    return render_template('database.html',
+                           data=data,
+                           unique_scopes=unique_scopes,
+                           unique_level1=unique_level1,
+                           unique_level2=unique_level2,
+                           unique_level3=unique_level3,
+                           unique_level4=unique_level4,
+                           unique_column_text=unique_column_text,
+                           unique_uom=unique_uom,
+                           unique_ghg_unit=unique_ghg_unit)
 
 
 def load_excel_data():
