@@ -248,6 +248,43 @@ $(document).ready(function() {
 
 });
 
+// SQL
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Skrypt załadowany');
+
+    // Pobierz dane JSON
+    var dataContainer = document.getElementById('dataContainer');
+    var fuelsUnits = JSON.parse(dataContainer.getAttribute('data-fuels-units'));
+    console.log('Dane fuelsUnits:', fuelsUnits);
+
+    var fuelSelects = document.querySelectorAll('select[name="paliwo"]');
+    var unitSelects = document.querySelectorAll('select[name="jednostka"]');
+
+    fuelSelects.forEach(function(fuelSelect, index) {
+        fuelSelect.addEventListener('change', function() {
+            var selectedFuel = this.value.trim();  // Usuń spacje na początku i końcu
+            var unitSelect = unitSelects[index];
+            unitSelect.innerHTML = ''; // Opróżnij obecne opcje jednostki
+            console.log('Wybrane paliwo:', selectedFuel);
+
+            if (fuelsUnits[selectedFuel]) {
+                console.log('Dostępne jednostki dla paliwa:', fuelsUnits[selectedFuel]);
+                fuelsUnits[selectedFuel].forEach(function(unit) {
+                    var option = document.createElement('option');
+                    option.value = unit;
+                    option.text = unit;
+                    unitSelect.appendChild(option);
+                });
+            } else {
+                console.log('Brak dostępnych jednostek dla wybranego paliwa.');
+            }
+        });
+    });
+});
+
+
+
 // Wykresy:
 
 document.addEventListener('DOMContentLoaded', function() {

@@ -235,6 +235,9 @@
                     </div>
                 </div>
 
+                <!-- Przekazanie JSON-a z danymi -->
+                <div id="dataContainer" data-fuels-units='{{ fuels_units | safe }}'></div>
+
                 <!-- Repeater for Stacjonarne źródła emisji -->
                 <div id="kt_docs_repeater_stacjonarne">
                     <div class="form-group">
@@ -246,9 +249,9 @@
                                         <select class="form-select" name="paliwo" data-control="select2"
                                                 data-placeholder="Select an option">
                                             <option></option>
-                                            <option value="węgiel">Węgiel</option>
-                                            <option value="gaz">Gaz ziemny</option>
-                                            <option value="drewno">Drewno</option>
+                                            {% for fuel_type in fuel_types %}
+                                            <option value="{{ fuel_type }}">{{ fuel_type }}</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                     <div class="col-md-3">
@@ -258,14 +261,13 @@
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Jednostka:</label>
-                                        <select class="form-select" name="jednostka" data-control="select2"
-                                                data-placeholder="Select an option">
-                                            <option></option>
-                                            <option value="kWh">kWh</option>
-                                            <option value="m3">m³</option>
-                                            <option value="litry">litry</option>
+                                        <select class="form-select jednostka-select" name="jednostka"
+                                                data-control="select2"
+                                                data-placeholder="Wybierz jednostkę">
+                                            <!-- Jednostki zostaną załadowane dynamicznie na podstawie wybranego paliwa -->
                                         </select>
                                     </div>
+
                                     <div class="col-md-3">
                                         <a href="javascript:;" data-repeater-delete
                                            class="btn btn-sm btn-light-danger mt-3">
@@ -276,270 +278,102 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="form-group mt-5">
-                        <a href="javascript:;" data-repeater-create class="btn btn-light-primary">
-                            <i class="ki-duotone ki-plus fs-3"></i> Dodaj źródło emisji
-                        </a>
-                    </div>
                 </div>
 
-                <div class="separator my-5"></div>
-
-                <!-- Mobilne źródła emisji -->
-                <div class="pb-10 pb-lg-15">
-                    <h2 class="fw-bold d-flex align-items-center text-gray-900">Mobilne źródła emisji</h2>
-                    <div class="text-muted fw-semibold fs-6">
-                        Wpisz dane dotyczące firmowych pojazdów. Uwzględnij wszystkie auta, które są własnością lub
-                        podlegają nadzorowi firmy, w tym pojazdy leasingowane.
-                    </div>
+                <div class="form-group mt-5">
+                    <a href="javascript:;" data-repeater-create class="btn btn-light-primary">
+                        <i class="ki-duotone ki-plus fs-3"></i> Dodaj źródło emisji
+                    </a>
                 </div>
-
-                <!-- Repeater for Mobilne źródła emisji -->
-                <div id="kt_docs_repeater_mobilne">
-                    <div class="form-group">
-                        <div data-repeater-list="mobilne_emissions">
-                            <div data-repeater-item>
-                                <div class="row mb-4">
-                                    <div class="col-md-3">
-                                        <label class="form-label">Liczba pojazdów:</label>
-                                        <input type="number" class="form-control" name="liczba_pojazdow"
-                                               placeholder="Wprowadź liczbę pojazdów" required/>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Rodzaj pojazdu:</label>
-                                        <select class="form-select" name="rodzaj_pojazdu" required>
-                                            <option></option>
-                                            <option value="Samochód osobowy">Samochód osobowy</option>
-                                            <option value="Samochód ciężarowy">Samochód ciężarowy</option>
-                                            <option value="Motocykl">Motocykl</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Sposób zasilania:</label>
-                                        <select class="form-select" name="sposob_zasilania" required>
-                                            <option></option>
-                                            <option value="Benzyna">Benzyna</option>
-                                            <option value="Diesel">Diesel</option>
-                                            <option value="Elektryczny">Elektryczny</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Zużycie paliwa:</label>
-                                        <input type="number" class="form-control" name="zuzycie_paliwa"
-                                               placeholder="Wprowadź zużycie paliwa" required/>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Jednostka:</label>
-                                        <select class="form-select" name="jednostka" required>
-                                            <option></option>
-                                            <option value="l/rok">l/rok</option>
-                                            <option value="km/rok">km/rok</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Sposób podania danych o zużyciu paliwa:</label>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="sposob_podania"
-                                                   value="litry" required>
-                                            <label class="form-check-label">litry</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="sposob_podania"
-                                                   value="kilometry" required>
-                                            <label class="form-check-label">kilometry</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 mt-4">
-                                        <a href="javascript:;" data-repeater-delete
-                                           class="btn btn-sm btn-light-danger mt-3">
-                                            <i class="ki-duotone ki-trash fs-5"></i> Usuń
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group mt-5">
-                        <a href="javascript:;" data-repeater-create class="btn btn-light-primary">
-                            <i class="ki-duotone ki-plus fs-3"></i> Dodaj pojazd
-                        </a>
-                    </div>
-                </div>
-
-
-                <!-- Stepper Navigation Buttons -->
-                <div class="d-flex justify-content-between">
-                    <!-- Przycisk "Poprzedni krok" po lewej stronie -->
-                    <div>
-                        <button type="button" class="btn btn-secondary prev-step">Poprzedni krok</button>
-                    </div>
-
-                    <!-- Przycisk "Następny krok" po prawej stronie -->
-                    <div>
-                        <button type="button" class="btn btn-primary next-step">Następny krok</button>
-                    </div>
-                </div>
-
             </div>
-        </div>
 
 
-        <!-- Step 3 (Hidden by default) -->
-        <div class="step d-none" data-step="3">
+            <div class="separator my-5"></div>
+
+            <!-- Mobilne źródła emisji -->
             <div class="pb-10 pb-lg-15">
-                <!-- Energia Elektryczna -->
-                <h2 class="fw-bold d-flex align-items-center text-gray-900">Energia elektryczna</h2>
+                <h2 class="fw-bold d-flex align-items-center text-gray-900">Mobilne źródła emisji</h2>
                 <div class="text-muted fw-semibold fs-6">
-                    Wskaż wszystkie źródła zakupionej lub dostarczonej z zewnątrz energii elektrycznej oraz roczne
-                    zużycie tej energii w odpowiedniej jednostce. Jeśli korzystasz z energii do ładowania samochodów
-                    elektrycznych oraz plug-in, dodaj również te dane.
-
-
-                    Nie uwzględniaj wyprodukowanej przez Ciebie energii, która pochodzi z OZE. W Zakresie 2 nie generuje
-                    ona emisji. Emisje związane np. z wyprodukowaniem modułów fotowoltaicznych nie są brane pod uwagę w
-                    tej kalkulacji, bo wchodzą w Zakres 3.
+                    Wpisz dane dotyczące firmowych pojazdów. Uwzględnij wszystkie auta, które są własnością lub
+                    podlegają nadzorowi firmy, w tym pojazdy leasingowane.
                 </div>
+            </div>
 
-                <div id="kt_docs_repeater_energia_elektryczna">
-                    <div class="form-group">
-                        <div data-repeater-list="energia_elektryczna">
-                            <div data-repeater-item>
-                                <div class="row mb-4">
-                                    <div class="col-md-3">
-                                        <label class="form-label">Pochodzenie energii:</label>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio"
-                                                   name="energia_elektryczna[0][pochodzenie_energii]"
-                                                   value="oze" required>
-                                            <label class="form-check-label">OZE</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio"
-                                                   name="energia_elektryczna[0][pochodzenie_energii]"
-                                                   value="nie_oze" required>
-                                            <label class="form-check-label">nie OZE</label>
-                                        </div>
+            <!-- Repeater for Mobilne źródła emisji -->
+            <div id="kt_docs_repeater_mobilne">
+                <div class="form-group">
+                    <div data-repeater-list="mobilne_emissions">
+                        <div data-repeater-item>
+                            <div class="row mb-4">
+                                <div class="col-md-3">
+                                    <label class="form-label">Liczba pojazdów:</label>
+                                    <input type="number" class="form-control" name="liczba_pojazdow"
+                                           placeholder="Wprowadź liczbę pojazdów" required/>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Rodzaj pojazdu:</label>
+                                    <select class="form-select" name="rodzaj_pojazdu" required>
+                                        <option></option>
+                                        <option value="Samochód osobowy">Samochód osobowy</option>
+                                        <option value="Samochód ciężarowy">Samochód ciężarowy</option>
+                                        <option value="Motocykl">Motocykl</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Sposób zasilania:</label>
+                                    <select class="form-select" name="sposob_zasilania" required>
+                                        <option></option>
+                                        <option value="Benzyna">Benzyna</option>
+                                        <option value="Diesel">Diesel</option>
+                                        <option value="Elektryczny">Elektryczny</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Zużycie paliwa:</label>
+                                    <input type="number" class="form-control" name="zuzycie_paliwa"
+                                           placeholder="Wprowadź zużycie paliwa" required/>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Jednostka:</label>
+                                    <select class="form-select" name="jednostka" required>
+                                        <option></option>
+                                        <option value="l/rok">l/rok</option>
+                                        <option value="km/rok">km/rok</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Sposób podania danych o zużyciu paliwa:</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="sposob_podania"
+                                               value="litry" required>
+                                        <label class="form-check-label">litry</label>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Dostawca energii elektrycznej:</label>
-                                        <select class="form-select" name="energia_elektryczna[0][dostawca_energii]"
-                                                required>
-                                            <option></option>
-                                            <option value="Alchemia S.A.">Alchemia S.A.</option>
-                                            <option value="Energia Polska">Energia Polska</option>
-                                        </select>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="sposob_podania"
+                                               value="kilometry" required>
+                                        <label class="form-check-label">kilometry</label>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Zużycie:</label>
-                                        <input type="number" class="form-control" name="energia_elektryczna[0][zuzycie]"
-                                               placeholder="Wprowadź zużycie" required/>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Jednostka:</label>
-                                        <select class="form-select" name="energia_elektryczna[0][jednostka]" required>
-                                            <option></option>
-                                            <option value="MWh/rok">MWh/rok</option>
-                                            <option value="kWh/rok">kWh/rok</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3 mt-4">
-                                        <a href="javascript:;" data-repeater-delete
-                                           class="btn btn-sm btn-light-danger mt-3">
-                                            <i class="ki-duotone ki-trash fs-5"></i> Usuń
-                                        </a>
-                                    </div>
+                                </div>
+                                <div class="col-md-3 mt-4">
+                                    <a href="javascript:;" data-repeater-delete
+                                       class="btn btn-sm btn-light-danger mt-3">
+                                        <i class="ki-duotone ki-trash fs-5"></i> Usuń
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="form-group mt-5">
-                        <a href="javascript:;" data-repeater-create class="btn btn-light-primary">
-                            <i class="ki-duotone ki-plus fs-3"></i> Dodaj dostawcę energii elektrycznej
-                        </a>
-                    </div>
                 </div>
 
-                <div class="form-check mt-5">
-                    <label class="form-label">Czy do ładowania samochodów elektrycznych (w tym hybrydowych Plug-in)
-                        zużywasz zakupioną energię elektryczną?</label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="ladowanie_samochodow" value="nie" required>
-                        <label class="form-check-label">nie</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="ladowanie_samochodow" value="tak" required>
-                        <label class="form-check-label">tak</label>
-                    </div>
+                <div class="form-group mt-5">
+                    <a href="javascript:;" data-repeater-create class="btn btn-light-primary">
+                        <i class="ki-duotone ki-plus fs-3"></i> Dodaj pojazd
+                    </a>
                 </div>
             </div>
 
-            <div class="pb-10 pb-lg-15">
-                <!-- Energia Cieplna -->
-                <h2 class="fw-bold d-flex align-items-center text-gray-900">Energia cieplna</h2>
-                <div class="text-muted fw-semibold fs-6">
-                    Podaj dane dotyczące zakupionej lub dostarczonej z zewnątrz energii cieplnej, np. ciepła sieciowego.
-                    Uzupełnij informacje o dostawcach oraz rocznym zużyciu w wybranej jednostce.
 
-
-                    Nie uwzględniaj wyprodukowanej przez Ciebie energii, która pochodzi z OZE. W Zakresie 2 nie generuje
-                    ona emisji. Emisje związane np. z wyprodukowaniem modułów fotowoltaicznych nie są brane pod uwagę w
-                    tej kalkulacji, bo wchodzą w Zakres 3.
-                </div>
-
-                <!-- Repeater for Energia Cieplna -->
-                <div id="kt_docs_repeater_energia_cieplna">
-                    <div class="form-group">
-                        <div data-repeater-list="energia_cieplna">
-                            <div data-repeater-item>
-                                <div class="row mb-4">
-                                    <div class="col-md-3">
-                                        <label class="form-label">Dostawca energii cieplnej:</label>
-                                        <select class="form-select" name="dostawca_energii_cieplnej" required>
-                                            <option></option>
-                                            <option value="MIEJSKIE PRZEDSIĘBIORSTWO ENERGETYCZNE">MIEJSKIE
-                                                PRZEDSIĘBIORSTWO ENERGETYCZNE
-                                            </option>
-                                            <option value="CESJA_LUBELSKIE PRZEDSIĘBIORSTWO ENERGETYCZNE">
-                                                CESJA_LUBELSKIE PRZEDSIĘBIORSTWO ENERGETYCZNE
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Zużycie:</label>
-                                        <input type="number" class="form-control" name="zuzycie_cieplnej"
-                                               placeholder="Wprowadź zużycie" required/>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Jednostka:</label>
-                                        <select class="form-select" name="jednostka_cieplnej" required>
-                                            <option></option>
-                                            <option value="GJ/rok">GJ/rok</option>
-                                            <option value="MWh/rok">MWh/rok</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3 mt-4">
-                                        <a href="javascript:;" data-repeater-delete
-                                           class="btn btn-sm btn-light-danger mt-3">
-                                            <i class="ki-duotone ki-trash fs-5"></i> Usuń
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group mt-5">
-                        <a href="javascript:;" data-repeater-create class="btn btn-light-primary">
-                            <i class="ki-duotone ki-plus fs-3"></i> Dodaj dostawcę energii cieplnej
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step navigation buttons -->
+            <!-- Stepper Navigation Buttons -->
             <div class="d-flex justify-content-between">
                 <!-- Przycisk "Poprzedni krok" po lewej stronie -->
                 <div>
@@ -553,320 +387,484 @@
             </div>
 
         </div>
-
-
-        <!-- Step 4 (Hidden by default) -->
-        <div class="step d-none" data-step="4">
-            <!-- Emisje łącznie -->
-            <div class="row mb-5">
-                <div class="col-md-8">
-                    <h2 class="fw-bold text-gray-900">Emisje łącznie</h2>
-                    <h1 class="display-4 fw-bold text-gray-900">127.72 <span class="fs-4">t CO2e/rok</span></h1>
-                    <button type="button" class="btn btn-success"
-                            onclick="window.location.href='{{ url_for('generate_pdf') }}'">Pobierz raport PDF
-                    </button>
-
-                </div>
-            </div>
-
-            <!-- Dane dotyczące emisji -->
-            <div class="row mb-5">
-                <div class="col-md-4">
-                    <h5>Emisje na m²</h5>
-                    <p class="fw-bold">2.55 <span class="fs-6">t CO2e/rok</span></p>
-                </div>
-                <div class="col-md-4">
-                    <h5>Emisje na pracownika</h5>
-                    <p class="fw-bold">127.72 <span class="fs-6">t CO2e/rok na pracownika</span></p>
-                </div>
-                <div class="col-md-4">
-                    <h5>Emisje na obrót firmy</h5>
-                    <p class="fw-bold">1.28 <span class="fs-6">t CO2e/rok na 1000 zł obrotu</span></p>
-                </div>
-            </div>
-
-            <!-- Zakres 1 i Zakres 2 -->
-            <div class="row mb-5">
-                <div class="col-md-6">
-                    <h5 class="fw-bold text-gray-900"><span class="text-primary">•</span> Zakres 1 (emisje bezpośrednie)
-                    </h5>
-                    <p class="fw-bold text-gray-900">2.97 t CO2e/rok <span class="text-muted">(2.33%)</span></p>
-                    <ul class="list-unstyled">
-                        <li>Olej opałowy - 0.01 t CO2e/rok (0.01%)</li>
-                        <li>Gaz ziemny - 0.01 t CO2e/rok (0.01%)</li>
-                        <li>Paliwo w samochodach należących bądź będących pod kontrolą firmy - 2.96 t CO2e/rok (2.31%)
-                        </li>
-                    </ul>
-                </div>
-                <div class="col-md-6">
-                    <h5 class="fw-bold text-gray-900"><span class="text-warning">•</span> Zakres 2 (emisje pośrednie)
-                    </h5>
-                    <p class="fw-bold text-gray-900">124.75 t CO2e/rok <span class="text-muted">(97.67%)</span></p>
-                    <ul class="list-unstyled">
-                        <li>Energia elektryczna - 80.81 t CO2e/rok (63.27%)</li>
-                        <li>Energia cieplna - 43.94 t CO2e/rok (34.40%)</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Wykresy -->
-            <div class="row mb-5">
-                <div class="col-md-6">
-                    <h5 class="fw-bold text-gray-900">Porównanie emisji przedsiębiorstwa</h5>
-                    <ul class="list-unstyled">
-                        <li>218 osób można rocznie zaopatrzyć w energię elektryczną</li>
-                        <li>90 osób musiałoby przesiąść się z samochodu na rower, żeby skompensować te emisje</li>
-                        <li>5616 razy można przejechać koleją z Gdyni do Krakowa</li>
-                        <li>15 razy można okrążyć Ziemię samochodem</li>
-                    </ul>
-                </div>
-                <div class="col-md-6 d-flex justify-content-center align-items-center" style="height: 300px;">
-                    <canvas id="pieChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Wykres słupkowy -->
-            <div class="row mb-5">
-                <div class="col-md-12" style="height: 200px;">
-                    <canvas id="barChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Wskaźniki rozróżnienia metod -->
-            <div class="row">
-                <div class="col-md-12">
-                    <h5 class="fw-bold text-gray-900">Rozróżnienie metod:</h5>
-                    <ul class="list-unstyled">
-                        <li><strong>Location-based</strong>: Opiera się na lokalizacji. Odzwierciedla średnią
-                            intensywność emisji w sieciach.
-                        </li>
-                        <li><strong>Market-based</strong>: Odzwierciedla emisje wybrane przez przedsiębiorstwa na
-                            podstawie umów dotyczących zakupu energii.
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Ramka z informacjami o redukcji -->
-            <div class="row mb-5 p-4" style="background-color: #f2f2f9; border-radius: 8px;">
-                <div class="col-md-8">
-                    <h3 class="fw-bold">Podejmij akcje, zacznij redukować emisje</h3>
-                    <p class="text-muted">W zakresie w jakim podlegam przepisom o ochronie danych osobowych:</p>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="consent1">
-                        <label class="form-check-label" for="consent1">
-                            Wyrażam zgodę na udostępnienie przez ING Usługi dla Biznesu S.A. moich danych osobowych (tj.
-                            NIP, nazwa firmy, imię, nazwisko oraz adres e-mail) do ING Bank Śląski S.A. w celu oceny
-                            ryzyka transformacji.
-                        </label>
-                    </div>
-                    <div class="form-check mb-4">
-                        <input class="form-check-input" type="checkbox" id="consent2">
-                        <label class="form-check-label" for="consent2">
-                            Wyrażam zgodę na udostępnienie przez ING Usługi dla Biznesu S.A. moich danych osobowych (tj.
-                            NIP, nazwa firmy, imię, nazwisko oraz adres e-mail) do Fundacji Climate Strategies Poland z
-                            siedzibą w Gdańsku, w celu przekazywania mi oraz reprezentowanemu przeze mnie podmiotowi
-                            informacji branżowych, dotyczących konkurencyjności klimatycznej przedsiębiorstw oraz
-                            aktualizacji o wydarzeniach organizowanych przez Fundację Climate Strategies Poland.
-                        </label>
-                    </div>
-                    <p class="text-muted">Wiem, że mam prawo w dowolnym momencie wycofać zgodę. Wycofanie zgody nie
-                        wpływa na zgodność z prawem przetwarzania, którego dokonano na podstawie zgody przed jej
-                        wycofaniem.</p>
-                    <button type="button" class="btn btn-success"
-                            onclick="window.location.href='{{ url_for('generate_pdf') }}'">Pobierz raport PDF
-                    </button>
-                    <button type="button" class="btn btn-primary">Umów się na konsultację</button>
-                </div>
-                <div class="col-md-4 text-end">
-                    <h3 class="fw-bold text-gray-900">Emisje po redukcji</h3>
-                    <h1 class="display-5 fw-bold text-primary">46.91 <span class="fs-4">t CO2e/rok</span></h1>
-                    <p class="fw-bold">Redukcja <span class="text-primary">63.27%</span></p>
-                </div>
-            </div>
-
-            <!-- Opisy dotyczące metodologii -->
-            <div class="row mb-5">
-                <div class="col-md-12">
-                    <p class="text-muted">
-                        Kalkulację należy traktować wyłącznie jako estymację śladu węglowego. Nie stanowi ona wyłącznej
-                        metodyki obliczeń dokonywanych przez Fundację Climate Strategies Poland oraz nie uwzględnia w
-                        sposób wyczerpujący wszystkich okoliczności mających wpływ na obliczenie śladu węglowego.
-                    </p>
-                    <p class="text-muted">
-                        Wykorzystany w opracowaniu wskaźnik emisji GHG, spośród powszechnie dostępnych, charakteryzuje
-                        się istotnością:
-                    </p>
-                    <ul class="text-muted">
-                        <li>czasową – wskaźniki adekwatne/najbliższe dla okresu, dla którego liczony jest ślad
-                            węglowy,
-                        </li>
-                        <li>geograficzną – wskaźniki reprezentatywne dla obszaru, dla którego liczony jest ślad
-                            węglowy,
-                        </li>
-                        <li>technologiczną – wskaźniki uwzględniające stosowaną technologię, dla której liczony jest
-                            ślad węglowy.
-                        </li>
-                    </ul>
-                    <p class="text-muted">
-                        Polegamy na współczynnikach z uznanych, recenzowanych, oficjalnie publikowanych źródeł:
-                    </p>
-                    <ul class="text-muted">
-                        <li>krajowych i międzynarodowych ośrodków badawczych,</li>
-                        <li>stowarzyszeń branżowych,</li>
-                        <li>ośrodków odpowiedzialnych za regulacje prawne, monitoring, statystyki w dedykowanych
-                            obszarach.
-                        </li>
-                    </ul>
-                    <p class="text-muted">
-                        Nasze podejście jest zgodne z zapisami metodyk GHG Protocol, IPCC, a także wskazanych norm. 1
-                        12006 IPCC Guidelines for National Greenhouse Gas Inventories. Chapter 2: Approaches to Data
-                        Collection; GHG Protocol: A Corporate Accounting and Reporting Standard; PAS 2050:2011.
-                    </p>
-                </div>
-            </div>
-            <!-- Step navigation buttons -->
-            <div class="d-flex justify-content-between">
-                <!-- Przycisk "Poprzedni krok" po lewej stronie -->
-                <div>
-                    <button type="button" class="btn btn-secondary prev-step">Poprzedni krok</button>
-                </div>
-
-                <!-- Przycisk "Następny krok" po prawej stronie -->
-                <div>
-                    <button type="button" class="btn btn-primary next-step">Następny krok</button>
-                </div>
-            </div>
-        </div>
-
-
-        <!-- Step 5 (Hidden by default) -->
-        <div class="step d-none" data-step="5">
-            <!-- Sekcje A1 i A2 -->
-            <div class="row mb-5">
-                <div class="col-md-12">
-                    <h3 class="fw-bold text-gray-900">Gratulacje! Wiesz już, jaki ślad węglowy generuje działalność
-                        Twojej firmy w zakresie 1 i 2 GHG.</h3>
-                    <p>To pierwszy krok w kierunku obniżenia emisji gazów cieplarnianych. Co dalej? W przygotowaniu i
-                        wdrożeniu strategii redukcji emisyjności pomogą Ci dźwignie redukcji śladu węglowego. Są to
-                        działania, które doprowadzą do obniżenia emisji ze źródeł, które mają duży udział w całkowitym
-                        śladzie węglowym przedsiębiorstwa.</p>
-                </div>
-            </div>
-
-            <!-- Zakresy -->
-            <div class="row mb-5">
-                <div class="col-md-12">
-                    <h4 class="fw-bold text-gray-900">Zakres 1</h4>
-                    <ul>
-                        <li>Wybieraj pojazdy o niższym śladzie węglowym, np. korzystaj z wózka widłowego zasilanego
-                            energią elektryczną pochodzącą z OZE.
-                        </li>
-                        <li>Wymień samochody spalinowe na takie, które są zasilane energią elektryczną pochodzącą ze
-                            źródeł odnawialnych.
-                        </li>
-                        <li>Postaw na naturalne czynniki chłodnicze w klimatyzacji.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="row mb-5">
-                <div class="col-md-12">
-                    <h4 class="fw-bold text-gray-900">Zakres 2</h4>
-                    <ul>
-                        <li>Korzystaj z energii elektrycznej, która pochodzi z odnawialnych źródeł emisji, np. zielonej
-                            energii elektrycznej.
-                        </li>
-                        <li>Redukuj zużycie mediów.</li>
-                        <li>Wprowadź elektryczne ogrzewanie w budynkach.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="row mb-5">
-                <div class="col-md-12">
-                    <h4 class="fw-bold text-gray-900">Zakres 3</h4>
-                    <ul>
-                        <li>Ograniczaj zakup materiałów i dobór kapitałowych.</li>
-                        <li>Redukuj zużycie surowców dzięki optymalizacji procesów.</li>
-                        <li>Weryfikuj łańcuch dostaw, czyli sprawdzaj skąd pochodzą surowce i jak są transportowane.
-                        </li>
-                        <li>Uświadamiaj pracowników w zakresie proekologicznych zachowań (np. wyboru roweru zamiast
-                            samochodu).
-                        </li>
-                        <li>Segreguj odpady.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="row mb-5">
-                <div class="col-md-12">
-                    <h4 class="fw-bold text-gray-900">Co dalej? Jak możesz wykorzystać estymację śladu węglowego swojej
-                        firmy?</h4>
-                    <ol>
-                        <li><strong>Sprawdź poprawność danych w formularzu:</strong> Podstawę do zewnętrznego
-                            raportowania informacji na temat wyliczonego śladu węglowego stanowi zgodność obliczeń ze
-                            standardem kalkulacji gazów cieplarnianych GHG Protocol. Indywidualna konsultacja z naszym
-                            ekspertem pozwoli Ci zweryfikować, czy wprowadzone w kalkulatorze dane zostały wprowadzone
-                            poprawnie.
-                        </li>
-                        <li><strong>Zaprojektuj strategię redukcji emisji:</strong> Dobrze przygotowana strategia to
-                            skomplikowany i powiązany system regulacyjno – społeczno – gospodarczy, w który zaangażowani
-                            są praktycznie wszyscy interesariusze. Wymaga on kilku milowych kroków i zdefiniowania
-                            najważniejszych założeń tj. zmapowania obszarów działalności czy potencjalnych sposobów
-                            osiągania neutralności klimatycznej. Pomagamy odpowiednio zaplanować i sukcesywnie wdrażać
-                            te działania, by przyniosły jak największe korzyści.
-                        </li>
-                        <li><strong>Redukuj emisje gazów cieplarnianych:</strong> Po obliczeniu śladu węglowego firmy
-                            pojawia się pytanie: co dalej? To jest ten moment, kiedy należy zastanowić się nad
-                            możliwością stworzenia i wdrożenia planu redukcji emisji oraz strategii unikania emisji
-                            zarówno we własnym zakresie, jak i w całym łańcuchu wartości. Dobrą praktyką jest, by
-                            ograniczanie emisji rozpocząć od najprostszych kroków, które nie wymagają od nas większego
-                            wysiłku, i stopniowo przechodzić do najbardziej skomplikowanych i czasochłonnych procesów.
-                        </li>
-                        <li><strong>Kompensuj ślad węglowy:</strong> Kolejnym krokiem po wdrożeniu działań
-                            ograniczających emisje gazów cieplarnianych jest kompensacja emisji, których nie da się
-                            zredukować. Wybór działań offsetowych jest trudnym tematem, wokół którego pojawia się
-                            mnóstwo sprzecznych informacji. Łatwo wpaść w pułapkę i nawet mając najlepsze zamiary –
-                            zostać posądzonym o greenwashing. Dlatego bazując na doświadczeniu naszych ekspertów,
-                            pomagamy przedsiębiorstwom podjąć najlepsze dla nich decyzje.
-                        </li>
-                        <li><strong>Opracuj strategię komunikacji wewnętrznej i zewnętrznej:</strong> Nawet
-                            najrzetelniej przygotowana strategia redukcji i kompensacji emisji może przysporzyć
-                            problemów, jeśli nie będzie odpowiednio komunikowana. W pracy z firmami kładziemy nacisk na
-                            odpowiedzialną komunikację klimatyczną, pokazywanie działań firmy w szerszym kontekście i
-                            adresowanie obszarów jej największej emisyjności. Prowadzimy warsztaty w obszarze
-                            greenwashingu w deklaracjach klimatycznych.
-                        </li>
-                        <li><strong>Pokaż się światu:</strong> Jednym ze sposobów zaprezentowania i zweryfikowania
-                            środowiskowej polityki firmy jest sprawozdanie wyników emisyjności i działań
-                            proklimatycznych w raportach globalnego projektu CDP. Takie raportowanie pomaga zmierzyć
-                            postępy, ale też pozycjonuje firmę na tle danej branży oraz firm podobnej wielkości, zarówno
-                            w Polsce, Europie jak i na świecie. Do tej pory swoje wyniki opublikowało tu ponad 10
-                            tysięcy zaangażowanych klimatycznie firm, miast i regionów. Zgłaszając się do CDP, można
-                            uzyskać przewagę nad konkurencją. Ujawnianie wyników pomaga również wyprzedzić zmiany
-                            regulacyjne i polityczne. Niesie to możliwość znalezienia nowych strumieni działania,
-                            których wymagają inwestorzy i klienci na całym świecie. Proces opracowania wyników pod kątem
-                            raportowania do CDP jest żmudny i czasochłonny. Nasza Fundacja pomaga w systematyzacji i ich
-                            ujawnieniu względem CDP.
-                        </li>
-                    </ol>
-                </div>
-            </div>
-
-            <!-- Step navigation buttons -->
-            <div class="d-flex justify-content-between">
-                <button type="button" class="btn btn-secondary prev-step">Poprzedni krok</button>
-                <div>
-                    <button type="submit" class="btn btn-success">Zakończ i zapisz</button>
-                </div>
-            </div>
-        </div>
-
-
-    </form>
 </div>
-</form>
+
+
+<!-- Step 3 (Hidden by default) -->
+<div class="step d-none" data-step="3">
+    <div class="pb-10 pb-lg-15">
+        <!-- Energia Elektryczna -->
+        <h2 class="fw-bold d-flex align-items-center text-gray-900">Energia elektryczna</h2>
+        <div class="text-muted fw-semibold fs-6">
+            Wskaż wszystkie źródła zakupionej lub dostarczonej z zewnątrz energii elektrycznej oraz roczne
+            zużycie tej energii w odpowiedniej jednostce. Jeśli korzystasz z energii do ładowania samochodów
+            elektrycznych oraz plug-in, dodaj również te dane.
+
+
+            Nie uwzględniaj wyprodukowanej przez Ciebie energii, która pochodzi z OZE. W Zakresie 2 nie generuje
+            ona emisji. Emisje związane np. z wyprodukowaniem modułów fotowoltaicznych nie są brane pod uwagę w
+            tej kalkulacji, bo wchodzą w Zakres 3.
+        </div>
+
+        <div id="kt_docs_repeater_energia_elektryczna">
+            <div class="form-group">
+                <div data-repeater-list="energia_elektryczna">
+                    <div data-repeater-item>
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <label class="form-label">Pochodzenie energii:</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio"
+                                           name="energia_elektryczna[0][pochodzenie_energii]"
+                                           value="oze" required>
+                                    <label class="form-check-label">OZE</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio"
+                                           name="energia_elektryczna[0][pochodzenie_energii]"
+                                           value="nie_oze" required>
+                                    <label class="form-check-label">nie OZE</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Dostawca energii elektrycznej:</label>
+                                <select class="form-select" name="energia_elektryczna[0][dostawca_energii]"
+                                        required>
+                                    <option></option>
+                                    <option value="Alchemia S.A.">Alchemia S.A.</option>
+                                    <option value="Energia Polska">Energia Polska</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Zużycie:</label>
+                                <input type="number" class="form-control" name="energia_elektryczna[0][zuzycie]"
+                                       placeholder="Wprowadź zużycie" required/>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Jednostka:</label>
+                                <select class="form-select" name="energia_elektryczna[0][jednostka]" required>
+                                    <option></option>
+                                    <option value="MWh/rok">MWh/rok</option>
+                                    <option value="kWh/rok">kWh/rok</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mt-4">
+                                <a href="javascript:;" data-repeater-delete
+                                   class="btn btn-sm btn-light-danger mt-3">
+                                    <i class="ki-duotone ki-trash fs-5"></i> Usuń
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group mt-5">
+                <a href="javascript:;" data-repeater-create class="btn btn-light-primary">
+                    <i class="ki-duotone ki-plus fs-3"></i> Dodaj dostawcę energii elektrycznej
+                </a>
+            </div>
+        </div>
+
+        <div class="form-check mt-5">
+            <label class="form-label">Czy do ładowania samochodów elektrycznych (w tym hybrydowych Plug-in)
+                zużywasz zakupioną energię elektryczną?</label>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="ladowanie_samochodow" value="nie" required>
+                <label class="form-check-label">nie</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="ladowanie_samochodow" value="tak" required>
+                <label class="form-check-label">tak</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="pb-10 pb-lg-15">
+        <!-- Energia Cieplna -->
+        <h2 class="fw-bold d-flex align-items-center text-gray-900">Energia cieplna</h2>
+        <div class="text-muted fw-semibold fs-6">
+            Podaj dane dotyczące zakupionej lub dostarczonej z zewnątrz energii cieplnej, np. ciepła sieciowego.
+            Uzupełnij informacje o dostawcach oraz rocznym zużyciu w wybranej jednostce.
+
+
+            Nie uwzględniaj wyprodukowanej przez Ciebie energii, która pochodzi z OZE. W Zakresie 2 nie generuje
+            ona emisji. Emisje związane np. z wyprodukowaniem modułów fotowoltaicznych nie są brane pod uwagę w
+            tej kalkulacji, bo wchodzą w Zakres 3.
+        </div>
+
+        <!-- Repeater for Energia Cieplna -->
+        <div id="kt_docs_repeater_energia_cieplna">
+            <div class="form-group">
+                <div data-repeater-list="energia_cieplna">
+                    <div data-repeater-item>
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <label class="form-label">Dostawca energii cieplnej:</label>
+                                <select class="form-select" name="dostawca_energii_cieplnej" required>
+                                    <option></option>
+                                    <option value="MIEJSKIE PRZEDSIĘBIORSTWO ENERGETYCZNE">MIEJSKIE
+                                        PRZEDSIĘBIORSTWO ENERGETYCZNE
+                                    </option>
+                                    <option value="CESJA_LUBELSKIE PRZEDSIĘBIORSTWO ENERGETYCZNE">
+                                        CESJA_LUBELSKIE PRZEDSIĘBIORSTWO ENERGETYCZNE
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Zużycie:</label>
+                                <input type="number" class="form-control" name="zuzycie_cieplnej"
+                                       placeholder="Wprowadź zużycie" required/>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Jednostka:</label>
+                                <select class="form-select" name="jednostka_cieplnej" required>
+                                    <option></option>
+                                    <option value="GJ/rok">GJ/rok</option>
+                                    <option value="MWh/rok">MWh/rok</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mt-4">
+                                <a href="javascript:;" data-repeater-delete
+                                   class="btn btn-sm btn-light-danger mt-3">
+                                    <i class="ki-duotone ki-trash fs-5"></i> Usuń
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group mt-5">
+                <a href="javascript:;" data-repeater-create class="btn btn-light-primary">
+                    <i class="ki-duotone ki-plus fs-3"></i> Dodaj dostawcę energii cieplnej
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step navigation buttons -->
+    <div class="d-flex justify-content-between">
+        <!-- Przycisk "Poprzedni krok" po lewej stronie -->
+        <div>
+            <button type="button" class="btn btn-secondary prev-step">Poprzedni krok</button>
+        </div>
+
+        <!-- Przycisk "Następny krok" po prawej stronie -->
+        <div>
+            <button type="button" class="btn btn-primary next-step">Następny krok</button>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Step 4 (Hidden by default) -->
+<div class="step d-none" data-step="4">
+    <!-- Emisje łącznie -->
+    <div class="row mb-5">
+        <div class="col-md-8">
+            <h2 class="fw-bold text-gray-900">Emisje łącznie</h2>
+            <h1 class="display-4 fw-bold text-gray-900">127.72 <span class="fs-4">t CO2e/rok</span></h1>
+            <button type="button" class="btn btn-success"
+                    onclick="window.location.href='{{ url_for('generate_pdf') }}'">Pobierz raport PDF
+            </button>
+
+        </div>
+    </div>
+
+    <!-- Dane dotyczące emisji -->
+    <div class="row mb-5">
+        <div class="col-md-4">
+            <h5>Emisje na m²</h5>
+            <p class="fw-bold">2.55 <span class="fs-6">t CO2e/rok</span></p>
+        </div>
+        <div class="col-md-4">
+            <h5>Emisje na pracownika</h5>
+            <p class="fw-bold">127.72 <span class="fs-6">t CO2e/rok na pracownika</span></p>
+        </div>
+        <div class="col-md-4">
+            <h5>Emisje na obrót firmy</h5>
+            <p class="fw-bold">1.28 <span class="fs-6">t CO2e/rok na 1000 zł obrotu</span></p>
+        </div>
+    </div>
+
+    <!-- Zakres 1 i Zakres 2 -->
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <h5 class="fw-bold text-gray-900"><span class="text-primary">•</span> Zakres 1 (emisje bezpośrednie)
+            </h5>
+            <p class="fw-bold text-gray-900">2.97 t CO2e/rok <span class="text-muted">(2.33%)</span></p>
+            <ul class="list-unstyled">
+                <li>Olej opałowy - 0.01 t CO2e/rok (0.01%)</li>
+                <li>Gaz ziemny - 0.01 t CO2e/rok (0.01%)</li>
+                <li>Paliwo w samochodach należących bądź będących pod kontrolą firmy - 2.96 t CO2e/rok (2.31%)
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <h5 class="fw-bold text-gray-900"><span class="text-warning">•</span> Zakres 2 (emisje pośrednie)
+            </h5>
+            <p class="fw-bold text-gray-900">124.75 t CO2e/rok <span class="text-muted">(97.67%)</span></p>
+            <ul class="list-unstyled">
+                <li>Energia elektryczna - 80.81 t CO2e/rok (63.27%)</li>
+                <li>Energia cieplna - 43.94 t CO2e/rok (34.40%)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Wykresy -->
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <h5 class="fw-bold text-gray-900">Porównanie emisji przedsiębiorstwa</h5>
+            <ul class="list-unstyled">
+                <li>218 osób można rocznie zaopatrzyć w energię elektryczną</li>
+                <li>90 osób musiałoby przesiąść się z samochodu na rower, żeby skompensować te emisje</li>
+                <li>5616 razy można przejechać koleją z Gdyni do Krakowa</li>
+                <li>15 razy można okrążyć Ziemię samochodem</li>
+            </ul>
+        </div>
+        <div class="col-md-6 d-flex justify-content-center align-items-center" style="height: 300px;">
+            <canvas id="pieChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Wykres słupkowy -->
+    <div class="row mb-5">
+        <div class="col-md-12" style="height: 200px;">
+            <canvas id="barChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Wskaźniki rozróżnienia metod -->
+    <div class="row">
+        <div class="col-md-12">
+            <h5 class="fw-bold text-gray-900">Rozróżnienie metod:</h5>
+            <ul class="list-unstyled">
+                <li><strong>Location-based</strong>: Opiera się na lokalizacji. Odzwierciedla średnią
+                    intensywność emisji w sieciach.
+                </li>
+                <li><strong>Market-based</strong>: Odzwierciedla emisje wybrane przez przedsiębiorstwa na
+                    podstawie umów dotyczących zakupu energii.
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Ramka z informacjami o redukcji -->
+    <div class="row mb-5 p-4" style="background-color: #f2f2f9; border-radius: 8px;">
+        <div class="col-md-8">
+            <h3 class="fw-bold">Podejmij akcje, zacznij redukować emisje</h3>
+            <p class="text-muted">W zakresie w jakim podlegam przepisom o ochronie danych osobowych:</p>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="consent1">
+                <label class="form-check-label" for="consent1">
+                    Wyrażam zgodę na udostępnienie przez ING Usługi dla Biznesu S.A. moich danych osobowych (tj.
+                    NIP, nazwa firmy, imię, nazwisko oraz adres e-mail) do ING Bank Śląski S.A. w celu oceny
+                    ryzyka transformacji.
+                </label>
+            </div>
+            <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" id="consent2">
+                <label class="form-check-label" for="consent2">
+                    Wyrażam zgodę na udostępnienie przez ING Usługi dla Biznesu S.A. moich danych osobowych (tj.
+                    NIP, nazwa firmy, imię, nazwisko oraz adres e-mail) do Fundacji Climate Strategies Poland z
+                    siedzibą w Gdańsku, w celu przekazywania mi oraz reprezentowanemu przeze mnie podmiotowi
+                    informacji branżowych, dotyczących konkurencyjności klimatycznej przedsiębiorstw oraz
+                    aktualizacji o wydarzeniach organizowanych przez Fundację Climate Strategies Poland.
+                </label>
+            </div>
+            <p class="text-muted">Wiem, że mam prawo w dowolnym momencie wycofać zgodę. Wycofanie zgody nie
+                wpływa na zgodność z prawem przetwarzania, którego dokonano na podstawie zgody przed jej
+                wycofaniem.</p>
+            <button type="button" class="btn btn-success"
+                    onclick="window.location.href='{{ url_for('generate_pdf') }}'">Pobierz raport PDF
+            </button>
+            <button type="button" class="btn btn-primary">Umów się na konsultację</button>
+        </div>
+        <div class="col-md-4 text-end">
+            <h3 class="fw-bold text-gray-900">Emisje po redukcji</h3>
+            <h1 class="display-5 fw-bold text-primary">46.91 <span class="fs-4">t CO2e/rok</span></h1>
+            <p class="fw-bold">Redukcja <span class="text-primary">63.27%</span></p>
+        </div>
+    </div>
+
+    <!-- Opisy dotyczące metodologii -->
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <p class="text-muted">
+                Kalkulację należy traktować wyłącznie jako estymację śladu węglowego. Nie stanowi ona wyłącznej
+                metodyki obliczeń dokonywanych przez Fundację Climate Strategies Poland oraz nie uwzględnia w
+                sposób wyczerpujący wszystkich okoliczności mających wpływ na obliczenie śladu węglowego.
+            </p>
+            <p class="text-muted">
+                Wykorzystany w opracowaniu wskaźnik emisji GHG, spośród powszechnie dostępnych, charakteryzuje
+                się istotnością:
+            </p>
+            <ul class="text-muted">
+                <li>czasową – wskaźniki adekwatne/najbliższe dla okresu, dla którego liczony jest ślad
+                    węglowy,
+                </li>
+                <li>geograficzną – wskaźniki reprezentatywne dla obszaru, dla którego liczony jest ślad
+                    węglowy,
+                </li>
+                <li>technologiczną – wskaźniki uwzględniające stosowaną technologię, dla której liczony jest
+                    ślad węglowy.
+                </li>
+            </ul>
+            <p class="text-muted">
+                Polegamy na współczynnikach z uznanych, recenzowanych, oficjalnie publikowanych źródeł:
+            </p>
+            <ul class="text-muted">
+                <li>krajowych i międzynarodowych ośrodków badawczych,</li>
+                <li>stowarzyszeń branżowych,</li>
+                <li>ośrodków odpowiedzialnych za regulacje prawne, monitoring, statystyki w dedykowanych
+                    obszarach.
+                </li>
+            </ul>
+            <p class="text-muted">
+                Nasze podejście jest zgodne z zapisami metodyk GHG Protocol, IPCC, a także wskazanych norm. 1
+                12006 IPCC Guidelines for National Greenhouse Gas Inventories. Chapter 2: Approaches to Data
+                Collection; GHG Protocol: A Corporate Accounting and Reporting Standard; PAS 2050:2011.
+            </p>
+        </div>
+    </div>
+    <!-- Step navigation buttons -->
+    <div class="d-flex justify-content-between">
+        <!-- Przycisk "Poprzedni krok" po lewej stronie -->
+        <div>
+            <button type="button" class="btn btn-secondary prev-step">Poprzedni krok</button>
+        </div>
+
+        <!-- Przycisk "Następny krok" po prawej stronie -->
+        <div>
+            <button type="button" class="btn btn-primary next-step">Następny krok</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- Step 5 (Hidden by default) -->
+<div class="step d-none" data-step="5">
+    <!-- Sekcje A1 i A2 -->
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <h3 class="fw-bold text-gray-900">Gratulacje! Wiesz już, jaki ślad węglowy generuje działalność
+                Twojej firmy w zakresie 1 i 2 GHG.</h3>
+            <p>To pierwszy krok w kierunku obniżenia emisji gazów cieplarnianych. Co dalej? W przygotowaniu i
+                wdrożeniu strategii redukcji emisyjności pomogą Ci dźwignie redukcji śladu węglowego. Są to
+                działania, które doprowadzą do obniżenia emisji ze źródeł, które mają duży udział w całkowitym
+                śladzie węglowym przedsiębiorstwa.</p>
+        </div>
+    </div>
+
+    <!-- Zakresy -->
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <h4 class="fw-bold text-gray-900">Zakres 1</h4>
+            <ul>
+                <li>Wybieraj pojazdy o niższym śladzie węglowym, np. korzystaj z wózka widłowego zasilanego
+                    energią elektryczną pochodzącą z OZE.
+                </li>
+                <li>Wymień samochody spalinowe na takie, które są zasilane energią elektryczną pochodzącą ze
+                    źródeł odnawialnych.
+                </li>
+                <li>Postaw na naturalne czynniki chłodnicze w klimatyzacji.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <h4 class="fw-bold text-gray-900">Zakres 2</h4>
+            <ul>
+                <li>Korzystaj z energii elektrycznej, która pochodzi z odnawialnych źródeł emisji, np. zielonej
+                    energii elektrycznej.
+                </li>
+                <li>Redukuj zużycie mediów.</li>
+                <li>Wprowadź elektryczne ogrzewanie w budynkach.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <h4 class="fw-bold text-gray-900">Zakres 3</h4>
+            <ul>
+                <li>Ograniczaj zakup materiałów i dobór kapitałowych.</li>
+                <li>Redukuj zużycie surowców dzięki optymalizacji procesów.</li>
+                <li>Weryfikuj łańcuch dostaw, czyli sprawdzaj skąd pochodzą surowce i jak są transportowane.
+                </li>
+                <li>Uświadamiaj pracowników w zakresie proekologicznych zachowań (np. wyboru roweru zamiast
+                    samochodu).
+                </li>
+                <li>Segreguj odpady.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <h4 class="fw-bold text-gray-900">Co dalej? Jak możesz wykorzystać estymację śladu węglowego swojej
+                firmy?</h4>
+            <ol>
+                <li><strong>Sprawdź poprawność danych w formularzu:</strong> Podstawę do zewnętrznego
+                    raportowania informacji na temat wyliczonego śladu węglowego stanowi zgodność obliczeń ze
+                    standardem kalkulacji gazów cieplarnianych GHG Protocol. Indywidualna konsultacja z naszym
+                    ekspertem pozwoli Ci zweryfikować, czy wprowadzone w kalkulatorze dane zostały wprowadzone
+                    poprawnie.
+                </li>
+                <li><strong>Zaprojektuj strategię redukcji emisji:</strong> Dobrze przygotowana strategia to
+                    skomplikowany i powiązany system regulacyjno – społeczno – gospodarczy, w który zaangażowani
+                    są praktycznie wszyscy interesariusze. Wymaga on kilku milowych kroków i zdefiniowania
+                    najważniejszych założeń tj. zmapowania obszarów działalności czy potencjalnych sposobów
+                    osiągania neutralności klimatycznej. Pomagamy odpowiednio zaplanować i sukcesywnie wdrażać
+                    te działania, by przyniosły jak największe korzyści.
+                </li>
+                <li><strong>Redukuj emisje gazów cieplarnianych:</strong> Po obliczeniu śladu węglowego firmy
+                    pojawia się pytanie: co dalej? To jest ten moment, kiedy należy zastanowić się nad
+                    możliwością stworzenia i wdrożenia planu redukcji emisji oraz strategii unikania emisji
+                    zarówno we własnym zakresie, jak i w całym łańcuchu wartości. Dobrą praktyką jest, by
+                    ograniczanie emisji rozpocząć od najprostszych kroków, które nie wymagają od nas większego
+                    wysiłku, i stopniowo przechodzić do najbardziej skomplikowanych i czasochłonnych procesów.
+                </li>
+                <li><strong>Kompensuj ślad węglowy:</strong> Kolejnym krokiem po wdrożeniu działań
+                    ograniczających emisje gazów cieplarnianych jest kompensacja emisji, których nie da się
+                    zredukować. Wybór działań offsetowych jest trudnym tematem, wokół którego pojawia się
+                    mnóstwo sprzecznych informacji. Łatwo wpaść w pułapkę i nawet mając najlepsze zamiary –
+                    zostać posądzonym o greenwashing. Dlatego bazując na doświadczeniu naszych ekspertów,
+                    pomagamy przedsiębiorstwom podjąć najlepsze dla nich decyzje.
+                </li>
+                <li><strong>Opracuj strategię komunikacji wewnętrznej i zewnętrznej:</strong> Nawet
+                    najrzetelniej przygotowana strategia redukcji i kompensacji emisji może przysporzyć
+                    problemów, jeśli nie będzie odpowiednio komunikowana. W pracy z firmami kładziemy nacisk na
+                    odpowiedzialną komunikację klimatyczną, pokazywanie działań firmy w szerszym kontekście i
+                    adresowanie obszarów jej największej emisyjności. Prowadzimy warsztaty w obszarze
+                    greenwashingu w deklaracjach klimatycznych.
+                </li>
+                <li><strong>Pokaż się światu:</strong> Jednym ze sposobów zaprezentowania i zweryfikowania
+                    środowiskowej polityki firmy jest sprawozdanie wyników emisyjności i działań
+                    proklimatycznych w raportach globalnego projektu CDP. Takie raportowanie pomaga zmierzyć
+                    postępy, ale też pozycjonuje firmę na tle danej branży oraz firm podobnej wielkości, zarówno
+                    w Polsce, Europie jak i na świecie. Do tej pory swoje wyniki opublikowało tu ponad 10
+                    tysięcy zaangażowanych klimatycznie firm, miast i regionów. Zgłaszając się do CDP, można
+                    uzyskać przewagę nad konkurencją. Ujawnianie wyników pomaga również wyprzedzić zmiany
+                    regulacyjne i polityczne. Niesie to możliwość znalezienia nowych strumieni działania,
+                    których wymagają inwestorzy i klienci na całym świecie. Proces opracowania wyników pod kątem
+                    raportowania do CDP jest żmudny i czasochłonny. Nasza Fundacja pomaga w systematyzacji i ich
+                    ujawnieniu względem CDP.
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Step navigation buttons -->
+    <div class="d-flex justify-content-between">
+        <button type="button" class="btn btn-secondary prev-step">Poprzedni krok</button>
+        <div>
+            <button type="submit" class="btn btn-success">Zakończ i zapisz</button>
+        </div>
+    </div>
 </div>
 
 <!-- Bootstrap 5 JS Bundle (zawiera Popper) -->

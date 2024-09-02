@@ -1,3 +1,5 @@
+import json
+
 import pdfkit
 from flask import Flask, render_template, request, redirect, url_for, make_response
 from sqlalchemy import text
@@ -9,6 +11,7 @@ from database import engine_company, engine_excel, CompanyProfile, create_tables
 app = Flask(__name__, static_url_path='/static', static_folder='static')
 
 
+# Funkcja do zapisywania profilu firmy
 # Funkcja do zapisywania profilu firmy
 @app.route('/save_company_profile', methods=['POST'])
 def save_company_profile():
@@ -25,16 +28,6 @@ def save_company_profile():
 
     # Zbieranie danych z dodatkowych opcji
     additional_option = request.form.get('additional_select')
-
-    # Debugging prints
-    print("Company Name:", company_name)
-    print("Company NIP:", company_nip)
-    print("Business Type:", business_type)
-    print("Additional Option:", additional_option)  # Debugging print
-    print("Reporting Period:", reporting_period)
-    print("Employee Count:", employee_count)
-    print("Annual Revenue:", annual_revenue)
-    print("Usable Area:", usable_area)
 
     # Tworzenie nowego wpisu do tabeli company_profiles
     new_company = CompanyProfile(
@@ -76,11 +69,29 @@ def save_company_profile():
 
     # Zapis do bazy danych
     for emission in stationary_emissions:
+        fuel_type = emission['paliwo']
+        unit = emission['jednostka']
+        consumption = float(emission['zuzycie'])
+
+        # Pobieranie współczynnika emisji CO2 z bazy danych
+        conversion_factor = session.execute(text('''
+            SELECT "GHG Conversion Factor 2023"
+            FROM excel_data
+            WHERE "Level 3" = :fuel_type
+            AND "UOM" = :unit
+        '''), {'fuel_type': fuel_type, 'unit': unit}).fetchone()
+
+        if conversion_factor:
+            co2_emission = consumption * conversion_factor[0] / 1000  # konwersja na tony CO2e
+        else:
+            co2_emission = 0  # default value if no conversion factor found
+
         new_emission = StationaryEmission(
             company_id=company_id,
-            fuel_type=emission['paliwo'],
-            consumption=float(emission['zuzycie']),
-            unit=emission['jednostka']
+            fuel_type=fuel_type,
+            consumption=consumption,
+            unit=unit,
+            co2_emission=co2_emission  # Zakładam, że kolumna 'co2_emission' jest w tabeli
         )
         session.add(new_emission)
 
@@ -184,11 +195,35 @@ def save_company_profile():
 
 
 # Funkcja do obsługi formularza i zapisu danych
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
-    if request.method == 'POST':
-        return save_company_profile()
-    return render_template('index.html')
+    session = sessionmaker(bind=engine_excel)()
+
+    # Pobieranie danych z bazy
+    fuels_units = session.execute(text('''
+        SELECT "Level 3" AS fuel, array_agg(DISTINCT "UOM") AS units
+        FROM excel_data
+        WHERE "Level 3" LIKE '%Benz%'
+           OR "Level 3" LIKE '%Olej%'
+           OR "Level 3" LIKE '%LPG%'
+           OR "Level 3" LIKE '%Drewno%'
+           OR "Level 3" LIKE '%Węgiel%'
+           OR "Level 3" LIKE '%Ekogroszek%'
+           OR "Level 3" LIKE '%Biomasa%'
+           OR "Level 3" LIKE '%Pellet%'
+        GROUP BY "Level 3"
+        ORDER BY "Level 3";
+    ''')).fetchall()
+
+    fuels_units_dict = {row.fuel: row.units for row in fuels_units}
+    fuel_types = list(fuels_units_dict.keys())
+
+    # Debugowanie JSON-a w backendzie
+    print(json.dumps(fuels_units_dict, ensure_ascii=False))
+
+    # Przekazanie JSON do szablonu
+    return render_template('index.html', fuels_units=json.dumps(fuels_units_dict, ensure_ascii=False),
+                           fuel_types=fuel_types)
 
 
 @app.route('/database')
