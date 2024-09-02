@@ -55,8 +55,7 @@ class StationaryEmission(Base):
     fuel_type = Column(String, nullable=False)
     consumption = Column(Float, nullable=False)
     unit = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
     company_profile = relationship("CompanyProfile", back_populates="stationary_emissions")
 
 
@@ -70,8 +69,9 @@ class MobileEmission(Base):
     fuel_type = Column(String, nullable=False)
     fuel_consumption = Column(Float, nullable=False)
     unit = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
+    vehicle_count = Column(Integer, nullable=False)
+    fuel_submission_method = Column(String)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
     company_profile = relationship("CompanyProfile", back_populates="mobile_emissions")
 
 
@@ -85,7 +85,8 @@ class ElectricityEmission(Base):
     supplier = Column(String, nullable=False)
     consumption = Column(Float, nullable=False)
     unit = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    ladowanie_samochodow = Column(String)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     company_profile = relationship("CompanyProfile", back_populates="electricity_emissions")
 
@@ -99,7 +100,7 @@ class HeatEmission(Base):
     supplier = Column(String, nullable=False)
     consumption = Column(Float, nullable=False)
     unit = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     company_profile = relationship("CompanyProfile", back_populates="heat_emissions")
 

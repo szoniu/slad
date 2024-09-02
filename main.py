@@ -54,11 +54,28 @@ def save_company_profile():
     company_id = new_company.id
 
     # Zbieranie danych z kroku 2 (Stacjonarne źródła emisji)
-    stationary_emissions = request.form.getlist('stacjonarne_emissions')
-    print("Stationary Emissions:", stationary_emissions)  # Debugging print
+    stationary_emissions = []
 
+    # Iteracja przez wszystkie klucze w request.form
+    for key in request.form.keys():
+        if 'stacjonarne_emissions' in key:
+            # Oczekiwany format klucza: stacjonarne_emissions[0][paliwo]
+            # Rozbij klucz, aby uzyskać indeks i nazwę pola
+            index = int(key.split('[')[1].split(']')[0])
+            field = key.split('[')[2].split(']')[0]
+
+            # Upewnij się, że lista ma wystarczający rozmiar
+            if len(stationary_emissions) <= index:
+                stationary_emissions.append({})
+
+            # Przypisz wartość do odpowiedniego słownika
+            stationary_emissions[index][field] = request.form[key]
+
+    # Logowanie przetworzonych danych
+    print(f"Stationary Emissions (parsed): {stationary_emissions}")
+
+    # Zapis do bazy danych
     for emission in stationary_emissions:
-        print("Emission Data:", emission)  # Additional Debugging print
         new_emission = StationaryEmission(
             company_id=company_id,
             fuel_type=emission['paliwo'],
@@ -68,31 +85,89 @@ def save_company_profile():
         session.add(new_emission)
 
     # Zbieranie danych z kroku 2 (Mobilne źródła emisji)
-    mobile_emissions = request.form.getlist('mobilne_emissions')
+    mobile_emissions = []
+
+    # Iteracja przez wszystkie klucze w request.form
+    for key in request.form.keys():
+        if 'mobilne_emissions' in key:
+            # Oczekiwany format klucza: mobilne_emissions[0][liczba_pojazdow]
+            # Rozbij klucz, aby uzyskać indeks i nazwę pola
+            index = int(key.split('[')[1].split(']')[0])
+            field = key.split('[')[2].split(']')[0]
+
+            # Upewnij się, że lista ma wystarczający rozmiar
+            if len(mobile_emissions) <= index:
+                mobile_emissions.append({})
+
+            # Przypisz wartość do odpowiedniego słownika
+            mobile_emissions[index][field] = request.form[key]
+
+    # Logowanie przetworzonych danych
+    print(f"Mobile Emissions (parsed): {mobile_emissions}")
+
+    # Zapis do bazy danych
     for emission in mobile_emissions:
         new_emission = MobileEmission(
             company_id=company_id,
             vehicle_type=emission['rodzaj_pojazdu'],
             fuel_type=emission['sposob_zasilania'],
             fuel_consumption=float(emission['zuzycie_paliwa']),
-            unit=emission['jednostka']
+            unit=emission['jednostka'],
+            vehicle_count=int(emission['liczba_pojazdow']),
+            fuel_submission_method=emission['sposob_podania']
         )
         session.add(new_emission)
 
     # Zbieranie danych z kroku 3 (Energia elektryczna)
-    electricity_emissions = request.form.getlist('energia_elektryczna')
+    electricity_emissions = []
+
+    # Pobieranie wartości pola ladowanie_samochodow
+    ladowanie_samochodow = request.form.get('ladowanie_samochodow')
+
+    # Iteracja przez wszystkie klucze w request.form
+    for key in request.form.keys():
+        if 'energia_elektryczna' in key:
+            index = int(key.split('[')[1].split(']')[0])
+            field = key.split('[')[2].split(']')[0]
+
+            if len(electricity_emissions) <= index:
+                electricity_emissions.append({})
+
+            electricity_emissions[index][field] = request.form[key]
+
+    # Logowanie przetworzonych danych
+    print(f"Electricity Emissions (parsed): {electricity_emissions}")
+
+    # Zapis do bazy danych
     for emission in electricity_emissions:
         new_emission = ElectricityEmission(
             company_id=company_id,
             energy_source=emission['pochodzenie_energii'],
             supplier=emission['dostawca_energii'],
             consumption=float(emission['zuzycie']),
-            unit=emission['jednostka']
+            unit=emission['jednostka'],
+            ladowanie_samochodow=ladowanie_samochodow  # Przypisanie wartości do każdego wpisu
         )
         session.add(new_emission)
 
     # Zbieranie danych z kroku 3 (Energia cieplna)
-    heat_emissions = request.form.getlist('energia_cieplna')
+    heat_emissions = []
+
+    # Iteracja przez wszystkie klucze w request.form
+    for key in request.form.keys():
+        if 'energia_cieplna' in key:
+            index = int(key.split('[')[1].split(']')[0])
+            field = key.split('[')[2].split(']')[0]
+
+            if len(heat_emissions) <= index:
+                heat_emissions.append({})
+
+            heat_emissions[index][field] = request.form[key]
+
+    # Logowanie przetworzonych danych
+    print(f"Heat Emissions (parsed): {heat_emissions}")
+
+    # Zapis do bazy danych
     for emission in heat_emissions:
         new_emission = HeatEmission(
             company_id=company_id,

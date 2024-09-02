@@ -368,6 +368,7 @@
                     </div>
                 </div>
 
+
                 <!-- Stepper Navigation Buttons -->
                 <div class="d-flex justify-content-between">
                     <!-- Przycisk "Poprzedni krok" po lewej stronie -->
@@ -401,7 +402,6 @@
                     tej kalkulacji, bo wchodzą w Zakres 3.
                 </div>
 
-                <!-- Repeater for Energia Elektryczna -->
                 <div id="kt_docs_repeater_energia_elektryczna">
                     <div class="form-group">
                         <div data-repeater-list="energia_elektryczna">
@@ -410,19 +410,22 @@
                                     <div class="col-md-3">
                                         <label class="form-label">Pochodzenie energii:</label>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="pochodzenie_energii"
+                                            <input class="form-check-input" type="radio"
+                                                   name="energia_elektryczna[0][pochodzenie_energii]"
                                                    value="oze" required>
                                             <label class="form-check-label">OZE</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="pochodzenie_energii"
+                                            <input class="form-check-input" type="radio"
+                                                   name="energia_elektryczna[0][pochodzenie_energii]"
                                                    value="nie_oze" required>
                                             <label class="form-check-label">nie OZE</label>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Dostawca energii elektrycznej:</label>
-                                        <select class="form-select" name="dostawca_energii" required>
+                                        <select class="form-select" name="energia_elektryczna[0][dostawca_energii]"
+                                                required>
                                             <option></option>
                                             <option value="Alchemia S.A.">Alchemia S.A.</option>
                                             <option value="Energia Polska">Energia Polska</option>
@@ -430,12 +433,12 @@
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Zużycie:</label>
-                                        <input type="number" class="form-control" name="zuzycie"
+                                        <input type="number" class="form-control" name="energia_elektryczna[0][zuzycie]"
                                                placeholder="Wprowadź zużycie" required/>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Jednostka:</label>
-                                        <select class="form-select" name="jednostka" required>
+                                        <select class="form-select" name="energia_elektryczna[0][jednostka]" required>
                                             <option></option>
                                             <option value="MWh/rok">MWh/rok</option>
                                             <option value="kWh/rok">kWh/rok</option>
