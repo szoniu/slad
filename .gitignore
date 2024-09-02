@@ -1,4 +1,6 @@
 .idea/
+.DS_Store
+
 .vscode/
 *alembic*
 # Byte-compiled / optimized / DLL files
