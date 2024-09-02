@@ -51,15 +51,15 @@ def show_database():
         columns = result.keys()
         data = [dict(zip(columns, row)) for row in result.fetchall()]
 
-    # Tworzenie unikalnych wartości dla każdej kolumny
-    unique_scopes = sorted(set(row['Scope'] for row in data))
-    unique_level1 = sorted(set(row['Level 1'] for row in data))
-    unique_level2 = sorted(set(row['Level 2'] for row in data))
-    unique_level3 = sorted(set(row['Level 3'] for row in data))
-    unique_level4 = sorted(set(row['Level 4'] for row in data))
-    unique_column_text = sorted(set(row['Column Text'] for row in data))
-    unique_uom = sorted(set(row['UOM'] for row in data))
-    unique_ghg_unit = sorted(set(row['GHG/Unit'] for row in data))
+    # Tworzenie unikalnych wartości dla każdej kolumny, ignorując None
+    unique_scopes = sorted(set(row['Scope'] for row in data if row['Scope'] is not None))
+    unique_level1 = sorted(set(row['Level 1'] for row in data if row['Level 1'] is not None))
+    unique_level2 = sorted(set(row['Level 2'] for row in data if row['Level 2'] is not None))
+    unique_level3 = sorted(set(row['Level 3'] for row in data if row['Level 3'] is not None))
+    unique_level4 = sorted(set(row['Level 4'] for row in data if row['Level 4'] is not None))
+    unique_column_text = sorted(set(row['Column Text'] for row in data if row['Column Text'] is not None))
+    unique_uom = sorted(set(row['UOM'] for row in data if row['UOM'] is not None))
+    unique_ghg_unit = sorted(set(row['GHG/Unit'] for row in data if row['GHG/Unit'] is not None))
 
     # Renderowanie szablonu HTML z przekazanymi danymi i unikalnymi wartościami
     return render_template('database.html',

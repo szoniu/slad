@@ -28,7 +28,7 @@
         <tr>
             <th></th>
             <th>
-                <select class="form-select form-select-sm">
+                <select class="form-select form-select-sm" id="filter-scope">
                     <option value="">Wybierz Scope</option>
                     {% for scope in unique_scopes %}
                     <option value="{{ scope }}">{{ scope }}</option>
@@ -36,7 +36,7 @@
                 </select>
             </th>
             <th>
-                <select class="form-select form-select-sm">
+                <select class="form-select form-select-sm" id="filter-level1">
                     <option value="">Wybierz Level 1</option>
                     {% for level1 in unique_level1 %}
                     <option value="{{ level1 }}">{{ level1 }}</option>
@@ -44,7 +44,7 @@
                 </select>
             </th>
             <th>
-                <select class="form-select form-select-sm">
+                <select class="form-select form-select-sm" id="filter-level2">
                     <option value="">Wybierz Level 2</option>
                     {% for level2 in unique_level2 %}
                     <option value="{{ level2 }}">{{ level2 }}</option>
@@ -52,7 +52,7 @@
                 </select>
             </th>
             <th>
-                <select class="form-select form-select-sm">
+                <select class="form-select form-select-sm" id="filter-level3">
                     <option value="">Wybierz Level 3</option>
                     {% for level3 in unique_level3 %}
                     <option value="{{ level3 }}">{{ level3 }}</option>
@@ -60,7 +60,7 @@
                 </select>
             </th>
             <th>
-                <select class="form-select form-select-sm">
+                <select class="form-select form-select-sm" id="filter-level4">
                     <option value="">Wybierz Level 4</option>
                     {% for level4 in unique_level4 %}
                     <option value="{{ level4 }}">{{ level4 }}</option>
@@ -68,7 +68,7 @@
                 </select>
             </th>
             <th>
-                <select class="form-select form-select-sm">
+                <select class="form-select form-select-sm" id="filter-column-text">
                     <option value="">Wybierz Column Text</option>
                     {% for column_text in unique_column_text %}
                     <option value="{{ column_text }}">{{ column_text }}</option>
@@ -76,7 +76,7 @@
                 </select>
             </th>
             <th>
-                <select class="form-select form-select-sm">
+                <select class="form-select form-select-sm" id="filter-uom">
                     <option value="">Wybierz UOM</option>
                     {% for uom in unique_uom %}
                     <option value="{{ uom }}">{{ uom }}</option>
@@ -84,7 +84,7 @@
                 </select>
             </th>
             <th>
-                <select class="form-select form-select-sm">
+                <select class="form-select form-select-sm" id="filter-ghg-unit">
                     <option value="">Wybierz GHG/Unit</option>
                     {% for ghg_unit in unique_ghg_unit %}
                     <option value="{{ ghg_unit }}">{{ ghg_unit }}</option>
@@ -98,14 +98,14 @@
         {% for row in data %}
         <tr>
             <td>{{ row['ID'] }}</td>
-            <td>{{ row['Scope'] }}</td>
-            <td>{{ row['Level 1'] }}</td>
-            <td>{{ row['Level 2'] }}</td>
-            <td>{{ row['Level 3'] }}</td>
-            <td>{{ row['Level 4'] }}</td>
-            <td>{{ row['Column Text'] }}</td>
-            <td>{{ row['UOM'] }}</td>
-            <td>{{ row['GHG/Unit'] }}</td>
+            <td class="scope">{{ row['Scope'] }}</td>
+            <td class="level1">{{ row['Level 1'] }}</td>
+            <td class="level2">{{ row['Level 2'] }}</td>
+            <td class="level3">{{ row['Level 3'] }}</td>
+            <td class="level4">{{ row['Level 4'] }}</td>
+            <td class="column-text">{{ row['Column Text'] }}</td>
+            <td class="uom">{{ row['UOM'] }}</td>
+            <td class="ghg-unit">{{ row['GHG/Unit'] }}</td>
             <td>{{ row['GHG Conversion Factor 2023'] }}</td>
         </tr>
         {% endfor %}
@@ -119,6 +119,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+<!-- Custom JS (opcjonalnie) -->
+<script src="{{ url_for('static', filename='js/database.js') }}"></script>
 
 </body>
 </html>
