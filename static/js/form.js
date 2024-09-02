@@ -164,34 +164,149 @@ $(document).ready(function() {
 
 // Repeater
 
-$(document).ready(function() {
 
-    // Inicjalizacja dla stacjonarnych źródeł emisji
-    $('#kt_docs_repeater_stacjonarne').repeater({
-        initEmpty: false,
-        show: function () {
-            $(this).slideDown();
-        },
-        hide: function (deleteElement) {
-            $(this).slideUp(deleteElement);
-        },
-        ready: function (setIndexes) {
-            console.log("Repeater for stacjonarne źródła emisji is ready and initialized.");
+$(document).ready(function() {
+console.log("Skrypt załadowany");
+
+    // Parsowanie danych JSON z jednostkami paliw
+    var fuelsUnits = JSON.parse($('#dataContainer').attr('data-fuels-units'));
+    console.log('Dane fuelsUnits:', fuelsUnits);
+
+    // Ukrycie formularza na początku
+    $('#stacjonarne_form_container').hide();
+
+    // Funkcja do resetowania formularza
+    function resetForm() {
+        var form = $('#stacjonarne_emisje_form');
+        if (form.length > 0) {
+            form[0].reset();  // Resetowanie wszystkich pól formularza
+            $('#jednostka').empty(); // Wyczyszczenie listy jednostek
+            $('#paliwo').val(''); // Wyczyszczenie pola wyboru paliwa
+        } else {
+            console.error("Formularz nie został znaleziony.");
+        }
+    }
+
+    // Pokaż formularz po kliknięciu "Dodaj źródło emisji"
+    $('#dodaj_stacjonarne_btn').on('click', function() {
+        resetForm();  // Resetowanie formularza przed jego ponownym pokazaniem
+
+        $('#dodaj_stacjonarne_btn').hide();  // Ukryj przycisk "Dodaj źródło emisji"
+        $('#stacjonarne_form_container').show();  // Pokaż formularz
+
+        // Ustawienie domyślnego paliwa po kliknięciu "Dodaj źródło emisji"
+        var firstFuel = $('#paliwo option:first').val();
+        $('#paliwo').val(firstFuel).change();  // Wywołanie zmiany, aby załadować jednostki
+    });
+
+    // Dynamiczne ładowanie jednostek na podstawie wybranego paliwa
+    $('#paliwo').on('change', function() {
+        var selectedFuel = $(this).val();
+        var units = fuelsUnits[selectedFuel];
+        var unitSelect = $('#jednostka');
+        unitSelect.empty();  // Wyczyść listę jednostek przed dodaniem nowych
+
+        if (units) {
+            // Dodanie opcji jednostek do pola select
+            units.forEach(function(unit) {
+                unitSelect.append(new Option(unit, unit));
+            });
+
+            // Ustawienie domyślnej jednostki (pierwsza z listy)
+            unitSelect.val(units[0]);
+        } else {
+            console.log('Brak dostępnych jednostek dla wybranego paliwa.');
         }
     });
 
-    // Inicjalizacja dla mobilnych źródeł emisji
+    // Obsługa przycisku "Zapisz"
+    $('#zapisz_emisje_btn').on('click', function() {
+        var paliwo = $('#paliwo').val();
+        var zuzycie = $('#zuzycie').val();
+        var jednostka = $('#jednostka').val();
+
+        if (!paliwo || !zuzycie || !jednostka) {
+            alert("Wszystkie pola muszą być wypełnione!");
+            return;
+        }
+
+        // Liczba istniejących wierszy w tabeli
+        var rowCount = $('#stacjonarne_emisje_table tbody tr').length;
+
+        // Dodanie nowego wiersza do tabeli z dynamicznie wygenerowanymi nazwami pól
+        var newRow = `
+            <tr>
+                <td>
+                    <input type="hidden" name="stacjonarne_emissions[${rowCount}][paliwo]" value="${paliwo}">
+                    ${paliwo}
+                </td>
+                <td>
+                    <input type="hidden" name="stacjonarne_emissions[${rowCount}][zuzycie]" value="${zuzycie}">
+                    ${zuzycie}
+                </td>
+                <td>
+                    <input type="hidden" name="stacjonarne_emissions[${rowCount}][jednostka]" value="${jednostka}">
+                    ${jednostka}
+                </td>
+                <td>
+                    <a href="#" class="edit-btn">Edytuj</a> ·
+                    <a href="#" class="delete-btn">Usuń</a>
+                </td>
+            </tr>
+        `;
+
+        $('#stacjonarne_emisje_table tbody').append(newRow);
+
+        // Ukrycie formularza po dodaniu i pokazanie przycisku "Dodaj źródło emisji"
+        $('#stacjonarne_form_container').hide();
+        $('#dodaj_stacjonarne_btn').show();  // Pokaż przycisk "Dodaj źródło emisji" ponownie
+
+        resetForm();  // Resetowanie formularza po dodaniu danych
+    });
+
+    // Obsługa przycisku "Anuluj"
+    $('#anuluj_emisje_btn').on('click', function() {
+        resetForm();  // Resetowanie formularza po anulowaniu
+
+        // Ukryj formularz i pokaż ponownie przycisk "Dodaj źródło emisji"
+        $('#stacjonarne_form_container').hide();
+        $('#dodaj_stacjonarne_btn').show();
+    });
+
+    // Obsługa edycji i usuwania
+    $('#stacjonarne_emisje_table').on('click', '.edit-btn', function(e) {
+        e.preventDefault();
+        // Tutaj można dodać logikę do edycji rekordu
+    });
+
+    $('#stacjonarne_emisje_table').on('click', '.delete-btn', function(e) {
+        e.preventDefault();
+        $(this).closest('tr').remove();
+    });
+
     $('#kt_docs_repeater_mobilne').repeater({
         initEmpty: false,
         show: function () {
+            console.log("Dodano nowy pojazd - show function");
             $(this).slideDown();
         },
         hide: function (deleteElement) {
+            console.log("Usunięto pojazd - hide function");
             $(this).slideUp(deleteElement);
         },
         ready: function (setIndexes) {
             console.log("Repeater for mobilne źródła emisji is ready and initialized.");
         }
+    });
+
+    // Specyficzne nasłuchiwanie dla "Dodaj źródło emisji"
+    $('#add_stacjonarne').on('click', function() {
+        console.log("Kliknięto 'Dodaj źródło emisji'");
+    });
+
+    // Specyficzne nasłuchiwanie dla "Dodaj pojazd"
+    $('#add_mobilne').on('click', function() {
+        console.log("Kliknięto 'Dodaj pojazd'");
     });
 
     // Inicjalizacja dla energii elektrycznej
@@ -245,8 +360,8 @@ $(document).ready(function() {
         // Programowe wysłanie formularza po sprawdzeniu danych
         this.submit();
     });
+    });
 
-});
 
 // SQL
 

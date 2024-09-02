@@ -46,14 +46,12 @@ def save_company_profile():
     # Zapisz ID nowo utworzonej firmy do zmiennej, aby użyć go w kolejnych krokach
     company_id = new_company.id
 
-    # Zbieranie danych z kroku 2 (Stacjonarne źródła emisji)
+    # Iteracja przez wszystkie klucze w request.form
     stationary_emissions = []
 
-    # Iteracja przez wszystkie klucze w request.form
     for key in request.form.keys():
         if 'stacjonarne_emissions' in key:
             # Oczekiwany format klucza: stacjonarne_emissions[0][paliwo]
-            # Rozbij klucz, aby uzyskać indeks i nazwę pola
             index = int(key.split('[')[1].split(']')[0])
             field = key.split('[')[2].split(']')[0]
 
@@ -91,7 +89,7 @@ def save_company_profile():
             fuel_type=fuel_type,
             consumption=consumption,
             unit=unit,
-            co2_emission=co2_emission  # Zakładam, że kolumna 'co2_emission' jest w tabeli
+            co2_emission=co2_emission
         )
         session.add(new_emission)
 
