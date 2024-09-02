@@ -220,24 +220,100 @@ def show_database():
                            unique_ghg_unit=unique_ghg_unit)
 
 
+def calculate_emissions(data):
+    # Przykładowe współczynniki emisji
+    CO2_FACTORS = {
+        'olej_opalowy': 2.52,  # kg CO2e/l
+        'gaz_ziemny': 0.202,  # kg CO2e/kWh
+        'benzyna': 2.31,  # kg CO2e/l
+        'diesel': 2.68,  # kg CO2e/l
+        'energia_elektryczna': 0.45,  # kg CO2e/kWh
+        'energia_cieplna': 0.25  # kg CO2e/kWh
+    }
+
+    # Oblicz emisje dla każdej kategorii
+    total_emissions = 0
+    direct_emissions = []
+    indirect_emissions = []
+
+    # Obliczenia emisji dla stacjonarnych źródeł
+    for emission in data['stationary_emissions']:
+        fuel_type = emission['paliwo']
+        consumption = float(emission['zuzycie'])
+        unit = emission['jednostka']
+
+        if fuel_type == 'węgiel':
+            # Przykładowy przelicznik dla węgla
+            CO2_value = consumption * CO2_FACTORS['gaz_ziemny']
+            direct_emissions.append({'type': fuel_type, 'value': CO2_value})
+            total_emissions += CO2_value
+
+    # Obliczenia emisji dla mobilnych źródeł
+    for emission in data['mobile_emissions']:
+        fuel_type = emission['sposob_zasilania']
+        consumption = float(emission['zuzycie_paliwa'])
+
+        if fuel_type in CO2_FACTORS:
+            CO2_value = consumption * CO2_FACTORS[fuel_type]
+            direct_emissions.append({'type': f"Paliwo ({fuel_type})", 'value': CO2_value})
+            total_emissions += CO2_value
+
+    # Obliczenia emisji dla energii elektrycznej
+    for emission in data['electricity_emissions']:
+        consumption = float(emission['zuzycie'])
+        CO2_value = consumption * CO2_FACTORS['energia_elektryczna']
+        indirect_emissions.append({'type': 'Energia elektryczna', 'value': CO2_value})
+        total_emissions += CO2_value
+
+    # Obliczenia emisji dla energii cieplnej
+    for emission in data['heat_emissions']:
+        consumption = float(emission['zuzycie_cieplnej'])
+        CO2_value = consumption * CO2_FACTORS['energia_cieplna']
+        indirect_emissions.append({'type': 'Energia cieplna', 'value': CO2_value})
+        total_emissions += CO2_value
+
+    return {
+        'total_emissions': total_emissions,
+        'direct_emissions': direct_emissions,
+        'indirect_emissions': indirect_emissions
+    }
+
+
+def calculate_emission_metrics(total_emissions, employee_count, usable_area, annual_revenue):
+    emissions_per_m2 = total_emissions / usable_area
+    emissions_per_employee = total_emissions / employee_count
+    emissions_per_revenue = (total_emissions / annual_revenue) * 1000  # per 1000 zł obrotu
+
+    return {
+        'emissions_per_m2': emissions_per_m2,
+        'emissions_per_employee': emissions_per_employee,
+        'emissions_per_revenue': emissions_per_revenue
+    }
+
+
 @app.route('/generate_pdf')
 def generate_pdf():
+    # Pobranie danych z formularza
+    form_data = ...  # zbierz dane z formularza
+
+    # Obliczenia emisji
+    emissions = calculate_emissions(form_data)
+    metrics = calculate_emission_metrics(
+        total_emissions=emissions['total_emissions'],
+        employee_count=int(form_data['employee_count']),
+        usable_area=float(form_data['usable_area']),
+        annual_revenue=float(form_data['annual_revenue'])
+    )
+
     data = {
-        'company_name': request.args.get('company_name', 'Firma XYZ'),
-        'reporting_period': request.args.get('reporting_period', '2022'),
-        'total_emissions': '127.72 t CO2e/rok',
-        'emissions_per_m2': '2.55 t CO2e/rok',
-        'emissions_per_employee': '127.72 t CO2e/rok na pracownika',
-        'emissions_per_revenue': '1.28 t CO2e/rok na 1000 zł obrotu',
-        'direct_emissions': [
-            {'type': 'Olej opałowy', 'value': '0.01 t CO2e/rok', 'percentage': '0.01%'},
-            {'type': 'Gaz ziemny', 'value': '0.01 t CO2e/rok', 'percentage': '0.01%'},
-            {'type': 'Paliwo w samochodach', 'value': '2.96 t CO2e/rok', 'percentage': '2.31%'},
-        ],
-        'indirect_emissions': [
-            {'type': 'Energia elektryczna', 'value': '80.81 t CO2e/rok', 'percentage': '63.27%'},
-            {'type': 'Energia cieplna', 'value': '43.94 t CO2e/rok', 'percentage': '34.40%'},
-        ],
+        'company_name': form_data['company_name'],
+        'reporting_period': form_data['reporting_period'],
+        'total_emissions': f"{metrics['total_emissions']:.2f} t CO2e/rok",
+        'emissions_per_m2': f"{metrics['emissions_per_m2']:.2f} t CO2e/rok",
+        'emissions_per_employee': f"{metrics['emissions_per_employee']:.2f} t CO2e/rok na pracownika",
+        'emissions_per_revenue': f"{metrics['emissions_per_revenue']:.2f} t CO2e/rok na 1000 zł obrotu",
+        'direct_emissions': emissions['direct_emissions'],
+        'indirect_emissions': emissions['indirect_emissions'],
     }
 
     html_content = render_template('report_template.html', data=data)
