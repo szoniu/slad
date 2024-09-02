@@ -128,6 +128,10 @@ $(document).ready(function() {
 
         }
     });
+        $('#stepper-form').on('submit', function(event) {
+        var selectedOption = $('#additional_select').val();
+        console.log("Additional Option Selected:", selectedOption);
+    });
 });
 
 
@@ -166,16 +170,27 @@ $(document).ready(function() {
 
 $(document).ready(function() {
 
-    // Inicjalizacja dla stacjonarnych źródeł emisji
-    $('#kt_docs_repeater_stacjonarne').repeater({
-        initEmpty: false,
-        show: function () {
-            $(this).slideDown();
-        },
-        hide: function (deleteElement) {
-            $(this).slideUp(deleteElement);
-        }
-    });
+// Inicjalizacja dla stacjonarnych źródeł emisji
+$('#kt_docs_repeater_stacjonarne').repeater({
+    initEmpty: false,
+    show: function () {
+        $(this).slideDown();
+    },
+    hide: function (deleteElement) {
+        $(this).slideUp(deleteElement);
+    },
+    ready: function (setIndexes) {
+        console.log("Repeater is ready and initialized.");
+    }
+});
+
+// Sprawdzenie danych przed wysłaniem formularza
+$('#stepper-form').on('submit', function (event) {
+    var stacjonarneData = $('#kt_docs_repeater_stacjonarne').repeaterVal();
+    console.log("Stacjonarne Emissions Data:", stacjonarneData);
+
+    // Możesz dodać więcej logów dla innych pól, np. mobilnych źródeł emisji
+});
 
     // Inicjalizacja dla mobilnych źródeł emisji
     $('#kt_docs_repeater_mobilne').repeater({
