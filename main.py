@@ -52,7 +52,7 @@ def show_database():
         data = [dict(zip(columns, row)) for row in result.fetchall()]
 
     # Renderuj stronę HTML z danymi
-    return render_template('sales.html', data=data)
+    return render_template('database.html', data=data)
 
 
 def load_excel_data():
