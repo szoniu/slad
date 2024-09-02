@@ -1,9 +1,9 @@
 import pandas as pd
+import pdfkit
 from flask import Flask, render_template, request, redirect, url_for, make_response
 from sqlalchemy import text
-import pdfkit
 
-from database import engine  # Import engine z pliku database.py
+from database import engine_company, engine_excel  # Import engine z pliku database.py
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
 
@@ -23,13 +23,22 @@ def index():
 
 @app.route('/save_company_profile', methods=['POST'])
 def save_company_profile():
-    # Odbierz dane z formularza
     company_name = request.form.get('company_name')
     company_nip = request.form.get('company_nip')
     business_type = request.form.get('business_type')
-    # Pobrane dane możesz teraz przetworzyć lub zapisać do bazy danych
 
-    # Zwróć użytkownikowi odpowiednią odpowiedź
+    query = text("""
+        INSERT INTO company_profiles (company_name, company_nip, business_type)
+        VALUES (:company_name, :company_nip, :business_type)
+    """)
+
+    with engine_company.connect() as connection:
+        connection.execute(query, {
+            'company_name': company_name,
+            'company_nip': company_nip,
+            'business_type': business_type
+        })
+
     return redirect(url_for('index'))
 
 
@@ -37,7 +46,7 @@ def save_company_profile():
 def show_database():
     # Pobierz dane z bazy danych
     query = text("SELECT * FROM excel_data")
-    with engine.connect() as connection:
+    with engine_excel.connect() as connection:
         result = connection.execute(query)
         columns = result.keys()
         data = [dict(zip(columns, row)) for row in result.fetchall()]
@@ -60,11 +69,11 @@ def load_excel_data():
     table_name = 'excel_data'
 
     # Zastąpienie istniejącej tabeli nowymi danymi
-    df.to_sql(table_name, con=engine, index=False, if_exists='replace')
+    df.to_sql(table_name, con=engine_excel, index=False, if_exists='replace')
     print(f"Table '{table_name}' created/replaced and data inserted.")
 
     # Sprawdzenie liczby zaimportowanych wierszy
-    with engine.connect() as connection:
+    with engine_excel.connect() as connection:
         result = connection.execute(text(f"SELECT COUNT(*) FROM {table_name}"))
         row_count = result.scalar()
         print(f"Liczba wierszy zaimportowanych do tabeli '{table_name}': {row_count}")
@@ -104,6 +113,32 @@ def generate_pdf():
     return response
 
 
+def create_tables():
+    # Sprawdzenie, jako który użytkownik jesteśmy połączeni
+    with engine_company.connect() as connection:
+        result = connection.execute(text("SELECT current_user;"))
+        current_user = result.scalar()
+        print(f"Połączono jako: {current_user}")
+
+    # SQL zapytanie tworzące tabelę
+    create_table_query = text("""
+        CREATE TABLE IF NOT EXISTS company_profiles (
+            id SERIAL PRIMARY KEY,
+            company_name VARCHAR(255) NOT NULL,
+            company_nip VARCHAR(20) NOT NULL,
+            business_type VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    """)
+
+    # Wykonanie zapytania
+    with engine_company.connect() as connection:
+        connection.execute(create_table_query)
+
+    print("Tabela 'company_profiles' została utworzona.")
+
+
 if __name__ == '__main__':
+    # create_tables()  # Tworzenie tabeli przed uruchomieniem aplikacji
     # load_excel_data()
     app.run(debug=True)

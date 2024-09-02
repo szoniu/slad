@@ -2,14 +2,18 @@ import os
 
 from sqlalchemy import create_engine
 
-# Pobierz wartość zmiennej środowiskowej
-DATABASE_URI = os.getenv('DATABASE_URI')
+# Pobranie URI dla obu baz danych ze zmiennych środowiskowych
+DATABASE_URI_COMPANY = os.getenv('DATABASE_URI_COMPANY')
+DATABASE_URI_EXCEL = os.getenv('DATABASE_URI_EXCEL')
 
-if not DATABASE_URI:
-    raise ValueError("No DATABASE_URI set for Flask application. Did you forget to set the environment variable?")
+# Sprawdzenie, czy zmienne środowiskowe są ustawione
+if not DATABASE_URI_COMPANY:
+    raise ValueError(
+        "No DATABASE_URI_COMPANY set for Flask application. Did you forget to set the environment variable?")
 
-# Debugowanie: Wyświetlenie wartości zmiennej DATABASE_URI
-# print(f"DATABASE_URI: {DATABASE_URI}")
+if not DATABASE_URI_EXCEL:
+    raise ValueError("No DATABASE_URI_EXCEL set for Flask application. Did you forget to set the environment variable?")
 
-# Utwórz silnik bazy danych
-engine = create_engine(DATABASE_URI)
+# Utworzenie silników bazy danych
+engine_company = create_engine(DATABASE_URI_COMPANY)
+engine_excel = create_engine(DATABASE_URI_EXCEL)
