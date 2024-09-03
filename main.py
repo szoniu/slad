@@ -360,6 +360,6 @@ def generate_pdf():
 
 
 if __name__ == '__main__':
-    create_tables()  # Tworzenie tabel przed uruchomieniem aplikacji
-    load_excel_data()  # Opcjonalne ładowanie danych
+    # create_tables()  # Tworzenie tabel przed uruchomieniem aplikacji
+    # load_excel_data()  # Opcjonalne ładowanie danych
     app.run(debug=True)
