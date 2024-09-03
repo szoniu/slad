@@ -6,7 +6,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 
 from database import engine_company, engine_excel, CompanyProfile, create_tables, StationaryEmission, MobileEmission, \
-    ElectricityEmission, HeatEmission
+    ElectricityEmission, HeatEmission, load_excel_data
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
 
@@ -361,5 +361,5 @@ def generate_pdf():
 
 if __name__ == '__main__':
     create_tables()  # Tworzenie tabel przed uruchomieniem aplikacji
-    # load_excel_data()  # Opcjonalne ładowanie danych
+    load_excel_data()  # Opcjonalne ładowanie danych
     app.run(debug=True)
