@@ -5,3 +5,4 @@ openpyxl
 litecli
 psycopg2
 pdfkit
+gunicorn
