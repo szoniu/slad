@@ -170,18 +170,29 @@ console.log("Skrypt załadowany");
 
 // Parsowanie danych JSON z jednostkami paliw
 var fuelsUnits = JSON.parse($('#dataContainer').attr('data-fuels-units'));
-console.log('Dane fuelsUnits po parsowaniu:', fuelsUnits);  // Logujemy zawartość fuelsUnits, aby sprawdzić, czy dane są poprawnie ustawione
+console.log('Dane fuelsUnits po parsowaniu:', fuelsUnits);
 
 var currentEditRow = null;  // Przechowywanie aktualnie edytowanego wiersza
 
 // Funkcja do resetowania formularza tylko przy dodawaniu nowego rekordu
 function resetForm() {
+    // Sprawdzenie przez jQuery
     var form = $('#stacjonarne_emisje_form');
+    console.log("Sprawdzanie formularza przed resetowaniem (jQuery):", form);
+
+    // Sprawdzenie natywnie przez document.getElementById
+    var formById = document.getElementById('stacjonarne_emisje_form');
+    if (!formById) {
+        console.error("Formularz nie istnieje w DOM. Upewnij się, że ID formularza jest poprawne.", formById);
+    } else {
+        console.log("Formularz znaleziony przez document.getElementById:", formById);
+    }
+
     if (!form.length) {
-        console.error("Formularz nie został znaleziony. Upewnij się, że formularz istnieje w DOM.", form);
+        console.error("Formularz nie został znaleziony przez jQuery. Upewnij się, że formularz istnieje w DOM.");
         return;  // Zakończ funkcję, jeśli formularza nie ma
     }
-    console.log("Resetowanie formularza:", form);  // Logowanie formularza, gdy go resetujemy
+
     form[0].reset();  // Resetowanie wszystkich pól formularza
     $('#jednostka').empty();  // Wyczyszczenie listy jednostek
 }
@@ -195,6 +206,15 @@ $('#dodaj_stacjonarne_btn').on('click', function() {
 // Reset formularza, gdy modal jest w pełni wyświetlony
 $('#stacjonarneEmisjeModal').on('shown.bs.modal', function() {
     console.log("Modal został w pełni wyświetlony - resetowanie formularza.");
+
+    // Sprawdzenie, czy modal jest widoczny w DOM
+    var modalVisible = $('#stacjonarneEmisjeModal').is(':visible');
+    console.log('Modal jest widoczny:', modalVisible);
+
+    // Ponowna próba znalezienia formularza przez natywne API
+    var formByIdBeforeReset = document.getElementById('stacjonarne_emisje_form');
+    console.log("Formularz przed resetowaniem (natywnie):", formByIdBeforeReset);
+
     resetForm();  // Resetowanie formularza tylko przed dodaniem nowego rekordu
 });
 
