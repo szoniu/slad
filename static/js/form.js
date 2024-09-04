@@ -174,40 +174,36 @@ console.log('Dane fuelsUnits:', fuelsUnits);
 
 var currentEditRow = null;  // Przechowywanie aktualnie edytowanego wiersza
 
-// Funkcja do resetowania formularza
+// Funkcja do resetowania formularza tylko przy dodawaniu nowego rekordu
 function resetForm() {
     var form = $('#stacjonarne_emisje_form');
-    if (form.length > 0) {
-        form[0].reset();  // Resetowanie wszystkich pól formularza
-        $('#jednostka').empty(); // Wyczyszczenie listy jednostek
-        $('#paliwo').val(''); // Wyczyszczenie pola wyboru paliwa
-    } else {
-        console.error("Formularz nie został znaleziony.");
+    if (!form.length) {
+        console.error("Formularz nie został znaleziony. Upewnij się, że formularz istnieje w DOM.");
+        return;  // Zakończ funkcję, jeśli formularza nie ma
     }
+
+    form[0].reset();  // Resetowanie wszystkich pól formularza
+    $('#jednostka').empty();  // Wyczyszczenie listy jednostek
 }
+
 
 // Pokaż modalne okno po kliknięciu "Dodaj źródło emisji"
 $('#dodaj_stacjonarne_btn').on('click', function() {
-    resetForm();  // Resetowanie formularza przed jego ponownym pokazaniem
-
-    // Otwieramy modalne okno z formularzem
-    $('#stacjonarneEmisjeModal').modal('show');
+    resetForm();  // Resetowanie formularza tylko przed dodaniem nowego rekordu
     currentEditRow = null;  // Ustawienie braku wiersza do edycji
-
-    // Ustawienie domyślnego paliwa po kliknięciu "Dodaj źródło emisji"
-    var firstFuel = $('#paliwo option:first').val();
-    $('#paliwo').val(firstFuel).change();  // Wywołanie zmiany, aby załadować jednostki
+    $('#stacjonarneEmisjeModal').modal('show');
 });
 
 // Dynamiczne ładowanie jednostek na podstawie wybranego paliwa
 $('#paliwo').on('change', function() {
     var selectedFuel = $(this).val();
+    console.log('Wybrane paliwo (change event):', selectedFuel);
     var units = fuelsUnits[selectedFuel];
     var unitSelect = $('#jednostka');
     unitSelect.empty();  // Wyczyść listę jednostek przed dodaniem nowych
 
     if (units) {
-        // Dodanie opcji jednostek do pola select
+        console.log('Dostępne jednostki dla paliwa:', units);
         units.forEach(function(unit) {
             unitSelect.append(new Option(unit, unit));
         });
@@ -246,10 +242,9 @@ $('#zapisz_emisje_btn').on('click', function() {
             }
         });
     } else {
-        // Liczba istniejących wierszy w tabeli
+        // Dodawanie nowego wiersza
         var rowCount = $('#stacjonarne_emisje_table tbody tr').length;
 
-        // Dodanie nowego wiersza do tabeli z dynamicznie wygenerowanymi nazwami pól
         var newRow = `
             <tr>
                 <td>
@@ -274,14 +269,6 @@ $('#zapisz_emisje_btn').on('click', function() {
         $('#stacjonarne_emisje_table tbody').append(newRow);
     }
 
-    // Zamknij modal po dodaniu danych
-    $('#stacjonarneEmisjeModal').modal('hide');
-    resetForm();  // Resetowanie formularza po dodaniu danych
-});
-
-// Obsługa przycisku "Anuluj"
-$('#anuluj_emisje_btn').on('click', function() {
-    resetForm();  // Resetowanie formularza po anulowaniu
     $('#stacjonarneEmisjeModal').modal('hide');
 });
 
@@ -295,22 +282,41 @@ $('#stacjonarne_emisje_table').on('click', '.edit-btn', function(e) {
     var zuzycie = currentEditRow.find('input[name$="[zuzycie]"]').val();
     var jednostka = currentEditRow.find('input[name$="[jednostka]"]').val();
 
+    console.log('Wybrane paliwo:', paliwo);
+
+    // Sprawdzenie, czy paliwo istnieje
+    if (!paliwo || paliwo === "undefined") {
+        console.error('Paliwo undefined lub puste. Sprawdź dane w formularzu.');
+        return;  // Jeśli paliwo jest undefined, zatrzymaj działanie
+    }
+
     // Ustawienie tych wartości w formularzu
     $('#paliwo').val(paliwo).change();  // Zmiana paliwa
     $('#zuzycie').val(zuzycie);  // Wprowadzenie zużycia
 
-    // Załaduj jednostki dla wybranego paliwa
+    // Sprawdzenie, czy dla wybranego paliwa istnieją jednostki
     var units = fuelsUnits[paliwo];
+    if (!units || units.length === 0) {
+        console.error('Brak dostępnych jednostek dla wybranego paliwa.');
+        return;  // Zatrzymaj dalsze działania, jeśli jednostki nie istnieją
+    }
+
+    console.log('Dostępne jednostki dla paliwa:', units);
+
+    // Załaduj jednostki dla wybranego paliwa
     var unitSelect = $('#jednostka');
     unitSelect.empty();
     units.forEach(function(unit) {
         unitSelect.append(new Option(unit, unit));
     });
 
-    // Ustawienie jednostki
-    $('#jednostka').val(jednostka);
+    // Ustawienie domyślnej jednostki (pierwsza z listy)
+    if (jednostka) {
+        $('#jednostka').val(jednostka);
+    } else {
+        $('#jednostka').val(units[0]);  // Jeśli jednostka nie istnieje, ustaw domyślną
+    }
 
-    // Otwieramy modal do edycji
     $('#stacjonarneEmisjeModal').modal('show');
 });
 
@@ -319,6 +325,7 @@ $('#stacjonarne_emisje_table').on('click', '.delete-btn', function(e) {
     e.preventDefault();
     $(this).closest('tr').remove();
 });
+
 
 
 
