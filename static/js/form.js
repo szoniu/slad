@@ -186,11 +186,15 @@ function resetForm() {
     $('#jednostka').empty();  // Wyczyszczenie listy jednostek
 }
 
-
-// Pokaż modalne okno po kliknięciu "Dodaj źródło emisji"
+// Pokaż modalne okno po kliknięciu "Dodaj źródło emisji" z opóźnieniem
 $('#dodaj_stacjonarne_btn').on('click', function() {
-    resetForm();  // Resetowanie formularza tylko przed dodaniem nowego rekordu
     currentEditRow = null;  // Ustawienie braku wiersza do edycji
+
+    // Dodaj opóźnienie, aby upewnić się, że modal w pełni pojawił się w DOM
+    setTimeout(function() {
+        resetForm();  // Resetowanie formularza tylko przed dodaniem nowego rekordu
+    }, 100);  // Opóźnienie 100 ms, aby zapewnić, że modal jest w DOM
+
     $('#stacjonarneEmisjeModal').modal('show');
 });
 
@@ -284,8 +288,7 @@ $('#stacjonarne_emisje_table').on('click', '.edit-btn', function(e) {
 
     console.log('Wybrane paliwo:', paliwo);
 
-    // Sprawdzenie, czy paliwo istnieje
-    if (!paliwo || paliwo === "undefined") {
+    if (!paliwo) {
         console.error('Paliwo undefined lub puste. Sprawdź dane w formularzu.');
         return;  // Jeśli paliwo jest undefined, zatrzymaj działanie
     }
@@ -296,25 +299,24 @@ $('#stacjonarne_emisje_table').on('click', '.edit-btn', function(e) {
 
     // Sprawdzenie, czy dla wybranego paliwa istnieją jednostki
     var units = fuelsUnits[paliwo];
-    if (!units || units.length === 0) {
+    if (!units) {
         console.error('Brak dostępnych jednostek dla wybranego paliwa.');
         return;  // Zatrzymaj dalsze działania, jeśli jednostki nie istnieją
     }
 
     console.log('Dostępne jednostki dla paliwa:', units);
 
-    // Załaduj jednostki dla wybranego paliwa
     var unitSelect = $('#jednostka');
     unitSelect.empty();
     units.forEach(function(unit) {
         unitSelect.append(new Option(unit, unit));
     });
 
-    // Ustawienie domyślnej jednostki (pierwsza z listy)
+    // Ustawienie domyślnej jednostki
     if (jednostka) {
-        $('#jednostka').val(jednostka);
+        $('#jednostka').val(jednostka);  // Jeśli jednostka jest zdefiniowana, ustaw ją
     } else {
-        $('#jednostka').val(units[0]);  // Jeśli jednostka nie istnieje, ustaw domyślną
+        $('#jednostka').val(units[0]);  // Jeśli brak jednostki, ustaw domyślną
     }
 
     $('#stacjonarneEmisjeModal').modal('show');
@@ -325,7 +327,6 @@ $('#stacjonarne_emisje_table').on('click', '.delete-btn', function(e) {
     e.preventDefault();
     $(this).closest('tr').remove();
 });
-
 
 
 
