@@ -195,14 +195,22 @@ function updateUnitsForFuel(selectedFuel) {
     }
 }
 
+// Funkcja do czyszczenia pól formularza przy dodawaniu nowego wiersza
+function clearFormForNewEntry() {
+    console.log("Czyszczenie formularza przed dodaniem nowego wiersza...");
+    // Wyczyść pole zużycia
+    $('#zuzycie').val('');  // Wyczyszczenie pola zużycia
+
+    // Ustaw domyślne paliwo i jednostkę
+    var firstFuel = $('#paliwo option:first').val();
+    $('#paliwo').val(firstFuel).change();  // Wywołanie zmiany, aby załadować jednostki dla domyślnego paliwa
+}
+
 // Pokaż modalne okno po kliknięciu "Dodaj źródło emisji"
 $('#dodaj_stacjonarne_btn').on('click', function() {
     currentEditRow = null;  // Ustawienie braku wiersza do edycji
+    clearFormForNewEntry();  // Czyszczenie pól formularza
     $('#stacjonarneEmisjeModal').modal('show');  // Pokaż modal
-
-    // Ustawienie domyślnego paliwa po kliknięciu "Dodaj źródło emisji"
-    var firstFuel = $('#paliwo option:first').val();
-    $('#paliwo').val(firstFuel).change();  // Wywołanie zmiany, aby załadować jednostki
 });
 
 // Dynamiczne ładowanie jednostek na podstawie wybranego paliwa
@@ -231,10 +239,10 @@ $('#zapisz_emisje_btn').on('click', function() {
         currentEditRow.find('input[name$="[zuzycie]"]').val(zuzycie);
         currentEditRow.find('input[name$="[jednostka]"]').val(jednostka);
 
-        // Aktualizacja widocznych danych w komórkach bez usuwania inputów
-        currentEditRow.children('td:eq(0)').text(paliwo).append(`<input type="hidden" name="stacjonarne_emissions[0][paliwo]" value="${paliwo}">`);
-        currentEditRow.children('td:eq(1)').text(zuzycie).append(`<input type="hidden" name="stacjonarne_emissions[0][zuzycie]" value="${zuzycie}">`);
-        currentEditRow.children('td:eq(2)').text(jednostka).append(`<input type="hidden" name="stacjonarne_emissions[0][jednostka]" value="${jednostka}">`);
+        // Aktualizacja widocznych danych w komórkach BEZ usuwania ukrytych inputów
+        currentEditRow.children('td:eq(0)').html(`${paliwo}<input type="hidden" name="stacjonarne_emissions[0][paliwo]" value="${paliwo}">`);
+        currentEditRow.children('td:eq(1)').html(`${zuzycie}<input type="hidden" name="stacjonarne_emissions[0][zuzycie]" value="${zuzycie}">`);
+        currentEditRow.children('td:eq(2)').html(`${jednostka}<input type="hidden" name="stacjonarne_emissions[0][jednostka]" value="${jednostka}">`);
 
         console.log("Po aktualizacji:", {
             paliwo: currentEditRow.find('input[name$="[paliwo]"]').val(),
@@ -249,16 +257,13 @@ $('#zapisz_emisje_btn').on('click', function() {
         var newRow = `
             <tr>
                 <td>
-                    <input type="hidden" name="stacjonarne_emissions[${rowCount}][paliwo]" value="${paliwo}">
-                    ${paliwo}
+                    ${paliwo}<input type="hidden" name="stacjonarne_emissions[${rowCount}][paliwo]" value="${paliwo}">
                 </td>
                 <td>
-                    <input type="hidden" name="stacjonarne_emissions[${rowCount}][zuzycie]" value="${zuzycie}">
-                    ${zuzycie}
+                    ${zuzycie}<input type="hidden" name="stacjonarne_emissions[${rowCount}][zuzycie]" value="${zuzycie}">
                 </td>
                 <td>
-                    <input type="hidden" name="stacjonarne_emissions[${rowCount}][jednostka]" value="${jednostka}">
-                    ${jednostka}
+                    ${jednostka}<input type="hidden" name="stacjonarne_emissions[${rowCount}][jednostka]" value="${jednostka}">
                 </td>
                 <td>
                     <a href="#" class="edit-btn">Edytuj</a> ·
@@ -315,6 +320,7 @@ $('#stacjonarne_emisje_table').on('click', '.delete-btn', function(e) {
     e.preventDefault();
     $(this).closest('tr').remove();
 });
+
 
 
 
