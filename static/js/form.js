@@ -283,15 +283,27 @@ $('#stacjonarne_emisje_table').on('click', '.edit-btn', function(e) {
     var zuzycie = currentEditRow.find('input[name$="[zuzycie]"]').val();
     var jednostka = currentEditRow.find('input[name$="[jednostka]"]').val();
 
-    // Zaktualizowanie formularza edycji
-    $('#paliwo').val(paliwo).change();  // Zmiana paliwa
+    console.log("Próba edycji wiersza z danymi: ", { paliwo, zuzycie, jednostka });
+
+    // Upewniamy się, że wartość paliwa jest prawidłowo ustawiona
+    if (paliwo) {
+        $('#paliwo').val(paliwo).change();  // Zmiana paliwa
+    } else {
+        console.error('Nie udało się ustawić paliwa - wartość null lub undefined');
+        return;  // Przerwij edycję, jeśli paliwo jest nieprawidłowe
+    }
+
     $('#zuzycie').val(zuzycie);  // Wprowadzenie zużycia
 
     // Aktualizacja jednostek
     updateUnitsForFuel(paliwo);
 
     // Ustawienie odpowiedniej jednostki
-    $('#jednostka').val(jednostka);
+    if (jednostka) {
+        $('#jednostka').val(jednostka);  // Ustawienie jednostki, jeśli istnieje
+    } else {
+        console.error('Nie udało się ustawić jednostki - wartość null lub undefined');
+    }
 
     $('#stacjonarneEmisjeModal').modal('show');
 });
@@ -301,6 +313,7 @@ $('#stacjonarne_emisje_table').on('click', '.delete-btn', function(e) {
     e.preventDefault();
     $(this).closest('tr').remove();
 });
+
 
 
 
