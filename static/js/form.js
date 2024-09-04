@@ -174,82 +174,58 @@ console.log('Dane fuelsUnits po parsowaniu:', fuelsUnits);
 
 var currentEditRow = null;  // Przechowywanie aktualnie edytowanego wiersza
 
-// Funkcja do dynamicznego wstawiania formularza
-function loadForm() {
-    var modalBody = $('#stacjonarneEmisjeModal .modal-body');
+// Funkcja do ręcznego resetowania pól formularza
+function resetFields() {
+    console.log("Resetowanie pól formularza.");
 
-    // Usuwamy istniejący formularz
-    modalBody.empty();
+    // Wyczyszczenie pola "paliwo"
+    $('#paliwo').val($('#paliwo option:first').val()).change();  // Ustawienie na pierwszą opcję
 
-    // Tworzymy nowy formularz dynamicznie
-    var formHtml = `
-        <form id="stacjonarne_emisje_form">
-            <div class="form-group">
-                <label for="paliwo">Paliwo:</label>
-                <select id="paliwo" name="paliwo" class="form-select">
-                    {% for fuel_type in fuel_types %}
-                    <option value="{{ fuel_type }}">{{ fuel_type }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="zuzycie">Zużycie:</label>
-                <input type="text" id="zuzycie" name="zuzycie" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="jednostka">Jednostka:</label>
-                <select id="jednostka" name="jednostka" class="form-select">
-                    <!-- Jednostki zostaną załadowane dynamicznie -->
-                </select>
-            </div>
-        </form>
-    `;
+    // Wyczyszczenie pola "zuzycie"
+    $('#zuzycie').val('');
 
-    // Wstawiamy formularz do modala
-    modalBody.append(formHtml);
+    // Wyczyszczenie pola "jednostka"
+    $('#jednostka').empty();  // Wyczyszczenie listy jednostek
 }
 
 // Pokaż modalne okno po kliknięciu "Dodaj źródło emisji"
 $('#dodaj_stacjonarne_btn').on('click', function() {
     currentEditRow = null;  // Ustawienie braku wiersza do edycji
-    loadForm();  // Załaduj formularz dynamicznie
     $('#stacjonarneEmisjeModal').modal('show');  // Pokaż modal
 });
 
-// Reset formularza, gdy modal jest w pełni wyświetlony
+// Resetowanie pól formularza, gdy modal jest w pełni wyświetlony
 $('#stacjonarneEmisjeModal').on('shown.bs.modal', function() {
     console.log("Modal został w pełni wyświetlony.");
+    // Nie resetujemy pól formularza przy edycji.
+    if (currentEditRow === null) {
+        resetFields();  // Resetowanie pól formularza tylko przy dodaniu nowego wiersza
+    }
 });
 
 // Dynamiczne ładowanie jednostek na podstawie wybranego paliwa
-$('#stacjonarneEmisjeModal').on('change', '#paliwo', function() {
+$('#paliwo').on('change', function() {
     var selectedFuel = $(this).val();
-    console.log('Wybrane paliwo (change event):', selectedFuel);
-    console.log('Aktualne fuelsUnits:', fuelsUnits);  // Logowanie aktualnej wartości fuelsUnits
     var units = fuelsUnits[selectedFuel];
     var unitSelect = $('#jednostka');
-    unitSelect.empty();  // Wyczyść listę jednostek przed dodaniem nowych
+    unitSelect.empty();  // Wyczyść listę jednostek
 
     if (units) {
-        console.log('Dostępne jednostki dla paliwa:', units);
         units.forEach(function(unit) {
             unitSelect.append(new Option(unit, unit));
         });
-
-        // Ustawienie domyślnej jednostki (pierwsza z listy)
+        // Ustawienie domyślnej jednostki
         unitSelect.val(units[0]);
     } else {
-        console.error('Brak dostępnych jednostek dla wybranego paliwa.');
+        console.log('Brak dostępnych jednostek dla wybranego paliwa.');
     }
 });
 
 // Obsługa przycisku "Zapisz"
-$('#stacjonarneEmisjeModal').on('click', '#zapisz_emisje_btn', function() {
+$('#zapisz_emisje_btn').on('click', function() {
     var paliwo = $('#paliwo').val();
     var zuzycie = $('#zuzycie').val();
     var jednostka = $('#jednostka').val();
-
-    console.log('Dane formularza do zapisania:', { paliwo, zuzycie, jednostka });  // Logowanie danych przed zapisem
 
     if (!paliwo || !zuzycie || !jednostka) {
         alert("Wszystkie pola muszą być wypełnione!");
@@ -272,7 +248,7 @@ $('#stacjonarneEmisjeModal').on('click', '#zapisz_emisje_btn', function() {
             }
         });
     } else {
-        // Dodawanie nowego wiersza
+        // Dodanie nowego wiersza
         var rowCount = $('#stacjonarne_emisje_table tbody tr').length;
 
         var newRow = `
@@ -300,6 +276,17 @@ $('#stacjonarneEmisjeModal').on('click', '#zapisz_emisje_btn', function() {
     }
 
     $('#stacjonarneEmisjeModal').modal('hide');
+
+    // Resetowanie pól tylko przy dodaniu nowego wiersza, nie resetujemy przy edycji
+    if (currentEditRow === null) {
+        resetFields();  // Resetowanie pól po zapisaniu tylko, gdy dodajemy nowy wiersz
+    }
+});
+
+// Obsługa przycisku "Anuluj"
+$('#anuluj_emisje_btn').on('click', function() {
+    resetFields();  // Resetowanie pól
+    $('#stacjonarneEmisjeModal').modal('hide');
 });
 
 // Obsługa edycji
@@ -312,35 +299,17 @@ $('#stacjonarne_emisje_table').on('click', '.edit-btn', function(e) {
     var zuzycie = currentEditRow.find('input[name$="[zuzycie]"]').val();
     var jednostka = currentEditRow.find('input[name$="[jednostka]"]').val();
 
-    console.log('Edytowane dane:', { paliwo, zuzycie, jednostka });
-
-    loadForm();  // Załaduj nowy formularz
-
-    // Ustawienie tych wartości w formularzu
     $('#paliwo').val(paliwo).change();  // Zmiana paliwa
     $('#zuzycie').val(zuzycie);  // Wprowadzenie zużycia
 
-    // Sprawdzenie, czy dla wybranego paliwa istnieją jednostki
-    console.log('Aktualne fuelsUnits podczas edycji:', fuelsUnits);  // Sprawdzenie, czy zmienna fuelsUnits jest dostępna
     var units = fuelsUnits[paliwo];
-    if (!units) {
-        console.error('Brak dostępnych jednostek dla wybranego paliwa.');
-        return;  // Zatrzymaj dalsze działania, jeśli jednostki nie istnieją
-    }
-
-    console.log('Dostępne jednostki dla paliwa podczas edycji:', units);
-
-    var unitSelect = $('#jednostka');
-    unitSelect.empty();
-    units.forEach(function(unit) {
-        unitSelect.append(new Option(unit, unit));
-    });
-
-    // Ustawienie domyślnej jednostki
-    if (jednostka) {
-        $('#jednostka').val(jednostka);  // Jeśli jednostka jest zdefiniowana, ustaw ją
-    } else {
-        $('#jednostka').val(units[0]);  // Jeśli brak jednostki, ustaw domyślną
+    if (units) {
+        var unitSelect = $('#jednostka');
+        unitSelect.empty();  // Wyczyść listę jednostek
+        units.forEach(function(unit) {
+            unitSelect.append(new Option(unit, unit));
+        });
+        $('#jednostka').val(jednostka);  // Ustawienie wybranej jednostki
     }
 
     $('#stacjonarneEmisjeModal').modal('show');
