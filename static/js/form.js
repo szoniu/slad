@@ -318,9 +318,6 @@ $('#stacjonarne_emisje_table').on('click', '.delete-btn', function(e) {
 
 
 
-
-
-
     $('#kt_docs_repeater_mobilne').repeater({
         initEmpty: false,
         show: function () {
