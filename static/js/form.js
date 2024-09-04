@@ -174,51 +174,41 @@ console.log('Dane fuelsUnits po parsowaniu:', fuelsUnits);
 
 var currentEditRow = null;  // Przechowywanie aktualnie edytowanego wiersza
 
-// Funkcja do ręcznego resetowania pól formularza
-function resetFields() {
-    console.log("Resetowanie pól formularza.");
+// Funkcja do dynamicznego ładowania jednostek na podstawie paliwa
+function updateUnitsForFuel(selectedFuel) {
+    console.log('Wybrane paliwo:', selectedFuel);
 
-    // Wyczyszczenie pola "paliwo"
-    $('#paliwo').val($('#paliwo option:first').val()).change();  // Ustawienie na pierwszą opcję
+    var units = fuelsUnits[selectedFuel];
+    var unitSelect = $('#jednostka');
+    unitSelect.empty();  // Wyczyść listę jednostek przed dodaniem nowych
 
-    // Wyczyszczenie pola "zuzycie"
-    $('#zuzycie').val('');
-
-    // Wyczyszczenie pola "jednostka"
-    $('#jednostka').empty();  // Wyczyszczenie listy jednostek
+    if (units) {
+        // Dodanie opcji jednostek do pola select
+        units.forEach(function(unit) {
+            unitSelect.append(new Option(unit, unit));
+        });
+        // Ustawienie domyślnej jednostki (pierwsza z listy)
+        unitSelect.val(units[0]);
+        console.log('Dostępne jednostki dla paliwa:', units);
+    } else {
+        console.log('Brak dostępnych jednostek dla wybranego paliwa.');
+    }
 }
 
 // Pokaż modalne okno po kliknięciu "Dodaj źródło emisji"
 $('#dodaj_stacjonarne_btn').on('click', function() {
     currentEditRow = null;  // Ustawienie braku wiersza do edycji
     $('#stacjonarneEmisjeModal').modal('show');  // Pokaż modal
-});
 
-// Resetowanie pól formularza, gdy modal jest w pełni wyświetlony
-$('#stacjonarneEmisjeModal').on('shown.bs.modal', function() {
-    console.log("Modal został w pełni wyświetlony.");
-    // Nie resetujemy pól formularza przy edycji.
-    if (currentEditRow === null) {
-        resetFields();  // Resetowanie pól formularza tylko przy dodaniu nowego wiersza
-    }
+    // Ustawienie domyślnego paliwa po kliknięciu "Dodaj źródło emisji"
+    var firstFuel = $('#paliwo option:first').val();
+    $('#paliwo').val(firstFuel).change();  // Wywołanie zmiany, aby załadować jednostki
 });
 
 // Dynamiczne ładowanie jednostek na podstawie wybranego paliwa
 $('#paliwo').on('change', function() {
     var selectedFuel = $(this).val();
-    var units = fuelsUnits[selectedFuel];
-    var unitSelect = $('#jednostka');
-    unitSelect.empty();  // Wyczyść listę jednostek
-
-    if (units) {
-        units.forEach(function(unit) {
-            unitSelect.append(new Option(unit, unit));
-        });
-        // Ustawienie domyślnej jednostki
-        unitSelect.val(units[0]);
-    } else {
-        console.log('Brak dostępnych jednostek dla wybranego paliwa.');
-    }
+    updateUnitsForFuel(selectedFuel);  // Zaktualizowanie jednostek dla wybranego paliwa
 });
 
 // Obsługa przycisku "Zapisz"
@@ -276,16 +266,10 @@ $('#zapisz_emisje_btn').on('click', function() {
     }
 
     $('#stacjonarneEmisjeModal').modal('hide');
-
-    // Resetowanie pól tylko przy dodaniu nowego wiersza, nie resetujemy przy edycji
-    if (currentEditRow === null) {
-        resetFields();  // Resetowanie pól po zapisaniu tylko, gdy dodajemy nowy wiersz
-    }
 });
 
 // Obsługa przycisku "Anuluj"
 $('#anuluj_emisje_btn').on('click', function() {
-    resetFields();  // Resetowanie pól
     $('#stacjonarneEmisjeModal').modal('hide');
 });
 
@@ -299,18 +283,15 @@ $('#stacjonarne_emisje_table').on('click', '.edit-btn', function(e) {
     var zuzycie = currentEditRow.find('input[name$="[zuzycie]"]').val();
     var jednostka = currentEditRow.find('input[name$="[jednostka]"]').val();
 
+    // Zaktualizowanie formularza edycji
     $('#paliwo').val(paliwo).change();  // Zmiana paliwa
     $('#zuzycie').val(zuzycie);  // Wprowadzenie zużycia
 
-    var units = fuelsUnits[paliwo];
-    if (units) {
-        var unitSelect = $('#jednostka');
-        unitSelect.empty();  // Wyczyść listę jednostek
-        units.forEach(function(unit) {
-            unitSelect.append(new Option(unit, unit));
-        });
-        $('#jednostka').val(jednostka);  // Ustawienie wybranej jednostki
-    }
+    // Aktualizacja jednostek
+    updateUnitsForFuel(paliwo);
+
+    // Ustawienie odpowiedniej jednostki
+    $('#jednostka').val(jednostka);
 
     $('#stacjonarneEmisjeModal').modal('show');
 });
@@ -320,6 +301,8 @@ $('#stacjonarne_emisje_table').on('click', '.delete-btn', function(e) {
     e.preventDefault();
     $(this).closest('tr').remove();
 });
+
+
 
 
 
