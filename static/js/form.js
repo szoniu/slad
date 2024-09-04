@@ -283,27 +283,24 @@ $('#stacjonarne_emisje_table').on('click', '.edit-btn', function(e) {
     var zuzycie = currentEditRow.find('input[name$="[zuzycie]"]').val();
     var jednostka = currentEditRow.find('input[name$="[jednostka]"]').val();
 
+    // Debugging: sprawdzanie czy inputy mają poprawne wartości
     console.log("Próba edycji wiersza z danymi: ", { paliwo, zuzycie, jednostka });
+    console.log(currentEditRow.find('input').get());  // Wyświetla wszystkie inputy w wierszu
 
-    // Upewniamy się, że wartość paliwa jest prawidłowo ustawiona
-    if (paliwo) {
-        $('#paliwo').val(paliwo).change();  // Zmiana paliwa
-    } else {
-        console.error('Nie udało się ustawić paliwa - wartość null lub undefined');
-        return;  // Przerwij edycję, jeśli paliwo jest nieprawidłowe
+    if (!paliwo || !zuzycie || !jednostka) {
+        console.error('Brak danych do edycji - wartości nieprawidłowe.');
+        return;  // Przerwij edycję, jeśli brakuje danych
     }
 
+    // Zaktualizowanie formularza edycji
+    $('#paliwo').val(paliwo).change();  // Zmiana paliwa
     $('#zuzycie').val(zuzycie);  // Wprowadzenie zużycia
 
     // Aktualizacja jednostek
     updateUnitsForFuel(paliwo);
 
     // Ustawienie odpowiedniej jednostki
-    if (jednostka) {
-        $('#jednostka').val(jednostka);  // Ustawienie jednostki, jeśli istnieje
-    } else {
-        console.error('Nie udało się ustawić jednostki - wartość null lub undefined');
-    }
+    $('#jednostka').val(jednostka);
 
     $('#stacjonarneEmisjeModal').modal('show');
 });
