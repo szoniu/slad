@@ -227,14 +227,14 @@ $('#zapisz_emisje_btn').on('click', function() {
         currentEditRow.find('input[name^="stacjonarne_emissions"]').each(function() {
             var name = $(this).attr('name');
             if (name.includes("[paliwo]")) {
-                $(this).val(paliwo);
-                currentEditRow.find('td:eq(0)').text(paliwo);
+                $(this).val(paliwo);  // Zaktualizowanie ukrytego inputa z paliwem
+                currentEditRow.find('td:eq(0)').text(paliwo);  // Aktualizacja tekstu w kolumnie
             } else if (name.includes("[zuzycie]")) {
-                $(this).val(zuzycie);
-                currentEditRow.find('td:eq(1)').text(zuzycie);
+                $(this).val(zuzycie);  // Zaktualizowanie ukrytego inputa z zużyciem
+                currentEditRow.find('td:eq(1)').text(zuzycie);  // Aktualizacja tekstu w kolumnie
             } else if (name.includes("[jednostka]")) {
-                $(this).val(jednostka);
-                currentEditRow.find('td:eq(2)').text(jednostka);
+                $(this).val(jednostka);  // Zaktualizowanie ukrytego inputa z jednostką
+                currentEditRow.find('td:eq(2)').text(jednostka);  // Aktualizacja tekstu w kolumnie
             }
         });
 
@@ -317,6 +317,7 @@ $('#stacjonarne_emisje_table').on('click', '.delete-btn', function(e) {
     e.preventDefault();
     $(this).closest('tr').remove();
 });
+
 
 
 
