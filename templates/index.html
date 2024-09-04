@@ -253,36 +253,77 @@
                     </tbody>
                 </table>
 
-                <!-- Formularz dodawania stacjonarnych źródeł emisji -->
-                <div id="stacjonarne_form_container" style="display: none;">
-                    <form id="stacjonarne_emisje_form">
-                        <div class="form-group">
-                            <label for="paliwo">Paliwo:</label>
-                            <select id="paliwo" name="paliwo" class="form-select">
-                                {% for fuel_type in fuel_types %}
-                                <option value="{{ fuel_type }}">{{ fuel_type }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="zuzycie">Zużycie:</label>
-                            <input type="text" id="zuzycie" name="zuzycie" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="jednostka">Jednostka:</label>
-                            <select id="jednostka" name="jednostka" class="form-select">
-                                <!-- Jednostki zostaną załadowane dynamicznie -->
-                            </select>
-                        </div>
-                        <button type="button" id="zapisz_emisje_btn" class="btn btn-primary">Zapisz</button>
-                        <button type="button" id="anuluj_emisje_btn" class="btn btn-secondary">Anuluj</button>
-                    </form>
-                </div>
+<!--                &lt;!&ndash; Formularz dodawania stacjonarnych źródeł emisji &ndash;&gt;-->
+<!--                <div id="stacjonarne_form_container" style="display: none;">-->
+<!--                    <form id="stacjonarne_emisje_form">-->
+<!--                        <div class="form-group">-->
+<!--                            <label for="paliwo">Paliwo:</label>-->
+<!--                            <select id="paliwo" name="paliwo" class="form-select">-->
+<!--                                {% for fuel_type in fuel_types %}-->
+<!--                                <option value="{{ fuel_type }}">{{ fuel_type }}</option>-->
+<!--                                {% endfor %}-->
+<!--                            </select>-->
+<!--                        </div>-->
+<!--                        <div class="form-group">-->
+<!--                            <label for="zuzycie">Zużycie:</label>-->
+<!--                            <input type="text" id="zuzycie" name="zuzycie" class="form-control" required>-->
+<!--                        </div>-->
+<!--                        <div class="form-group">-->
+<!--                            <label for="jednostka">Jednostka:</label>-->
+<!--                            <select id="jednostka" name="jednostka" class="form-select">-->
+<!--                                &lt;!&ndash; Jednostki zostaną załadowane dynamicznie &ndash;&gt;-->
+<!--                            </select>-->
+<!--                        </div>-->
+<!--                        <button type="button" id="zapisz_emisje_btn" class="btn btn-primary">Zapisz</button>-->
+<!--                        <button type="button" id="anuluj_emisje_btn" class="btn btn-secondary">Anuluj</button>-->
+<!--                    </form>-->
+<!--                </div>-->
 
                 <!-- Przycisk Dodaj źródło emisji -->
                 <div class="form-group mt-5">
                     <button type="button" id="dodaj_stacjonarne_btn" class="btn btn-primary">Dodaj źródło emisji
                     </button>
+                </div>
+
+                <!-- Modal do dodawania stacjonarnych źródeł emisji -->
+                <div class="modal fade" id="stacjonarneEmisjeModal" tabindex="-1"
+                     aria-labelledby="stacjonarneEmisjeModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="stacjonarneEmisjeModalLabel">Dodaj źródło emisji</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Formularz dodawania stacjonarnych źródeł emisji -->
+                                <form id="stacjonarne_emisje_form">
+                                    <div class="form-group">
+                                        <label for="paliwo">Paliwo:</label>
+                                        <select id="paliwo" name="paliwo" class="form-select">
+                                            {% for fuel_type in fuel_types %}
+                                            <option value="{{ fuel_type }}">{{ fuel_type }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="zuzycie">Zużycie:</label>
+                                        <input type="text" id="zuzycie" name="zuzycie" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="jednostka">Jednostka:</label>
+                                        <select id="jednostka" name="jednostka" class="form-select">
+                                            <!-- Jednostki zostaną załadowane dynamicznie -->
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                                <button type="button" id="zapisz_emisje_btn" class="btn btn-primary">Zapisz</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
 

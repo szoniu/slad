@@ -168,121 +168,126 @@ $(document).ready(function() {
 $(document).ready(function() {
 console.log("Skrypt załadowany");
 
-    // Parsowanie danych JSON z jednostkami paliw
-    var fuelsUnits = JSON.parse($('#dataContainer').attr('data-fuels-units'));
-    console.log('Dane fuelsUnits:', fuelsUnits);
+// Parsowanie danych JSON z jednostkami paliw
+var fuelsUnits = JSON.parse($('#dataContainer').attr('data-fuels-units'));
+console.log('Dane fuelsUnits:', fuelsUnits);
 
-    // Ukrycie formularza na początku
-    $('#stacjonarne_form_container').hide();
+// Funkcja do resetowania formularza
+function resetForm() {
+    var form = $('#stacjonarne_emisje_form');
+    if (form.length > 0) {
+        form[0].reset();  // Resetowanie wszystkich pól formularza
+        $('#jednostka').empty(); // Wyczyszczenie listy jednostek
+        $('#paliwo').val(''); // Wyczyszczenie pola wyboru paliwa
+    } else {
+        console.error("Formularz nie został znaleziony.");
+    }
+}
 
-    // Funkcja do resetowania formularza
-    function resetForm() {
-        var form = $('#stacjonarne_emisje_form');
-        if (form.length > 0) {
-            form[0].reset();  // Resetowanie wszystkich pól formularza
-            $('#jednostka').empty(); // Wyczyszczenie listy jednostek
-            $('#paliwo').val(''); // Wyczyszczenie pola wyboru paliwa
-        } else {
-            console.error("Formularz nie został znaleziony.");
-        }
+// Pokaż modalne okno po kliknięciu "Dodaj źródło emisji"
+$('#dodaj_stacjonarne_btn').on('click', function() {
+    resetForm();  // Resetowanie formularza przed jego ponownym pokazaniem
+
+    // Otwieramy modalne okno z formularzem
+    $('#stacjonarneEmisjeModal').modal('show');
+
+    // Ustawienie domyślnego paliwa po kliknięciu "Dodaj źródło emisji"
+    var firstFuel = $('#paliwo option:first').val();
+    $('#paliwo').val(firstFuel).change();  // Wywołanie zmiany, aby załadować jednostki
+});
+
+// Zamknięcie modalnego okna i reset formularza przy kliknięciu "Anuluj"
+$('#stacjonarneEmisjeModal').on('hidden.bs.modal', function() {
+    resetForm();
+});
+
+// Dynamiczne ładowanie jednostek na podstawie wybranego paliwa
+$('#paliwo').on('change', function() {
+    var selectedFuel = $(this).val();
+    var units = fuelsUnits[selectedFuel];
+    var unitSelect = $('#jednostka');
+    unitSelect.empty();  // Wyczyść listę jednostek przed dodaniem nowych
+
+    if (units) {
+        // Dodanie opcji jednostek do pola select
+        units.forEach(function(unit) {
+            unitSelect.append(new Option(unit, unit));
+        });
+
+        // Ustawienie domyślnej jednostki (pierwsza z listy)
+        unitSelect.val(units[0]);
+    } else {
+        console.log('Brak dostępnych jednostek dla wybranego paliwa.');
+    }
+});
+
+// Obsługa przycisku "Zapisz"
+$('#zapisz_emisje_btn').on('click', function() {
+    var paliwo = $('#paliwo').val();
+    var zuzycie = $('#zuzycie').val();
+    var jednostka = $('#jednostka').val();
+
+    if (!paliwo || !zuzycie || !jednostka) {
+        alert("Wszystkie pola muszą być wypełnione!");
+        return;
     }
 
-    // Pokaż formularz po kliknięciu "Dodaj źródło emisji"
-    $('#dodaj_stacjonarne_btn').on('click', function() {
-        resetForm();  // Resetowanie formularza przed jego ponownym pokazaniem
+    // Liczba istniejących wierszy w tabeli
+    var rowCount = $('#stacjonarne_emisje_table tbody tr').length;
 
-        $('#dodaj_stacjonarne_btn').hide();  // Ukryj przycisk "Dodaj źródło emisji"
-        $('#stacjonarne_form_container').show();  // Pokaż formularz
+    // Dodanie nowego wiersza do tabeli z dynamicznie wygenerowanymi nazwami pól
+    var newRow = `
+        <tr>
+            <td>
+                <input type="hidden" name="stacjonarne_emissions[${rowCount}][paliwo]" value="${paliwo}">
+                ${paliwo}
+            </td>
+            <td>
+                <input type="hidden" name="stacjonarne_emissions[${rowCount}][zuzycie]" value="${zuzycie}">
+                ${zuzycie}
+            </td>
+            <td>
+                <input type="hidden" name="stacjonarne_emissions[${rowCount}][jednostka]" value="${jednostka}">
+                ${jednostka}
+            </td>
+            <td>
+                <a href="#" class="edit-btn">Edytuj</a> ·
+                <a href="#" class="delete-btn">Usuń</a>
+            </td>
+        </tr>
+    `;
 
-        // Ustawienie domyślnego paliwa po kliknięciu "Dodaj źródło emisji"
-        var firstFuel = $('#paliwo option:first').val();
-        $('#paliwo').val(firstFuel).change();  // Wywołanie zmiany, aby załadować jednostki
-    });
+    $('#stacjonarne_emisje_table tbody').append(newRow);
 
-    // Dynamiczne ładowanie jednostek na podstawie wybranego paliwa
-    $('#paliwo').on('change', function() {
-        var selectedFuel = $(this).val();
-        var units = fuelsUnits[selectedFuel];
-        var unitSelect = $('#jednostka');
-        unitSelect.empty();  // Wyczyść listę jednostek przed dodaniem nowych
+    // Zamknij modal po dodaniu danych
+    $('#stacjonarneEmisjeModal').modal('hide');
 
-        if (units) {
-            // Dodanie opcji jednostek do pola select
-            units.forEach(function(unit) {
-                unitSelect.append(new Option(unit, unit));
-            });
+    resetForm();  // Resetowanie formularza po dodaniu danych
+});
 
-            // Ustawienie domyślnej jednostki (pierwsza z listy)
-            unitSelect.val(units[0]);
-        } else {
-            console.log('Brak dostępnych jednostek dla wybranego paliwa.');
-        }
-    });
+// Obsługa przycisku "Anuluj"
+$('#anuluj_emisje_btn').on('click', function() {
+    resetForm();  // Resetowanie formularza po anulowaniu
+    $('#stacjonarneEmisjeModal').modal('hide');
+});
 
-    // Obsługa przycisku "Zapisz"
-    $('#zapisz_emisje_btn').on('click', function() {
-        var paliwo = $('#paliwo').val();
-        var zuzycie = $('#zuzycie').val();
-        var jednostka = $('#jednostka').val();
+// Obsługa edycji i usuwania
+$('#stacjonarne_emisje_table').on('click', '.edit-btn', function(e) {
+    e.preventDefault();
+    // Tutaj można dodać logikę do edycji rekordu
+});
 
-        if (!paliwo || !zuzycie || !jednostka) {
-            alert("Wszystkie pola muszą być wypełnione!");
-            return;
-        }
+$('#stacjonarne_emisje_table').on('click', '.delete-btn', function(e) {
+    e.preventDefault();
+    $(this).closest('tr').remove();
+});
 
-        // Liczba istniejących wierszy w tabeli
-        var rowCount = $('#stacjonarne_emisje_table tbody tr').length;
 
-        // Dodanie nowego wiersza do tabeli z dynamicznie wygenerowanymi nazwami pól
-        var newRow = `
-            <tr>
-                <td>
-                    <input type="hidden" name="stacjonarne_emissions[${rowCount}][paliwo]" value="${paliwo}">
-                    ${paliwo}
-                </td>
-                <td>
-                    <input type="hidden" name="stacjonarne_emissions[${rowCount}][zuzycie]" value="${zuzycie}">
-                    ${zuzycie}
-                </td>
-                <td>
-                    <input type="hidden" name="stacjonarne_emissions[${rowCount}][jednostka]" value="${jednostka}">
-                    ${jednostka}
-                </td>
-                <td>
-                    <a href="#" class="edit-btn">Edytuj</a> ·
-                    <a href="#" class="delete-btn">Usuń</a>
-                </td>
-            </tr>
-        `;
 
-        $('#stacjonarne_emisje_table tbody').append(newRow);
 
-        // Ukrycie formularza po dodaniu i pokazanie przycisku "Dodaj źródło emisji"
-        $('#stacjonarne_form_container').hide();
-        $('#dodaj_stacjonarne_btn').show();  // Pokaż przycisk "Dodaj źródło emisji" ponownie
 
-        resetForm();  // Resetowanie formularza po dodaniu danych
-    });
 
-    // Obsługa przycisku "Anuluj"
-    $('#anuluj_emisje_btn').on('click', function() {
-        resetForm();  // Resetowanie formularza po anulowaniu
 
-        // Ukryj formularz i pokaż ponownie przycisk "Dodaj źródło emisji"
-        $('#stacjonarne_form_container').hide();
-        $('#dodaj_stacjonarne_btn').show();
-    });
-
-    // Obsługa edycji i usuwania
-    $('#stacjonarne_emisje_table').on('click', '.edit-btn', function(e) {
-        e.preventDefault();
-        // Tutaj można dodać logikę do edycji rekordu
-    });
-
-    $('#stacjonarne_emisje_table').on('click', '.delete-btn', function(e) {
-        e.preventDefault();
-        $(this).closest('tr').remove();
-    });
 
     $('#kt_docs_repeater_mobilne').repeater({
         initEmpty: false,
