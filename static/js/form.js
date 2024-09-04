@@ -226,32 +226,20 @@ $('#zapisz_emisje_btn').on('click', function() {
         // Aktualizacja istniejącego wiersza
         console.log("Aktualizacja danych w istniejącym wierszu...");
 
-        // Aktualizujemy każdy ukryty input ręcznie, zamiast korzystać z .find()
-        var paliwoInput = currentEditRow.find('input[name$="[paliwo]"]');
-        var zuzycieInput = currentEditRow.find('input[name$="[zuzycie]"]');
-        var jednostkaInput = currentEditRow.find('input[name$="[jednostka]"]');
+        // Znalezienie ukrytych inputów w wierszu i aktualizacja ich wartości
+        currentEditRow.find('input[name$="[paliwo]"]').val(paliwo);
+        currentEditRow.find('input[name$="[zuzycie]"]').val(zuzycie);
+        currentEditRow.find('input[name$="[jednostka]"]').val(jednostka);
 
-        console.log('Przed aktualizacją:', {
-            paliwo: paliwoInput.val(),
-            zuzycie: zuzycieInput.val(),
-            jednostka: jednostkaInput.val()
-        });
+        // Aktualizacja widocznych danych w komórkach bez usuwania inputów
+        currentEditRow.children('td:eq(0)').text(paliwo).append(`<input type="hidden" name="stacjonarne_emissions[0][paliwo]" value="${paliwo}">`);
+        currentEditRow.children('td:eq(1)').text(zuzycie).append(`<input type="hidden" name="stacjonarne_emissions[0][zuzycie]" value="${zuzycie}">`);
+        currentEditRow.children('td:eq(2)').text(jednostka).append(`<input type="hidden" name="stacjonarne_emissions[0][jednostka]" value="${jednostka}">`);
 
-        // Aktualizacja inputów
-        paliwoInput.val(paliwo);
-        zuzycieInput.val(zuzycie);
-        jednostkaInput.val(jednostka);
-
-        // Aktualizacja widocznych danych w tabeli
-        currentEditRow.find('td:eq(0)').text(paliwo);
-        currentEditRow.find('td:eq(1)').text(zuzycie);
-        currentEditRow.find('td:eq(2)').text(jednostka);
-
-        // Logowanie po aktualizacji
         console.log("Po aktualizacji:", {
-            paliwo: paliwoInput.val(),
-            zuzycie: zuzycieInput.val(),
-            jednostka: jednostkaInput.val()
+            paliwo: currentEditRow.find('input[name$="[paliwo]"]').val(),
+            zuzycie: currentEditRow.find('input[name$="[zuzycie]"]').val(),
+            jednostka: currentEditRow.find('input[name$="[jednostka]"]').val()
         });
     } else {
         // Dodanie nowego wiersza
@@ -295,14 +283,14 @@ $('#stacjonarne_emisje_table').on('click', '.edit-btn', function(e) {
     e.preventDefault();
     currentEditRow = $(this).closest('tr');  // Znajdź wiersz, który chcemy edytować
 
-    // Pobranie wartości z wiersza
+    // Pobranie wartości z wiersza za pomocą ukrytych inputów
     var paliwo = currentEditRow.find('input[name$="[paliwo]"]').val();
     var zuzycie = currentEditRow.find('input[name$="[zuzycie]"]').val();
     var jednostka = currentEditRow.find('input[name$="[jednostka]"]').val();
 
     // Debugging: sprawdzanie czy inputy mają poprawne wartości
     console.log("Próba edycji wiersza z danymi: ", { paliwo, zuzycie, jednostka });
-    console.log(currentEditRow.find('input').get());  // Wyświetla wszystkie inputy w wierszu
+    console.log("Cała struktura wiersza w DOM podczas edycji:", currentEditRow.html());
 
     if (!paliwo || !zuzycie || !jednostka) {
         console.error('Brak danych do edycji - wartości nieprawidłowe.');
@@ -327,10 +315,6 @@ $('#stacjonarne_emisje_table').on('click', '.delete-btn', function(e) {
     e.preventDefault();
     $(this).closest('tr').remove();
 });
-
-
-
-
 
 
 
