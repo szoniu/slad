@@ -224,28 +224,38 @@ $('#zapisz_emisje_btn').on('click', function() {
 
     if (currentEditRow) {
         // Aktualizacja istniejącego wiersza
-        currentEditRow.find('input[name^="stacjonarne_emissions"]').each(function() {
-            var name = $(this).attr('name');
-            if (name.includes("[paliwo]")) {
-                $(this).val(paliwo);  // Zaktualizowanie ukrytego inputa z paliwem
-                currentEditRow.find('td:eq(0)').text(paliwo);  // Aktualizacja tekstu w kolumnie
-            } else if (name.includes("[zuzycie]")) {
-                $(this).val(zuzycie);  // Zaktualizowanie ukrytego inputa z zużyciem
-                currentEditRow.find('td:eq(1)').text(zuzycie);  // Aktualizacja tekstu w kolumnie
-            } else if (name.includes("[jednostka]")) {
-                $(this).val(jednostka);  // Zaktualizowanie ukrytego inputa z jednostką
-                currentEditRow.find('td:eq(2)').text(jednostka);  // Aktualizacja tekstu w kolumnie
-            }
+        console.log("Aktualizacja danych w istniejącym wierszu...");
+
+        // Aktualizujemy każdy ukryty input ręcznie, zamiast korzystać z .find()
+        var paliwoInput = currentEditRow.find('input[name$="[paliwo]"]');
+        var zuzycieInput = currentEditRow.find('input[name$="[zuzycie]"]');
+        var jednostkaInput = currentEditRow.find('input[name$="[jednostka]"]');
+
+        console.log('Przed aktualizacją:', {
+            paliwo: paliwoInput.val(),
+            zuzycie: zuzycieInput.val(),
+            jednostka: jednostkaInput.val()
         });
 
-        // Logowanie, co dokładnie zapisujemy po edycji
-        console.log("Zaktualizowane dane po edycji: ", {
-            paliwo: currentEditRow.find('input[name$="[paliwo]"]').val(),
-            zuzycie: currentEditRow.find('input[name$="[zuzycie]"]').val(),
-            jednostka: currentEditRow.find('input[name$="[jednostka]"]').val()
+        // Aktualizacja inputów
+        paliwoInput.val(paliwo);
+        zuzycieInput.val(zuzycie);
+        jednostkaInput.val(jednostka);
+
+        // Aktualizacja widocznych danych w tabeli
+        currentEditRow.find('td:eq(0)').text(paliwo);
+        currentEditRow.find('td:eq(1)').text(zuzycie);
+        currentEditRow.find('td:eq(2)').text(jednostka);
+
+        // Logowanie po aktualizacji
+        console.log("Po aktualizacji:", {
+            paliwo: paliwoInput.val(),
+            zuzycie: zuzycieInput.val(),
+            jednostka: jednostkaInput.val()
         });
     } else {
         // Dodanie nowego wiersza
+        console.log("Dodawanie nowego wiersza...");
         var rowCount = $('#stacjonarne_emisje_table tbody tr').length;
 
         var newRow = `
@@ -317,12 +327,6 @@ $('#stacjonarne_emisje_table').on('click', '.delete-btn', function(e) {
     e.preventDefault();
     $(this).closest('tr').remove();
 });
-
-
-
-
-
-
 
 
 
