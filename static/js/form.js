@@ -237,6 +237,13 @@ $('#zapisz_emisje_btn').on('click', function() {
                 currentEditRow.find('td:eq(2)').text(jednostka);
             }
         });
+
+        // Logowanie, co dokładnie zapisujemy po edycji
+        console.log("Zaktualizowane dane po edycji: ", {
+            paliwo: currentEditRow.find('input[name$="[paliwo]"]').val(),
+            zuzycie: currentEditRow.find('input[name$="[zuzycie]"]').val(),
+            jednostka: currentEditRow.find('input[name$="[jednostka]"]').val()
+        });
     } else {
         // Dodanie nowego wiersza
         var rowCount = $('#stacjonarne_emisje_table tbody tr').length;
@@ -310,6 +317,7 @@ $('#stacjonarne_emisje_table').on('click', '.delete-btn', function(e) {
     e.preventDefault();
     $(this).closest('tr').remove();
 });
+
 
 
 
