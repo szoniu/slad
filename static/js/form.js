@@ -324,30 +324,20 @@ $('#stacjonarne_emisje_table').on('click', '.delete-btn', function(e) {
 
 
 
-    $('#kt_docs_repeater_mobilne').repeater({
-        initEmpty: false,
-        show: function () {
-            console.log("Dodano nowy pojazd - show function");
-            $(this).slideDown();
-        },
-        hide: function (deleteElement) {
-            console.log("Usunięto pojazd - hide function");
-            $(this).slideUp(deleteElement);
-        },
-        ready: function (setIndexes) {
-            console.log("Repeater for mobilne źródła emisji is ready and initialized.");
-        }
-    });
+console.log('Skrypt załadowany - mobilne źródła emisji.');
 
-    // Specyficzne nasłuchiwanie dla "Dodaj źródło emisji"
-    $('#add_stacjonarne').on('click', function() {
-        console.log("Kliknięto 'Dodaj źródło emisji'");
-    });
+// Parsowanie danych JSON z pojazdami
 
-    // Specyficzne nasłuchiwanie dla "Dodaj pojazd"
-    $('#add_mobilne').on('click', function() {
-        console.log("Kliknięto 'Dodaj pojazd'");
-    });
+var mobilneDataContainer = document.getElementById('mobilneDataContainer');
+console.log(mobilneDataContainer.getAttribute('data-vehicles-data'));
+var vehiclesData = JSON.parse(mobilneDataContainer.getAttribute('data-vehicles-data'));
+console.log('Dane vehiclesData:', vehiclesData);
+
+// Iterowanie przez dane i wyświetlanie każdego wiersza w konsoli
+//vehiclesData.forEach(function(vehicle) {
+//    console.log('Pojazd:', vehicle.column_text, 'UOM:', vehicle.uom, 'GHG Unit:', vehicle.ghg_unit, 'Factor:', vehicle.conversion_factor);
+//});
+
 
     // Inicjalizacja dla energii elektrycznej
     $('#kt_docs_repeater_energia_elektryczna').repeater({
@@ -403,12 +393,11 @@ $('#stacjonarne_emisje_table').on('click', '.delete-btn', function(e) {
     });
 
 
-// SQL
-
+// SQL - Obsługa pierwszego formularza
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Skrypt załadowany');
 
-    // Pobierz dane JSON
+    // Pobierz dane JSON dla paliw
     var dataContainer = document.getElementById('dataContainer');
     var fuelsUnits = JSON.parse(dataContainer.getAttribute('data-fuels-units'));
     console.log('Dane fuelsUnits:', fuelsUnits);
@@ -436,7 +425,137 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
 });
+
+
+// Drugi modal
+
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = new bootstrap.Modal(document.getElementById('mobilneEmisjeModal'));
+    const mobilneEmisjeTableBody = document.querySelector('#mobilne_emisje_table tbody');
+
+    const vehiclesData = JSON.parse(document.getElementById('mobilneDataContainer').getAttribute('data-vehicles-data'));
+
+    // Funkcja do wypełnienia opcji w modalnym oknie
+    function populateModalOptions() {
+        const rodzajPojazduSelect = document.getElementById('rodzaj_pojazdu_modal');
+        const level2Select = document.getElementById('level2_modal');
+        const level3Select = document.getElementById('level3_modal');
+        const sposobZasilaniaSelect = document.getElementById('sposob_zasilania_modal');
+
+        // Czyścimy opcje przed załadowaniem
+        rodzajPojazduSelect.innerHTML = '<option></option>';
+        level2Select.innerHTML = '<option></option>';
+        level3Select.innerHTML = '<option></option>';
+        sposobZasilaniaSelect.innerHTML = '<option></option>';
+
+        // Dodawanie opcji do "Rodzaj pojazdu" (Level 1)
+        const uniqueVehicles = new Set();
+        vehiclesData.forEach(vehicle => {
+            if (!uniqueVehicles.has(vehicle.level1)) {
+                uniqueVehicles.add(vehicle.level1);
+                const optionVehicle = document.createElement('option');
+                optionVehicle.value = vehicle.level1;
+                optionVehicle.text = vehicle.level1;
+                rodzajPojazduSelect.appendChild(optionVehicle);
+            }
+        });
+
+        // Dodawanie opcji do "Sposób zasilania"
+        const uniqueFuelTypes = new Set();
+        vehiclesData.forEach(vehicle => {
+            if (!uniqueFuelTypes.has(vehicle.column_text)) {
+                uniqueFuelTypes.add(vehicle.column_text);
+                const optionFuel = document.createElement('option');
+                optionFuel.value = vehicle.column_text;
+                optionFuel.text = vehicle.column_text;
+                sposobZasilaniaSelect.appendChild(optionFuel);
+            }
+        });
+
+        // Dodaj listener na zmiany w Level 1 (Rodzaj pojazdu)
+        rodzajPojazduSelect.addEventListener('change', function () {
+            const selectedVehicle = this.value;
+            loadNextLevel(2, selectedVehicle, level2Select); // Ładuj opcje dla Level 2
+        });
+
+        // Dodaj listener na zmiany w Level 2
+        level2Select.addEventListener('change', function () {
+            const selectedLevel2 = this.value;
+            loadNextLevel(3, selectedLevel2, level3Select); // Ładuj opcje dla Level 3
+        });
+    }
+
+    // Funkcja AJAX do załadowania kolejnych opcji
+    function loadNextLevel(level, selectedValue, targetSelect) {
+        fetch(`/get_options?level=${level}&selectedValue=${selectedValue}`)
+            .then(response => response.json())
+            .then(data => {
+                targetSelect.innerHTML = '<option></option>';
+                data.options.forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option;
+                    opt.text = option;
+                    targetSelect.appendChild(opt);
+                });
+            })
+            .catch(error => {
+                console.error('Błąd podczas ładowania opcji dla poziomu ' + level + ':', error);
+            });
+    }
+
+    // Funkcja do dodawania wiersza do tabeli
+    function addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${liczbaPojazdow}</td>
+            <td>${rodzajPojazdu}</td>
+            <td>${level2}</td>
+            <td>${level3}</td>
+            <td>${sposobZasilania}</td>
+            <td>${zuzyciePaliwa}</td>
+            <td>${jednostka}</td>
+            <td><button type="button" class="btn btn-danger btn-sm remove-vehicle">Usuń</button></td>
+        `;
+        mobilneEmisjeTableBody.appendChild(row);
+    }
+
+    // Event listener na przycisk "Dodaj pojazd"
+    document.getElementById('dodaj_mobilne_btn').addEventListener('click', function () {
+        populateModalOptions(); // Wypełnij modal opcjami
+        modal.show(); // Otwórz modal
+    });
+
+    // Event listener na przycisk "Zapisz" w modalu
+    document.getElementById('zapisz_mobilne_btn').addEventListener('click', function () {
+        const liczbaPojazdow = document.getElementById('liczba_pojazdow_modal').value;
+        const rodzajPojazdu = document.getElementById('rodzaj_pojazdu_modal').value;
+        const level2 = document.getElementById('level2_modal').value;
+        const level3 = document.getElementById('level3_modal').value;
+        const sposobZasilania = document.getElementById('sposob_zasilania_modal').value;
+        const zuzyciePaliwa = document.getElementById('zuzycie_paliwa_modal').value;
+        const jednostka = document.getElementById('jednostka_modal').value;
+
+        // Walidacja - sprawdź, czy wszystkie pola są wypełnione
+        if (liczbaPojazdow && rodzajPojazdu && level2 && level3 && sposobZasilania && zuzyciePaliwa && jednostka) {
+            addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka);
+            modal.hide(); // Zamknij modal po dodaniu
+        } else {
+            alert("Proszę wypełnić wszystkie pola!");
+        }
+    });
+
+    // Event listener do usuwania wierszy
+    mobilneEmisjeTableBody.addEventListener('click', function (event) {
+        if (event.target.classList.contains('remove-vehicle')) {
+            event.target.closest('tr').remove(); // Usuwa wiersz tabeli
+        }
+    });
+});
+
+
+
 
 
 

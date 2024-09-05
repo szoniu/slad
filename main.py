@@ -1,11 +1,11 @@
 import json
 
 import pdfkit
-from flask import Flask, render_template, request, redirect, url_for, make_response
+from flask import Flask, render_template, request, redirect, url_for, make_response, jsonify
 from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 
-from database import engine_company, engine_excel, CompanyProfile, create_tables, StationaryEmission, MobileEmission, \
+from database import engine_company, engine_excel, CompanyProfile, StationaryEmission, MobileEmission, \
     ElectricityEmission, HeatEmission
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
@@ -197,7 +197,7 @@ def save_company_profile():
 def index():
     session = sessionmaker(bind=engine_excel)()
 
-    # Pobieranie danych z bazy
+    # Pobieranie danych do pierwszego formularza (tak jak było)
     fuels_units = session.execute(text('''
         SELECT "Level 3" AS fuel, array_agg(DISTINCT "UOM") AS units
         FROM excel_data
@@ -216,12 +216,62 @@ def index():
     fuels_units_dict = {row.fuel: row.units for row in fuels_units}
     fuel_types = list(fuels_units_dict.keys())
 
-    # Debugowanie JSON-a w backendzie
-    print(json.dumps(fuels_units_dict, ensure_ascii=False))
+    # Pobieranie danych do drugiego formularza (mobilne źródła emisji)
+    vehicles_data = session.execute(text('''
+        SELECT "Level 1" AS level1, 
+               "Column Text" AS column_text, 
+               "UOM" AS uom, 
+               "GHG/Unit" AS ghg_unit, 
+               "GHG Conversion Factor 2023" AS conversion_factor
+        FROM excel_data
+        WHERE "Level 1" LIKE '%Pojazdy%'
+          AND "Column Text" IS NOT NULL
+          AND "Column Text" != ''
+        ORDER BY "Level 1";
+    ''')).fetchall()
 
-    # Przekazanie JSON do szablonu
-    return render_template('index.html', fuels_units=json.dumps(fuels_units_dict, ensure_ascii=False),
-                           fuel_types=fuel_types)
+    # Zmiana struktury na listę słowników
+    vehicles_list = [{'level1': row.level1,
+                      'column_text': row.column_text,
+                      'uom': row.uom,
+                      'ghg_unit': row.ghg_unit,
+                      'conversion_factor': row.conversion_factor}
+                     for row in vehicles_data]
+
+    # Debugowanie JSON-a w backendzie
+    # print(json.dumps(vehicles_list, ensure_ascii=False))
+    print(vehicles_data)
+    # Przekazanie JSON-ów do szablonu
+    return render_template('index.html',
+                           fuels_units=json.dumps(fuels_units_dict, ensure_ascii=False),
+                           fuel_types=fuel_types,
+                           vehicles_data=json.dumps(vehicles_list, ensure_ascii=False))
+
+
+@app.route('/get_options')
+def get_options():
+    level = request.args.get('level')
+    selected_value = request.args.get('selectedValue')
+
+    session = sessionmaker(bind=engine_excel)()
+
+    if level == '2':
+        # Pobieranie opcji z Level 2 na podstawie wybranego Level 1
+        result = session.execute(text('''
+            SELECT DISTINCT "Level 2"
+            FROM excel_data
+            WHERE "Level 1" = :selected_value
+        '''), {'selected_value': selected_value}).fetchall()
+    elif level == '3':
+        # Pobieranie opcji z Level 3 na podstawie wybranego Level 2
+        result = session.execute(text('''
+            SELECT DISTINCT "Level 3"
+            FROM excel_data
+            WHERE "Level 2" = :selected_value
+        '''), {'selected_value': selected_value}).fetchall()
+
+    options = [row[0] for row in result]
+    return jsonify({'options': options})
 
 
 @app.route('/database')
@@ -360,6 +410,6 @@ def generate_pdf():
 
 
 if __name__ == '__main__':
-    create_tables()  # Tworzenie tabel przed uruchomieniem aplikacji
+    # create_tables()  # Tworzenie tabel przed uruchomieniem aplikacji
     # load_excel_data()  # Opcjonalne ładowanie danych
     app.run(debug=True)
