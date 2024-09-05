@@ -6,7 +6,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 
 from database import engine_company, engine_excel, CompanyProfile, create_tables, StationaryEmission, MobileEmission, \
-    ElectricityEmission, HeatEmission, load_excel_data
+    ElectricityEmission, HeatEmission
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
 
@@ -197,7 +197,7 @@ def save_company_profile():
 def index():
     session = sessionmaker(bind=engine_excel)()
 
-    # Pobieranie danych z bazy
+    # Pobieranie danych dotyczących paliw i jednostek
     fuels_units = session.execute(text('''
         SELECT "Level 3" AS fuel, array_agg(DISTINCT "UOM") AS units
         FROM excel_data
@@ -213,15 +213,40 @@ def index():
         ORDER BY "Level 3";
     ''')).fetchall()
 
+    # Pobieranie danych dotyczących pojazdów z dodatkowym filtrowaniem wartości 'Nieznany'
+    vehicle_details = session.execute(text('''
+        SELECT "Level 1", "Column Text", "UOM", "GHG/Unit", "GHG Conversion Factor 2023"
+        FROM excel_data
+        WHERE "Level 1" LIKE '%Pojazdy%'
+          AND "Column Text" IS NOT NULL
+          AND "Column Text" != ''
+          AND "Column Text" != 'Nieznany'
+        ORDER BY "Level 1";
+    ''')).fetchall()
+
+    # Konwersja wyników zapytań do listy słowników
     fuels_units_dict = {row.fuel: row.units for row in fuels_units}
     fuel_types = list(fuels_units_dict.keys())
 
-    # Debugowanie JSON-a w backendzie
-    print(json.dumps(fuels_units_dict, ensure_ascii=False))
+    vehicle_data_list = [
+        {
+            "type": row[0],
+            "text": row[1],
+            "uom": row[2],
+            "ghg_per_unit": row[3],
+            "ghg_conversion_factor": row[4]
+        } for row in vehicle_details
+    ]
 
-    # Przekazanie JSON do szablonu
-    return render_template('index.html', fuels_units=json.dumps(fuels_units_dict, ensure_ascii=False),
-                           fuel_types=fuel_types)
+    # Debugowanie danych w konsoli
+    print(json.dumps(fuels_units_dict, ensure_ascii=False))
+    print(vehicle_data_list)
+
+    # Przekazanie danych do szablonu
+    return render_template('index.html',
+                           fuels_units=json.dumps(fuels_units_dict, ensure_ascii=False),
+                           fuel_types=fuel_types,
+                           vehicle_data=vehicle_data_list)
 
 
 @app.route('/database')
