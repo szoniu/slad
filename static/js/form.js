@@ -168,20 +168,18 @@ $(document).ready(function() {
 $(document).ready(function() {
 console.log("Skrypt załadowany");
 
-// Parsowanie danych JSON z jednostkami paliw i mobilnych emisji
+// Parsowanie danych JSON z jednostkami paliw
 var fuelsUnits = JSON.parse($('#dataContainer').attr('data-fuels-units'));
-var vehicleFuelMapping = JSON.parse($('#dataContainer').attr('data-vehicle-fuel-mapping'));
 console.log('Dane fuelsUnits po parsowaniu:', fuelsUnits);
-console.log('Dane vehicleFuelMapping po parsowaniu:', vehicleFuelMapping);
 
 var currentEditRow = null;  // Przechowywanie aktualnie edytowanego wiersza
 
-// Funkcja do dynamicznego ładowania jednostek na podstawie paliwa (dla stacjonarnych źródeł emisji)
-function updateUnitsForFuel(selectedFuel, unitSelector) {
+// Funkcja do dynamicznego ładowania jednostek na podstawie paliwa
+function updateUnitsForFuel(selectedFuel) {
     console.log('Wybrane paliwo:', selectedFuel);
 
     var units = fuelsUnits[selectedFuel];
-    var unitSelect = $(unitSelector);
+    var unitSelect = $('#jednostka');
     unitSelect.empty();  // Wyczyść listę jednostek przed dodaniem nowych
 
     if (units) {
@@ -197,74 +195,35 @@ function updateUnitsForFuel(selectedFuel, unitSelector) {
     }
 }
 
-// Funkcja do dynamicznego ładowania sposobów zasilania i jednostek na podstawie rodzaju pojazdu (dla mobilnych źródeł emisji)
-function updateFuelAndUnitsForVehicle(selectedVehicle) {
-    console.log('Wybrany pojazd:', selectedVehicle);
+// Funkcja do czyszczenia pól formularza przy dodawaniu nowego wiersza
+function clearFormForNewEntry() {
+    console.log("Czyszczenie formularza przed dodaniem nowego wiersza...");
+    // Wyczyść pole zużycia
+    $('#zuzycie').val('');  // Wyczyszczenie pola zużycia
 
-    if (!selectedVehicle || !vehicleFuelMapping[selectedVehicle]) {
-        console.log('Nie znaleziono danych dla wybranego pojazdu.');
-        return;
-    }
-
-    var fuels = vehicleFuelMapping[selectedVehicle].fuels;
-    var units = vehicleFuelMapping[selectedVehicle].units;
-
-    var fuelSelect = $('#sposob_zasilania');
-    var unitSelect = $('#mobilne_jednostka');
-
-    fuelSelect.empty();
-    unitSelect.empty();
-
-    if (fuels) {
-        fuels.forEach(function(fuel) {
-            fuelSelect.append(new Option(fuel, fuel));
-        });
-        fuelSelect.val(fuels[0]);
-    }
-
-    if (units) {
-        units.forEach(function(unit) {
-            unitSelect.append(new Option(unit, unit));
-        });
-        unitSelect.val(units[0]);
-    }
-}
-
-
-// Funkcja do czyszczenia formularza stacjonarnych emisji
-function clearFormForNewStacjonarneEntry() {
-    console.log("Czyszczenie formularza dla nowego stacjonarnego źródła emisji...");
-    $('#zuzycie').val('');
+    // Ustaw domyślne paliwo i jednostkę
     var firstFuel = $('#paliwo option:first').val();
-    $('#paliwo').val(firstFuel).change();
+    $('#paliwo').val(firstFuel).change();  // Wywołanie zmiany, aby załadować jednostki dla domyślnego paliwa
 }
 
-// Funkcja do czyszczenia formularza mobilnych emisji
-function clearFormForNewMobilneEntry() {
-    console.log("Czyszczenie formularza dla nowego mobilnego źródła emisji...");
-    $('#zuzycie_paliwa').val('');
-    var firstVehicle = $('#rodzaj_pojazdu option:first').val();
-    $('#rodzaj_pojazdu').val(firstVehicle).change();  // Zmieniając wywołanie `change`, zapewniasz, że dane zostaną załadowane.
-}
-
-// Obsługa stacjonarnych emisji
+// Pokaż modalne okno po kliknięciu "Dodaj źródło emisji"
 $('#dodaj_stacjonarne_btn').on('click', function() {
-    currentEditRow = null;
-    clearFormForNewStacjonarneEntry();
-    $('#stacjonarneEmisjeModal').modal('show');
+    currentEditRow = null;  // Ustawienie braku wiersza do edycji
+    clearFormForNewEntry();  // Czyszczenie pól formularza
+    $('#stacjonarneEmisjeModal').modal('show');  // Pokaż modal
 });
 
-// Dynamiczne ładowanie jednostek dla stacjonarnych emisji
+// Dynamiczne ładowanie jednostek na podstawie wybranego paliwa
 $('#paliwo').on('change', function() {
     var selectedFuel = $(this).val();
-    updateUnitsForFuel(selectedFuel, '#stacjonarne_jednostka');
+    updateUnitsForFuel(selectedFuel);  // Zaktualizowanie jednostek dla wybranego paliwa
 });
 
-// Zapisanie danych stacjonarnych emisji
+// Obsługa przycisku "Zapisz"
 $('#zapisz_emisje_btn').on('click', function() {
     var paliwo = $('#paliwo').val();
     var zuzycie = $('#zuzycie').val();
-    var jednostka = $('#stacjonarne_jednostka').val();
+    var jednostka = $('#jednostka').val();
 
     if (!paliwo || !zuzycie || !jednostka) {
         alert("Wszystkie pola muszą być wypełnione!");
@@ -274,116 +233,121 @@ $('#zapisz_emisje_btn').on('click', function() {
     if (currentEditRow) {
         // Aktualizacja istniejącego wiersza
         console.log("Aktualizacja danych w istniejącym wierszu...");
-        currentEditRow.children('td:eq(0)').html(`${paliwo}<input type="hidden" name="stacjonarne_emissions[][paliwo]" value="${paliwo}">`);
-        currentEditRow.children('td:eq(1)').html(`${zuzycie}<input type="hidden" name="stacjonarne_emissions[][zuzycie]" value="${zuzycie}">`);
-        currentEditRow.children('td:eq(2)').html(`${jednostka}<input type="hidden" name="stacjonarne_emissions[][jednostka]" value="${jednostka}">`);
+
+        // Znalezienie ukrytych inputów w wierszu i aktualizacja ich wartości
+        currentEditRow.find('input[name$="[paliwo]"]').val(paliwo);
+        currentEditRow.find('input[name$="[zuzycie]"]').val(zuzycie);
+        currentEditRow.find('input[name$="[jednostka]"]').val(jednostka);
+
+        // Aktualizacja widocznych danych w komórkach BEZ usuwania ukrytych inputów
+        currentEditRow.children('td:eq(0)').html(`${paliwo}<input type="hidden" name="stacjonarne_emissions[0][paliwo]" value="${paliwo}">`);
+        currentEditRow.children('td:eq(1)').html(`${zuzycie}<input type="hidden" name="stacjonarne_emissions[0][zuzycie]" value="${zuzycie}">`);
+        currentEditRow.children('td:eq(2)').html(`${jednostka}<input type="hidden" name="stacjonarne_emissions[0][jednostka]" value="${jednostka}">`);
+
+        console.log("Po aktualizacji:", {
+            paliwo: currentEditRow.find('input[name$="[paliwo]"]').val(),
+            zuzycie: currentEditRow.find('input[name$="[zuzycie]"]').val(),
+            jednostka: currentEditRow.find('input[name$="[jednostka]"]').val()
+        });
     } else {
         // Dodanie nowego wiersza
+        console.log("Dodawanie nowego wiersza...");
         var rowCount = $('#stacjonarne_emisje_table tbody tr').length;
+
         var newRow = `
             <tr>
-                <td>${paliwo}<input type="hidden" name="stacjonarne_emissions[${rowCount}][paliwo]" value="${paliwo}"></td>
-                <td>${zuzycie}<input type="hidden" name="stacjonarne_emissions[${rowCount}][zuzycie]" value="${zuzycie}"></td>
-                <td>${jednostka}<input type="hidden" name="stacjonarne_emissions[${rowCount}][jednostka]" value="${jednostka}"></td>
-                <td><a href="#" class="edit-btn">Edytuj</a> · <a href="#" class="delete-btn">Usuń</a></td>
-            </tr>`;
+                <td>
+                    ${paliwo}<input type="hidden" name="stacjonarne_emissions[${rowCount}][paliwo]" value="${paliwo}">
+                </td>
+                <td>
+                    ${zuzycie}<input type="hidden" name="stacjonarne_emissions[${rowCount}][zuzycie]" value="${zuzycie}">
+                </td>
+                <td>
+                    ${jednostka}<input type="hidden" name="stacjonarne_emissions[${rowCount}][jednostka]" value="${jednostka}">
+                </td>
+                <td>
+                    <a href="#" class="edit-btn">Edytuj</a> ·
+                    <a href="#" class="delete-btn">Usuń</a>
+                </td>
+            </tr>
+        `;
+
         $('#stacjonarne_emisje_table tbody').append(newRow);
     }
 
     $('#stacjonarneEmisjeModal').modal('hide');
 });
 
-// Obsługa edycji stacjonarnych emisji
+// Obsługa przycisku "Anuluj"
+$('#anuluj_emisje_btn').on('click', function() {
+    $('#stacjonarneEmisjeModal').modal('hide');
+});
+
+// Obsługa edycji
 $('#stacjonarne_emisje_table').on('click', '.edit-btn', function(e) {
     e.preventDefault();
-    currentEditRow = $(this).closest('tr');
+    currentEditRow = $(this).closest('tr');  // Znajdź wiersz, który chcemy edytować
+
+    // Pobranie wartości z wiersza za pomocą ukrytych inputów
     var paliwo = currentEditRow.find('input[name$="[paliwo]"]').val();
     var zuzycie = currentEditRow.find('input[name$="[zuzycie]"]').val();
     var jednostka = currentEditRow.find('input[name$="[jednostka]"]').val();
-    $('#paliwo').val(paliwo).change();
-    $('#zuzycie').val(zuzycie);
-    updateUnitsForFuel(paliwo, '#stacjonarne_jednostka');
-    $('#stacjonarne_jednostka').val(jednostka);
+
+    // Debugging: sprawdzanie czy inputy mają poprawne wartości
+    console.log("Próba edycji wiersza z danymi: ", { paliwo, zuzycie, jednostka });
+    console.log("Cała struktura wiersza w DOM podczas edycji:", currentEditRow.html());
+
+    if (!paliwo || !zuzycie || !jednostka) {
+        console.error('Brak danych do edycji - wartości nieprawidłowe.');
+        return;  // Przerwij edycję, jeśli brakuje danych
+    }
+
+    // Zaktualizowanie formularza edycji
+    $('#paliwo').val(paliwo).change();  // Zmiana paliwa
+    $('#zuzycie').val(zuzycie);  // Wprowadzenie zużycia
+
+    // Aktualizacja jednostek
+    updateUnitsForFuel(paliwo);
+
+    // Ustawienie odpowiedniej jednostki
+    $('#jednostka').val(jednostka);
+
     $('#stacjonarneEmisjeModal').modal('show');
 });
 
-// Obsługa usuwania stacjonarnych emisji
+// Obsługa usuwania
 $('#stacjonarne_emisje_table').on('click', '.delete-btn', function(e) {
     e.preventDefault();
     $(this).closest('tr').remove();
 });
 
-// Obsługa mobilnych emisji
-$('#dodaj_mobilne_btn').on('click', function() {
-    currentEditRow = null;
-    clearFormForNewMobilneEntry();
-    $('#mobilneEmisjeModal').modal('show');
-});
-
-// Dynamiczne ładowanie sposobów zasilania i jednostek dla mobilnych emisji
-$('#rodzaj_pojazdu').on('change', function() {
-    var selectedVehicle = $(this).val();
-    updateFuelAndUnitsForVehicle(selectedVehicle);
-});
-
-// Zapisanie danych mobilnych emisji
-$('#zapisz_mobilne_emisje_btn').on('click', function() {
-    var rodzajPojazdu = $('#rodzaj_pojazdu').val();
-    var sposobZasilania = $('#sposob_zasilania').val();
-    var zuzyciePaliwa = $('#zuzycie_paliwa').val();
-    var jednostka = $('#mobilne_jednostka').val();
-
-    if (!rodzajPojazdu || !sposobZasilania || !zuzyciePaliwa || !jednostka) {
-        alert("Wszystkie pola muszą być wypełnione!");
-        return;
-    }
-
-    if (currentEditRow) {
-        // Aktualizacja istniejącego wiersza
-        currentEditRow.children('td:eq(0)').html(`${rodzajPojazdu}<input type="hidden" name="mobilne_emissions[][rodzaj_pojazdu]" value="${rodzajPojazdu}">`);
-        currentEditRow.children('td:eq(1)').html(`${sposobZasilania}<input type="hidden" name="mobilne_emissions[][sposob_zasilania]" value="${sposobZasilania}">`);
-        currentEditRow.children('td:eq(2)').html(`${zuzyciePaliwa}<input type="hidden" name="mobilne_emissions[][zuzycie_paliwa]" value="${zuzyciePaliwa}">`);
-        currentEditRow.children('td:eq(3)').html(`${jednostka}<input type="hidden" name="mobilne_emissions[][jednostka]" value="${jednostka}">`);
-    } else {
-        // Dodanie nowego wiersza
-        var rowCount = $('#mobilne_emisje_table tbody tr').length;
-        var newRow = `
-            <tr>
-                <td>${rodzajPojazdu}<input type="hidden" name="mobilne_emissions[${rowCount}][rodzaj_pojazdu]" value="${rodzajPojazdu}"></td>
-                <td>${sposobZasilania}<input type="hidden" name="mobilne_emissions[${rowCount}][sposob_zasilania]" value="${sposobZasilania}"></td>
-                <td>${zuzyciePaliwa}<input type="hidden" name="mobilne_emissions[${rowCount}][zuzycie_paliwa]" value="${zuzyciePaliwa}"></td>
-                <td>${jednostka}<input type="hidden" name="mobilne_emissions[${rowCount}][jednostka]" value="${jednostka}"></td>
-                <td><a href="#" class="edit-btn">Edytuj</a> · <a href="#" class="delete-btn">Usuń</a></td>
-            </tr>`;
-        $('#mobilne_emisje_table tbody').append(newRow);
-    }
-
-    $('#mobilneEmisjeModal').modal('hide');
-});
-
-// Obsługa edycji mobilnych emisji
-$('#mobilne_emisje_table').on('click', '.edit-btn', function(e) {
-    e.preventDefault();
-    currentEditRow = $(this).closest('tr');
-    var rodzajPojazdu = currentEditRow.find('input[name$="[rodzaj_pojazdu]"]').val();
-    var sposobZasilania = currentEditRow.find('input[name$="[sposob_zasilania]"]').val();
-    var zuzyciePaliwa = currentEditRow.find('input[name$="[zuzycie_paliwa]"]').val();
-    var jednostka = currentEditRow.find('input[name$="[jednostka]"]').val();
-    $('#rodzaj_pojazdu').val(rodzajPojazdu).change();
-    $('#zuzycie_paliwa').val(zuzyciePaliwa);
-    updateFuelAndUnitsForVehicle(rodzajPojazdu);
-    $('#sposob_zasilania').val(sposobZasilania);
-    $('#mobilne_jednostka').val(jednostka);
-    $('#mobilneEmisjeModal').modal('show');
-});
-
-// Obsługa usuwania mobilnych emisji
-$('#mobilne_emisje_table').on('click', '.delete-btn', function(e) {
-    e.preventDefault();
-    $(this).closest('tr').remove();
-});
 
 
+
+    $('#kt_docs_repeater_mobilne').repeater({
+        initEmpty: false,
+        show: function () {
+            console.log("Dodano nowy pojazd - show function");
+            $(this).slideDown();
+        },
+        hide: function (deleteElement) {
+            console.log("Usunięto pojazd - hide function");
+            $(this).slideUp(deleteElement);
+        },
+        ready: function (setIndexes) {
+            console.log("Repeater for mobilne źródła emisji is ready and initialized.");
+        }
+    });
+
+    // Specyficzne nasłuchiwanie dla "Dodaj źródło emisji"
+    $('#add_stacjonarne').on('click', function() {
+        console.log("Kliknięto 'Dodaj źródło emisji'");
+    });
+
+    // Specyficzne nasłuchiwanie dla "Dodaj pojazd"
+    $('#add_mobilne').on('click', function() {
+        console.log("Kliknięto 'Dodaj pojazd'");
+    });
 
     // Inicjalizacja dla energii elektrycznej
     $('#kt_docs_repeater_energia_elektryczna').repeater({

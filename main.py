@@ -197,7 +197,7 @@ def save_company_profile():
 def index():
     session = sessionmaker(bind=engine_excel)()
 
-    # Pobieranie danych dotyczących paliw i jednostek dla stacjonarnych emisji
+    # Pobieranie danych z bazy
     fuels_units = session.execute(text('''
         SELECT "Level 3" AS fuel, array_agg(DISTINCT "UOM") AS units
         FROM excel_data
@@ -213,32 +213,15 @@ def index():
         ORDER BY "Level 3";
     ''')).fetchall()
 
-    # Pobieranie typów pojazdów (Level 1), sposobów zasilania (Column Text) oraz jednostek (UOM)
-    vehicle_fuel_mapping = session.execute(text('''
-        SELECT "Level 1", array_agg(DISTINCT "Column Text") AS fuels, array_agg(DISTINCT "UOM") AS units
-        FROM excel_data
-        WHERE "Level 1" LIKE '%Pojazdy%'
-          AND "Column Text" IS NOT NULL
-          AND "Column Text" != ''
-          AND "Column Text" != 'Nieznany'
-        GROUP BY "Level 1"
-    ''')).fetchall()
-
-    # Konwersja wyników zapytań do formatu słowników
-    fuels_units_dict = {row[0]: row[1] for row in fuels_units}
-    vehicle_fuel_dict = {row[0]: {"fuels": row[1], "units": row[2]} for row in vehicle_fuel_mapping}
+    fuels_units_dict = {row.fuel: row.units for row in fuels_units}
     fuel_types = list(fuels_units_dict.keys())
 
     # Debugowanie JSON-a w backendzie
     print(json.dumps(fuels_units_dict, ensure_ascii=False))
-    print(vehicle_fuel_dict)
 
-    # Przekazanie danych do szablonu z serializacją do JSON
-    return render_template('index.html',
-                           fuels_units=json.dumps(fuels_units_dict, ensure_ascii=False),
-                           fuel_types=fuel_types,
-                           vehicle_fuel_mapping=json.dumps(vehicle_fuel_dict,
-                                                           ensure_ascii=False))  # Zmieniono na json.dumps
+    # Przekazanie JSON do szablonu
+    return render_template('index.html', fuels_units=json.dumps(fuels_units_dict, ensure_ascii=False),
+                           fuel_types=fuel_types)
 
 
 @app.route('/database')
