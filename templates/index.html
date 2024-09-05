@@ -236,7 +236,8 @@
                 </div>
 
                 <!-- Przekazanie JSON-a z danymi -->
-                <div id="dataContainer" data-fuels-units='{{ fuels_units | safe }}'></div>
+                <div id="dataContainer" data-fuels-units='{{ fuels_units | safe }}'
+                     data-vehicle-fuel-mapping='{{ vehicle_fuel_mapping | safe }}'></div>
 
                 <!-- Tabela wyświetlająca dodane emisje -->
                 <table id="stacjonarne_emisje_table" class="table">
@@ -287,8 +288,8 @@
                                         <input type="text" id="zuzycie" name="zuzycie" class="form-control" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="jednostka">Jednostka:</label>
-                                        <select id="jednostka" name="jednostka" class="form-select">
+                                        <label for="stacjonarne_jednostka">Jednostka:</label>
+                                        <select id="stacjonarne_jednostka" name="jednostka" class="form-select">
                                             <!-- Jednostki zostaną załadowane dynamicznie -->
                                         </select>
                                     </div>
@@ -314,76 +315,78 @@
                     </div>
                 </div>
 
-                <!-- Repeater for Mobilne źródła emisji -->
-                <div id="kt_docs_repeater_mobilne">
-                    <div class="form-group">
-                        <div data-repeater-list="mobilne_emissions">
-                            <div data-repeater-item>
-                                <div class="row mb-4">
-                                    <div class="col-md-3">
-                                        <label class="form-label">Liczba pojazdów:</label>
-                                        <input type="number" class="form-control" name="liczba_pojazdow"
-                                               placeholder="Wprowadź liczbę pojazdów" required/>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Rodzaj pojazdu:</label>
-                                        <select class="form-select" name="rodzaj_pojazdu" required>
-                                            <option></option>
-                                            <option value="Samochód osobowy">Samochód osobowy</option>
-                                            <option value="Samochód ciężarowy">Samochód ciężarowy</option>
-                                            <option value="Motocykl">Motocykl</option>
+                <!-- Tabela wyświetlająca dodane mobilne emisje -->
+                <table id="mobilne_emisje_table" class="table">
+                    <thead>
+                    <tr>
+                        <th>Rodzaj pojazdu</th>
+                        <th>Sposób zasilania</th>
+                        <th>Zużycie paliwa</th>
+                        <th>Jednostka</th>
+                        <th>Akcje</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Wiersze będą dodawane dynamicznie -->
+                    </tbody>
+                </table>
+
+                <!-- Przycisk Dodaj źródło emisji mobilnej -->
+                <div class="form-group mt-5">
+                    <button type="button" id="dodaj_mobilne_btn" class="btn btn-primary">Dodaj pojazd
+                    </button>
+                </div>
+
+                <!-- Modal do dodawania mobilnych źródeł emisji -->
+                <div class="modal fade" id="mobilneEmisjeModal" tabindex="-1" aria-labelledby="mobilneEmisjeModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="mobilneEmisjeModalLabel">Dodaj pojazd</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Form do dodawania emisji mobilnych -->
+                                <form id="mobilne_emisje_form">
+                                    <div class="form-group">
+                                        <label for="rodzaj_pojazdu">Rodzaj pojazdu:</label>
+                                        <select id="rodzaj_pojazdu" name="rodzaj_pojazdu" class="form-select" required>
+                                            <option value="">Wybierz rodzaj pojazdu</option>
+                                            {% for vehicle_type in vehicle_fuel_mapping.keys() %}
+                                            <option value="{{ vehicle_type }}">{{ vehicle_type }}</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Sposób zasilania:</label>
-                                        <select class="form-select" name="sposob_zasilania" required>
-                                            <option></option>
-                                            <option value="Benzyna">Benzyna</option>
-                                            <option value="Diesel">Diesel</option>
-                                            <option value="Elektryczny">Elektryczny</option>
+                                    <div class="form-group">
+                                        <label for="sposob_zasilania">Sposób zasilania:</label>
+                                        <select id="sposob_zasilania" name="sposob_zasilania" class="form-select"
+                                                required>
+                                            <option value="">Wybierz sposób zasilania</option>
+                                            <!-- Opcje zostaną załadowane dynamicznie -->
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Zużycie paliwa:</label>
-                                        <input type="number" class="form-control" name="zuzycie_paliwa"
-                                               placeholder="Wprowadź zużycie paliwa" required/>
+                                    <div class="form-group">
+                                        <label for="zuzycie_paliwa">Zużycie paliwa:</label>
+                                        <input type="number" id="zuzycie_paliwa" name="zuzycie_paliwa"
+                                               class="form-control" required>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Jednostka:</label>
-                                        <select class="form-select" name="jednostka" required>
-                                            <option></option>
-                                            <option value="l/rok">l/rok</option>
-                                            <option value="km/rok">km/rok</option>
+                                    <div class="form-group">
+                                        <label for="mobilne_jednostka">Jednostka:</label>
+                                        <select id="mobilne_jednostka" name="jednostka" class="form-select" required>
+                                            <option value="">Wybierz jednostkę</option>
+                                            <!-- Opcje zostaną załadowane dynamicznie -->
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Sposób podania danych o zużyciu paliwa:</label>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="sposob_podania"
-                                                   value="litry" required>
-                                            <label class="form-check-label">litry</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="sposob_podania"
-                                                   value="kilometry" required>
-                                            <label class="form-check-label">kilometry</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 mt-4">
-                                        <a href="javascript:;" data-repeater-delete
-                                           class="btn btn-sm btn-light-danger mt-3">
-                                            <i class="ki-duotone ki-trash fs-5"></i> Usuń
-                                        </a>
-                                    </div>
-                                </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                                <button type="button" id="zapisz_mobilne_emisje_btn" class="btn btn-primary">Zapisz
+                                </button>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="form-group mt-5">
-                        <a href="javascript:;" id="add_mobilne" data-repeater-create class="btn btn-light-primary">
-                            <i class="ki-duotone ki-plus fs-3"></i> Dodaj pojazd
-                        </a>
                     </div>
                 </div>
 

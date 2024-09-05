@@ -197,7 +197,7 @@ def save_company_profile():
 def index():
     session = sessionmaker(bind=engine_excel)()
 
-    # Pobieranie danych dotyczących paliw i jednostek
+    # Pobieranie danych dotyczących paliw i jednostek dla stacjonarnych emisji
     fuels_units = session.execute(text('''
         SELECT "Level 3" AS fuel, array_agg(DISTINCT "UOM") AS units
         FROM excel_data
@@ -213,40 +213,32 @@ def index():
         ORDER BY "Level 3";
     ''')).fetchall()
 
-    # Pobieranie danych dotyczących pojazdów z dodatkowym filtrowaniem wartości 'Nieznany'
-    vehicle_details = session.execute(text('''
-        SELECT "Level 1", "Column Text", "UOM", "GHG/Unit", "GHG Conversion Factor 2023"
+    # Pobieranie typów pojazdów (Level 1), sposobów zasilania (Column Text) oraz jednostek (UOM)
+    vehicle_fuel_mapping = session.execute(text('''
+        SELECT "Level 1", array_agg(DISTINCT "Column Text") AS fuels, array_agg(DISTINCT "UOM") AS units
         FROM excel_data
         WHERE "Level 1" LIKE '%Pojazdy%'
           AND "Column Text" IS NOT NULL
           AND "Column Text" != ''
           AND "Column Text" != 'Nieznany'
-        ORDER BY "Level 1";
+        GROUP BY "Level 1"
     ''')).fetchall()
 
-    # Konwersja wyników zapytań do listy słowników
-    fuels_units_dict = {row.fuel: row.units for row in fuels_units}
+    # Konwersja wyników zapytań do formatu słowników
+    fuels_units_dict = {row[0]: row[1] for row in fuels_units}
+    vehicle_fuel_dict = {row[0]: {"fuels": row[1], "units": row[2]} for row in vehicle_fuel_mapping}
     fuel_types = list(fuels_units_dict.keys())
 
-    vehicle_data_list = [
-        {
-            "type": row[0],
-            "text": row[1],
-            "uom": row[2],
-            "ghg_per_unit": row[3],
-            "ghg_conversion_factor": row[4]
-        } for row in vehicle_details
-    ]
-
-    # Debugowanie danych w konsoli
+    # Debugowanie JSON-a w backendzie
     print(json.dumps(fuels_units_dict, ensure_ascii=False))
-    print(vehicle_data_list)
+    print(vehicle_fuel_dict)
 
-    # Przekazanie danych do szablonu
+    # Przekazanie danych do szablonu z serializacją do JSON
     return render_template('index.html',
                            fuels_units=json.dumps(fuels_units_dict, ensure_ascii=False),
                            fuel_types=fuel_types,
-                           vehicle_data=vehicle_data_list)
+                           vehicle_fuel_mapping=json.dumps(vehicle_fuel_dict,
+                                                           ensure_ascii=False))  # Zmieniono na json.dumps
 
 
 @app.route('/database')
