@@ -594,8 +594,8 @@ function loadNextLevel(level, data, targetSelect) {
         const units = [...new Set(data.map(vehicle => vehicle.uom))];
         units.forEach(unit => {
             const option = document.createElement('option');
-            option.value = unit + '/rok';
-            option.text = unit + '/rok';
+            option.value = unit;
+            option.text = unit;
             jednostkaSelect.appendChild(option);
         });
 
