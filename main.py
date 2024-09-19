@@ -212,19 +212,22 @@ ORDER BY "Level 3";
     # Pobieranie danych do drugiego formularza (mobilne źródła emisji)
     vehicles_data = session.execute(text('''
         SELECT "Level 1" AS level1, 
+               "Level 2" AS level2,          -- Dodaj kolumnę Level 2
+               "Level 3" AS level3,          -- Dodaj kolumnę Level 3
                "Column Text" AS column_text, 
                "UOM" AS uom, 
                "GHG/Unit" AS ghg_unit, 
                "GHG Conversion Factor 2023" AS conversion_factor
         FROM excel_data
         WHERE "Level 1" LIKE '%Pojazdy%'
-          AND "Column Text" IS NOT NULL
-          AND "Column Text" != ''
+
         ORDER BY "Level 1";
     ''')).fetchall()
 
     # Zmiana struktury na listę słowników
     vehicles_list = [{'level1': row.level1,
+                      'level2': row.level2,  # Dodaj Level 2 do słownika
+                      'level3': row.level3,  # Dodaj Level 3 do słownika
                       'column_text': row.column_text,
                       'uom': row.uom,
                       'ghg_unit': row.ghg_unit,
@@ -232,7 +235,6 @@ ORDER BY "Level 3";
                      for row in vehicles_data]
 
     # Debugowanie JSON-a w backendzie
-    # print(json.dumps(vehicles_list, ensure_ascii=False))
     print(vehicles_data)
     # Przekazanie JSON-ów do szablonu
     return render_template('index.html',

@@ -335,10 +335,12 @@ console.log(mobilneDataContainer.getAttribute('data-vehicles-data'));
 var vehiclesData = JSON.parse(mobilneDataContainer.getAttribute('data-vehicles-data'));
 console.log('Dane vehiclesData:', vehiclesData);
 
-// Iterowanie przez dane i wyświetlanie każdego wiersza w konsoli
-//vehiclesData.forEach(function(vehicle) {
-//    console.log('Pojazd:', vehicle.column_text, 'UOM:', vehicle.uom, 'GHG Unit:', vehicle.ghg_unit, 'Factor:', vehicle.conversion_factor);
-//});
+// Sprawdzenie struktury obiektów w vehiclesData
+console.log('Pełne dane vehiclesData (struktura obiektów):');
+vehiclesData.forEach((vehicle, index) => {
+    console.log(`Obiekt ${index}:`, vehicle);
+    console.log('Dostępne klucze w obiekcie:', Object.keys(vehicle)); // Wyświetlenie dostępnych kluczy
+});
 
 
     // Inicjalizacja dla energii elektrycznej
@@ -436,109 +438,195 @@ document.addEventListener('DOMContentLoaded', function () {
     const mobilneEmisjeTableBody = document.querySelector('#mobilne_emisje_table tbody');
 
     const vehiclesData = JSON.parse(document.getElementById('mobilneDataContainer').getAttribute('data-vehicles-data'));
+    console.log('Pełne dane vehiclesData:', vehiclesData);
+// Przypisanie elementu do zmiennej na początku skryptu
+const level3Select = document.getElementById('level3_modal');
 
-    // Funkcja do wypełnienia opcji w modalnym oknie
-    function populateModalOptions() {
-        const rodzajPojazduSelect = document.getElementById('rodzaj_pojazdu_modal');
-        const level2Select = document.getElementById('level2_modal');
-        const level3Select = document.getElementById('level3_modal');
-        const sposobZasilaniaSelect = document.getElementById('sposob_zasilania_modal');
-        const jednostkaSelect = document.getElementById('jednostka_modal'); // Dodanie select dla jednostek
+// Funkcja do wypełnienia opcji w modalnym oknie
+function populateModalOptions() {
+    const rodzajPojazduSelect = document.getElementById('rodzaj_pojazdu_modal');
+    const level2Select = document.getElementById('level2_modal');
+    const sposobZasilaniaSelect = document.getElementById('sposob_zasilania_modal');
+    const jednostkaSelect = document.getElementById('jednostka_modal');
 
-        // Czyścimy opcje przed załadowaniem
-        rodzajPojazduSelect.innerHTML = '<option></option>';
-        level2Select.innerHTML = '<option></option>';
-        level3Select.innerHTML = '<option></option>';
-        sposobZasilaniaSelect.innerHTML = '<option></option>';
-        jednostkaSelect.innerHTML = '<option></option>'; // Czyścimy jednostki
+    // Sprawdzenie czy level3Select jest prawidłowo przypisany
+    if (!level3Select) {
+        console.error('level3Select element nie został znaleziony.');
+        return;
+    }
+
+    // Czyścimy opcje przed załadowaniem
+    rodzajPojazduSelect.innerHTML = '<option></option>';
+    level2Select.innerHTML = '<option></option>';
+    level3Select.innerHTML = '<option></option>';
+    sposobZasilaniaSelect.innerHTML = '<option></option>';
+    jednostkaSelect.innerHTML = '<option></option>';
 
         // Dodawanie opcji do "Rodzaj pojazdu" (Level 1)
-        const uniqueVehicles = new Set();
-        vehiclesData.forEach(vehicle => {
-            if (!uniqueVehicles.has(vehicle.level1)) {
-                uniqueVehicles.add(vehicle.level1);
-                const optionVehicle = document.createElement('option');
-                optionVehicle.value = vehicle.level1;
-                optionVehicle.text = vehicle.level1;
-                rodzajPojazduSelect.appendChild(optionVehicle);
-            }
+        const uniqueVehicles = [...new Set(vehiclesData.map(vehicle => vehicle.level1))];
+        uniqueVehicles.forEach(vehicle => {
+            const optionVehicle = document.createElement('option');
+            optionVehicle.value = vehicle;
+            optionVehicle.text = vehicle;
+            rodzajPojazduSelect.appendChild(optionVehicle);
         });
 
-        // Dodawanie opcji do "Sposób zasilania"
-        const uniqueFuelTypes = new Set();
-        vehiclesData.forEach(vehicle => {
-            if (!uniqueFuelTypes.has(vehicle.column_text)) {
-                uniqueFuelTypes.add(vehicle.column_text);
-                const optionFuel = document.createElement('option');
-                optionFuel.value = vehicle.column_text;
-                optionFuel.text = vehicle.column_text;
-                sposobZasilaniaSelect.appendChild(optionFuel);
-            }
-        });
-
-        // Dodaj listener na zmiany w Level 1 (Rodzaj pojazdu)
+        // Listener na zmiany w Level 1
         rodzajPojazduSelect.addEventListener('change', function () {
-            const selectedVehicle = this.value;
-            loadNextLevel(2, selectedVehicle, level2Select); // Ładuj opcje dla Level 2
+            const selectedLevel1 = this.value;
+            console.log('Wybrany Level 1:', selectedLevel1);
+            const filteredLevel1 = vehiclesData.filter(vehicle => vehicle.level1 === selectedLevel1);
+            console.log('Dane po przefiltrowaniu Level 1:', filteredLevel1);
+
+            loadNextLevel(2, filteredLevel1, level2Select);
         });
 
-        // Dodaj listener na zmiany w Level 2
+        // Listener na zmiany w Level 2
         level2Select.addEventListener('change', function () {
             const selectedLevel2 = this.value;
-            loadNextLevel(3, selectedLevel2, level3Select); // Ładuj opcje dla Level 3
+            console.log('Wybrany Level 2:', selectedLevel2);
+            const filteredLevel2 = vehiclesData.filter(vehicle => vehicle.level2 === selectedLevel2);
+            console.log('Dane po przefiltrowaniu Level 2:', filteredLevel2);
+
+            loadNextLevel(3, filteredLevel2, level3Select);
         });
 
-        // Dodaj listener na zmiany w Level 3 i aktualizuj jednostki
+        // Listener na zmiany w Level 3
         level3Select.addEventListener('change', function () {
             const selectedLevel3 = this.value;
-            updateUnitsForLevel3(selectedLevel3); // Aktualizuj jednostki dla wybranego Level 3
+            console.log('Wybrany Level 3:', selectedLevel3);
+            const filteredLevel3 = vehiclesData.filter(vehicle => vehicle.level3 === selectedLevel3);
+            console.log('Dane po przefiltrowaniu Level 3:', filteredLevel3);
+
+            loadFuelTypes(filteredLevel3);
+        });
+
+        // Listener na zmiany w Sposób zasilania
+        sposobZasilaniaSelect.addEventListener('change', function () {
+            const selectedFuel = this.value;
+            console.log('Wybrany sposób zasilania:', selectedFuel);
+            const filteredFuel = vehiclesData.filter(vehicle => vehicle.column_text === selectedFuel);
+            console.log('Dane po przefiltrowaniu sposobu zasilania:', filteredFuel);
+
+            updateUnits(filteredFuel);
         });
     }
 
-    // Funkcja do aktualizacji jednostek na podstawie wybranego Level 3
-function updateUnitsForLevel3(selectedLevel3) {
-    const jednostkaSelect = document.getElementById('jednostka_modal');
-    jednostkaSelect.innerHTML = '<option></option>'; // Czyścimy listę jednostek
+// Funkcja do ładowania opcji dla kolejnego poziomu
+function loadNextLevel(level, data, targetSelect) {
+    targetSelect.innerHTML = '<option></option>'; // Czyścimy poprzednie opcje
 
-    // Filtruj dane vehiclesData, aby znaleźć odpowiednie jednostki dla wybranego Level 3
-    const filteredUnits = vehiclesData.filter(vehicle => vehicle.column_text === selectedLevel3)
-                                      .map(vehicle => vehicle.uom);
+    if (level === 2) {
+        // Filtrowanie danych dla Level 2 na podstawie danych z Level 1
+        const uniqueLevel2 = [...new Set(data.map(vehicle => vehicle.level2))];
+        console.log('Dostępne wartości Level 2:', uniqueLevel2);
 
-    console.log('Filtered units:', filteredUnits); // Dodaj ten log, aby zobaczyć wyniki filtrowania
+        uniqueLevel2.forEach(value => {
+            if (value) {
+                const option = document.createElement('option');
+                option.value = value;
+                option.text = value;
+                targetSelect.appendChild(option);
+            }
+        });
 
-    // Dodaj jednostki do select
-    filteredUnits.forEach(unit => {
-        const option = document.createElement('option');
-        option.value = unit + '/rok'; // Dodanie "/rok" do jednostki
-        option.text = unit + '/rok';
-        jednostkaSelect.appendChild(option);
-    });
+        // Listener na zmiany w Level 2 - aby kontynuować filtrowanie
+        targetSelect.addEventListener('change', function () {
+            const selectedLevel2 = this.value;
+            console.log('Wybrany Level 2:', selectedLevel2);
 
-    // Ustaw pierwszą jednostkę jako domyślną, jeśli istnieją
-    if (filteredUnits.length > 0) {
-        jednostkaSelect.value = filteredUnits[0] + '/rok';
-    } else {
-        jednostkaSelect.appendChild(new Option("Brak jednostek", ""));
+            // Filtrujemy dane na podstawie Level 2
+            const filteredLevel2 = data.filter(vehicle => vehicle.level2 === selectedLevel2);
+            console.log('Dane po przefiltrowaniu Level 2:', filteredLevel2);
+
+            // Kontynuacja procesu ładowania kolejnego poziomu - Level 3
+            loadNextLevel(3, filteredLevel2, level3Select);
+        });
+    } else if (level === 3) {
+        // Filtrowanie danych dla Level 3 na podstawie danych z Level 2
+        const uniqueLevel3 = [...new Set(data.map(vehicle => vehicle.level3))];
+        console.log('Dostępne wartości Level 3:', uniqueLevel3);
+
+        uniqueLevel3.forEach(value => {
+            if (value) {
+                const option = document.createElement('option');
+                option.value = value;
+                option.text = value;
+                targetSelect.appendChild(option);
+            }
+        });
+
+        // Dodanie listenera na zmiany w Level 3 i aktualizacja sposobu zasilania
+        targetSelect.addEventListener('change', function () {
+            const selectedLevel3 = this.value;
+            console.log('Wybrany Level 3:', selectedLevel3);
+
+            // Filtrowanie danych po Level 3
+            const filteredLevel3 = data.filter(vehicle => vehicle.level3 === selectedLevel3);
+            console.log('Dane po przefiltrowaniu Level 3:', filteredLevel3);
+
+            // Ładowanie sposobów zasilania na podstawie przefiltrowanych danych
+            loadFuelTypes(filteredLevel3);
+        });
     }
 }
 
-    // Funkcja AJAX do załadowania kolejnych opcji
-    function loadNextLevel(level, selectedValue, targetSelect) {
-        fetch(`/get_options?level=${level}&selectedValue=${selectedValue}`)
-            .then(response => response.json())
-            .then(data => {
-                targetSelect.innerHTML = '<option></option>';
-                data.options.forEach(option => {
-                    const opt = document.createElement('option');
-                    opt.value = option;
-                    opt.text = option;
-                    targetSelect.appendChild(opt);
-                });
-            })
-            .catch(error => {
-                console.error('Błąd podczas ładowania opcji dla poziomu ' + level + ':', error);
-            });
+
+    // Funkcja do ładowania Sposób zasilania
+    function loadFuelTypes(data) {
+        const sposobZasilaniaSelect = document.getElementById('sposob_zasilania_modal');
+        sposobZasilaniaSelect.innerHTML = '<option></option>';
+
+        const uniqueFuels = [...new Set(data.map(vehicle => vehicle.column_text))];
+        uniqueFuels.forEach(fuel => {
+            const option = document.createElement('option');
+            option.value = fuel;
+            option.text = fuel;
+            sposobZasilaniaSelect.appendChild(option);
+        });
     }
+
+    // Funkcja do aktualizacji jednostek
+    function updateUnits(data) {
+        const jednostkaSelect = document.getElementById('jednostka_modal');
+        jednostkaSelect.innerHTML = '<option></option>';
+
+        const units = [...new Set(data.map(vehicle => vehicle.uom))];
+        units.forEach(unit => {
+            const option = document.createElement('option');
+            option.value = unit + '/rok';
+            option.text = unit + '/rok';
+            jednostkaSelect.appendChild(option);
+        });
+
+        if (units.length === 0) {
+            jednostkaSelect.appendChild(new Option('Brak jednostek', ''));
+        }
+    }
+
+    // Event listener na przycisk "Dodaj pojazd"
+    document.getElementById('dodaj_mobilne_btn').addEventListener('click', function () {
+        populateModalOptions();
+        modal.show();
+    });
+
+    // Event listener na przycisk "Zapisz" w modalu
+    document.getElementById('zapisz_mobilne_btn').addEventListener('click', function () {
+        const liczbaPojazdow = document.getElementById('liczba_pojazdow_modal').value;
+        const rodzajPojazdu = document.getElementById('rodzaj_pojazdu_modal').value;
+        const level2 = document.getElementById('level2_modal').value;
+        const level3 = document.getElementById('level3_modal').value;
+        const sposobZasilania = document.getElementById('sposob_zasilania_modal').value;
+        const zuzyciePaliwa = document.getElementById('zuzycie_paliwa_modal').value;
+        const jednostka = document.getElementById('jednostka_modal').value;
+
+        if (liczbaPojazdow && rodzajPojazdu && level2 && level3 && sposobZasilania && zuzyciePaliwa && jednostka) {
+            addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka);
+            modal.hide();
+        } else {
+            alert("Proszę wypełnić wszystkie pola!");
+        }
+    });
 
     // Funkcja do dodawania wiersza do tabeli
     function addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka) {
@@ -556,38 +644,15 @@ function updateUnitsForLevel3(selectedLevel3) {
         mobilneEmisjeTableBody.appendChild(row);
     }
 
-    // Event listener na przycisk "Dodaj pojazd"
-    document.getElementById('dodaj_mobilne_btn').addEventListener('click', function () {
-        populateModalOptions(); // Wypełnij modal opcjami
-        modal.show(); // Otwórz modal
-    });
-
-    // Event listener na przycisk "Zapisz" w modalu
-    document.getElementById('zapisz_mobilne_btn').addEventListener('click', function () {
-        const liczbaPojazdow = document.getElementById('liczba_pojazdow_modal').value;
-        const rodzajPojazdu = document.getElementById('rodzaj_pojazdu_modal').value;
-        const level2 = document.getElementById('level2_modal').value;
-        const level3 = document.getElementById('level3_modal').value;
-        const sposobZasilania = document.getElementById('sposob_zasilania_modal').value;
-        const zuzyciePaliwa = document.getElementById('zuzycie_paliwa_modal').value;
-        const jednostka = document.getElementById('jednostka_modal').value;
-
-        // Walidacja - sprawdź, czy wszystkie pola są wypełnione
-        if (liczbaPojazdow && rodzajPojazdu && level2 && level3 && sposobZasilania && zuzyciePaliwa && jednostka) {
-            addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka);
-            modal.hide(); // Zamknij modal po dodaniu
-        } else {
-            alert("Proszę wypełnić wszystkie pola!");
-        }
-    });
-
     // Event listener do usuwania wierszy
     mobilneEmisjeTableBody.addEventListener('click', function (event) {
         if (event.target.classList.contains('remove-vehicle')) {
-            event.target.closest('tr').remove(); // Usuwa wiersz tabeli
+            event.target.closest('tr').remove();
         }
     });
 });
+
+
 
 
 

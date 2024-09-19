@@ -378,7 +378,9 @@
                                     <div class="form-group">
                                         <label for="sposob_zasilania_modal">Sposób zasilania:</label>
                                         <select id="sposob_zasilania_modal" name="sposob_zasilania_modal"
-                                                class="form-select" required></select>
+                                                class="form-select" required>
+                                            <!-- Opcje będą ładowane dynamicznie -->
+                                        </select>
                                     </div>
                                     <div class="form-group">
                                         <label for="zuzycie_paliwa_modal">Zużycie paliwa:</label>
@@ -389,8 +391,7 @@
                                         <label for="jednostka_modal">Jednostka:</label>
                                         <select id="jednostka_modal" name="jednostka_modal" class="form-select"
                                                 required>
-                                            <option value="l/rok">l/rok</option>
-                                            <option value="km/rok">km/rok</option>
+                                            <!-- Opcje jednostek zostaną dodane dynamicznie przez JavaScript -->
                                         </select>
                                     </div>
                                 </form>
