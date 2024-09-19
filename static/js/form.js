@@ -166,34 +166,36 @@ $(document).ready(function() {
 
 
 $(document).ready(function() {
-console.log("Skrypt załadowany");
+    console.log("Skrypt załadowany");
 
-// Parsowanie danych JSON z jednostkami paliw
-var fuelsUnits = JSON.parse($('#dataContainer').attr('data-fuels-units'));
-console.log('Dane fuelsUnits po parsowaniu:', fuelsUnits);
+    // Parsowanie danych JSON z jednostkami paliw
+    var fuelsUnits = JSON.parse($('#dataContainer').attr('data-fuels-units'));
+    console.log('Dane fuelsUnits po parsowaniu:', fuelsUnits);
 
-var currentEditRow = null;  // Przechowywanie aktualnie edytowanego wiersza
+    var currentEditRow = null;  // Przechowywanie aktualnie edytowanego wiersza
 
-// Funkcja do dynamicznego ładowania jednostek na podstawie paliwa
-function updateUnitsForFuel(selectedFuel) {
-    console.log('Wybrane paliwo:', selectedFuel);
+    // Funkcja do dynamicznego ładowania jednostek na podstawie paliwa
+    function updateUnitsForFuel(selectedFuel) {
+        console.log('Wybrane paliwo:', selectedFuel);
 
-    var units = fuelsUnits[selectedFuel];
-    var unitSelect = $('#jednostka');
-    unitSelect.empty();  // Wyczyść listę jednostek przed dodaniem nowych
+        var units = fuelsUnits[selectedFuel];
+        var unitSelect = $('#jednostka');
+        unitSelect.empty();  // Wyczyść listę jednostek przed dodaniem nowych
 
-    if (units) {
-        // Dodanie opcji jednostek do pola select
-        units.forEach(function(unit) {
-            unitSelect.append(new Option(unit, unit));
-        });
-        // Ustawienie domyślnej jednostki (pierwsza z listy)
-        unitSelect.val(units[0]);
-        console.log('Dostępne jednostki dla paliwa:', units);
-    } else {
-        console.log('Brak dostępnych jednostek dla wybranego paliwa.');
+        if (units) {
+            // Dodanie opcji jednostek do pola select
+            units.forEach(function(unit) {
+                // Dodanie '/rok' do każdej jednostki
+                var unitWithSuffix = unit + "/rok";
+                unitSelect.append(new Option(unitWithSuffix, unitWithSuffix));
+            });
+            // Ustawienie domyślnej jednostki (pierwsza z listy)
+            unitSelect.val(units[0] + "/rok");
+            console.log('Dostępne jednostki dla paliwa:', units);
+        } else {
+            console.log('Brak dostępnych jednostek dla wybranego paliwa.');
+        }
     }
-}
 
 // Funkcja do czyszczenia pól formularza przy dodawaniu nowego wiersza
 function clearFormForNewEntry() {
@@ -429,8 +431,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// Drugi modal
-
 document.addEventListener('DOMContentLoaded', function () {
     const modal = new bootstrap.Modal(document.getElementById('mobilneEmisjeModal'));
     const mobilneEmisjeTableBody = document.querySelector('#mobilne_emisje_table tbody');
@@ -443,12 +443,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const level2Select = document.getElementById('level2_modal');
         const level3Select = document.getElementById('level3_modal');
         const sposobZasilaniaSelect = document.getElementById('sposob_zasilania_modal');
+        const jednostkaSelect = document.getElementById('jednostka_modal'); // Dodanie select dla jednostek
 
         // Czyścimy opcje przed załadowaniem
         rodzajPojazduSelect.innerHTML = '<option></option>';
         level2Select.innerHTML = '<option></option>';
         level3Select.innerHTML = '<option></option>';
         sposobZasilaniaSelect.innerHTML = '<option></option>';
+        jednostkaSelect.innerHTML = '<option></option>'; // Czyścimy jednostki
 
         // Dodawanie opcji do "Rodzaj pojazdu" (Level 1)
         const uniqueVehicles = new Set();
@@ -485,7 +487,40 @@ document.addEventListener('DOMContentLoaded', function () {
             const selectedLevel2 = this.value;
             loadNextLevel(3, selectedLevel2, level3Select); // Ładuj opcje dla Level 3
         });
+
+        // Dodaj listener na zmiany w Level 3 i aktualizuj jednostki
+        level3Select.addEventListener('change', function () {
+            const selectedLevel3 = this.value;
+            updateUnitsForLevel3(selectedLevel3); // Aktualizuj jednostki dla wybranego Level 3
+        });
     }
+
+    // Funkcja do aktualizacji jednostek na podstawie wybranego Level 3
+function updateUnitsForLevel3(selectedLevel3) {
+    const jednostkaSelect = document.getElementById('jednostka_modal');
+    jednostkaSelect.innerHTML = '<option></option>'; // Czyścimy listę jednostek
+
+    // Filtruj dane vehiclesData, aby znaleźć odpowiednie jednostki dla wybranego Level 3
+    const filteredUnits = vehiclesData.filter(vehicle => vehicle.column_text === selectedLevel3)
+                                      .map(vehicle => vehicle.uom);
+
+    console.log('Filtered units:', filteredUnits); // Dodaj ten log, aby zobaczyć wyniki filtrowania
+
+    // Dodaj jednostki do select
+    filteredUnits.forEach(unit => {
+        const option = document.createElement('option');
+        option.value = unit + '/rok'; // Dodanie "/rok" do jednostki
+        option.text = unit + '/rok';
+        jednostkaSelect.appendChild(option);
+    });
+
+    // Ustaw pierwszą jednostkę jako domyślną, jeśli istnieją
+    if (filteredUnits.length > 0) {
+        jednostkaSelect.value = filteredUnits[0] + '/rok';
+    } else {
+        jednostkaSelect.appendChild(new Option("Brak jednostek", ""));
+    }
+}
 
     // Funkcja AJAX do załadowania kolejnych opcji
     function loadNextLevel(level, selectedValue, targetSelect) {
@@ -553,6 +588,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
 
 
 

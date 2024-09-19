@@ -199,18 +199,11 @@ def index():
 
     # Pobieranie danych do pierwszego formularza (tak jak było)
     fuels_units = session.execute(text('''
-        SELECT "Level 3" AS fuel, array_agg(DISTINCT "UOM") AS units
-        FROM excel_data
-        WHERE "Level 3" LIKE '%Benz%'
-           OR "Level 3" LIKE '%Olej%'
-           OR "Level 3" LIKE '%LPG%'
-           OR "Level 3" LIKE '%Drewno%'
-           OR "Level 3" LIKE '%Węgiel%'
-           OR "Level 3" LIKE '%Ekogroszek%'
-           OR "Level 3" LIKE '%Biomasa%'
-           OR "Level 3" LIKE '%Pellet%'
-        GROUP BY "Level 3"
-        ORDER BY "Level 3";
+SELECT "Level 3" AS fuel, array_agg(DISTINCT "UOM") AS units
+FROM excel_data
+WHERE "Level 1" = 'Paliwa'
+GROUP BY "Level 3"
+ORDER BY "Level 3";
     ''')).fetchall()
 
     fuels_units_dict = {row.fuel: row.units for row in fuels_units}
