@@ -343,33 +343,92 @@ vehiclesData.forEach((vehicle, index) => {
 });
 
 
-    // Inicjalizacja dla energii elektrycznej
-    $('#kt_docs_repeater_energia_elektryczna').repeater({
-        initEmpty: false,
-        show: function () {
-            $(this).slideDown();
-        },
-        hide: function (deleteElement) {
-            $(this).slideUp(deleteElement);
-        },
-        ready: function (setIndexes) {
-            console.log("Repeater for energia elektryczna is ready and initialized.");
-        }
-    });
+// Inicjalizacja dla energii elektrycznej
+$('#kt_docs_repeater_energia_elektryczna').repeater({
+    initEmpty: true,
+    show: function () {
+        $(this).slideDown();
+    },
+    hide: function (deleteElement) {
+        $(this).slideUp(deleteElement);
+    },
+    ready: function (setIndexes) {
+        console.log("Repeater for energia elektryczna is ready and initialized.");
+    }
+});
 
-    // Inicjalizacja dla energii cieplnej
-    $('#kt_docs_repeater_energia_cieplna').repeater({
-        initEmpty: false,
-        show: function () {
-            $(this).slideDown();
-        },
-        hide: function (deleteElement) {
-            $(this).slideUp(deleteElement);
-        },
-        ready: function (setIndexes) {
-            console.log("Repeater for energia cieplna is ready and initialized.");
-        }
-    });
+// Obsługa przycisku "Zapisz" dla energii elektrycznej
+$('#zapisz_energia_elektryczna_btn').on('click', function() {
+    const pochodzenie = $('input[name="energia_elektryczna_pochodzenie"]:checked').val();
+    const dostawca = $('#dostawca_energia_elektryczna').val();
+    const zuzycie = $('#zuzycie_energia_elektryczna').val();
+    const jednostka = $('#jednostka_energia_elektryczna').val();
+
+    if (pochodzenie && dostawca && zuzycie && jednostka) {
+        // Dodanie nowego wiersza do tabeli
+        $('#energia_elektryczna_table tbody').append(`
+            <tr>
+                <td>${pochodzenie}</td>
+                <td>${dostawca}</td>
+                <td>${zuzycie}</td>
+                <td>${jednostka}</td>
+                <td><button type="button" class="btn btn-danger btn-sm remove-entry">Usuń</button></td>
+            </tr>
+        `);
+        // Zamknięcie modala
+        $('#energiaElektrycznaModal').modal('hide');
+    } else {
+        alert("Proszę wypełnić wszystkie pola!");
+    }
+});
+
+// Obsługa przycisku "Usuń" dla energii elektrycznej
+$('#energia_elektryczna_table').on('click', '.remove-entry', function() {
+    $(this).closest('tr').remove();
+});
+
+// Inicjalizacja dla energii cieplnej
+$('#kt_docs_repeater_energia_cieplna').repeater({
+    initEmpty: true,
+    show: function () {
+        $(this).slideDown();
+    },
+    hide: function (deleteElement) {
+        $(this).slideUp(deleteElement);
+    },
+    ready: function (setIndexes) {
+        console.log("Repeater for energia cieplna is ready and initialized.");
+    }
+});
+
+// Obsługa przycisku "Zapisz" dla energii cieplnej
+$('#zapisz_energia_cieplna_btn').on('click', function() {
+    const dostawca = $('#dostawca_energia_cieplna').val();
+    const zuzycie = $('#zuzycie_energia_cieplna').val();
+    const jednostka = $('#jednostka_energia_cieplna').val();
+
+    if (dostawca && zuzycie && jednostka) {
+        // Dodanie nowego wiersza do tabeli
+        $('#energia_cieplna_table tbody').append(`
+            <tr>
+                <td>${dostawca}</td>
+                <td>${zuzycie}</td>
+                <td>${jednostka}</td>
+                <td><button type="button" class="btn btn-danger btn-sm remove-entry">Usuń</button></td>
+            </tr>
+        `);
+        // Zamknięcie modala
+        $('#energiaCieplnaModal').modal('hide');
+    } else {
+        alert("Proszę wypełnić wszystkie pola!");
+    }
+});
+
+// Obsługa przycisku "Usuń" dla energii cieplnej
+$('#energia_cieplna_table').on('click', '.remove-entry', function() {
+    $(this).closest('tr').remove();
+});
+
 
     // Tutaj dodajemy logowanie przed wysłaniem formularza:
     $('#stepper-form').on('submit', function (event) {

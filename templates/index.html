@@ -492,6 +492,22 @@
                         </div>
                     </div>
 
+                    <table id="energia_elektryczna_table" class="table">
+                        <thead>
+                        <tr>
+                            <th>Pochodzenie energii</th>
+                            <th>Dostawca energii elektrycznej</th>
+                            <th>Zużycie</th>
+                            <th>Jednostka</th>
+                            <th>Akcje</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Wiersze będą dodawane dynamicznie przez JS -->
+                        </tbody>
+                    </table>
+
+
                     <div class="form-group mt-5">
                         <button type="button" data-repeater-create class="btn btn-primary">
                             Dodaj dostawcę energii elektrycznej
@@ -516,7 +532,7 @@
 
             <div class="pb-10 pb-lg-15">
                 <!-- Energia Cieplna -->
-                <h2 class="fw-bold d-flex align-items-center text-gray-900">Energia cieplna</h2>
+                <h2 class="fw-bold d-flex align-items-center text-gray-900 mt-5">Energia cieplna</h2>
                 <div class="text-muted fw-semibold fs-6">
                     Podaj dane dotyczące zakupionej lub dostarczonej z zewnątrz energii cieplnej, np. ciepła sieciowego.
                     Uzupełnij informacje o dostawcach oraz rocznym zużyciu w wybranej jednostce.
@@ -567,6 +583,21 @@
                             </div>
                         </div>
                     </div>
+
+                    <table id="energia_cieplna_table" class="table">
+                        <thead>
+                        <tr>
+                            <th>Dostawca energii cieplnej</th>
+                            <th>Zużycie</th>
+                            <th>Jednostka</th>
+                            <th>Akcje</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Wiersze będą dodawane dynamicznie przez JS -->
+                        </tbody>
+                    </table>
+
 
                     <div class="form-group mt-5">
                         <button type="button" data-repeater-create class="btn btn-primary">
