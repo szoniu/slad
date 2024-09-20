@@ -268,8 +268,8 @@ $('#zapisz_emisje_btn').on('click', function() {
                     ${jednostka}<input type="hidden" name="stacjonarne_emissions[${rowCount}][jednostka]" value="${jednostka}">
                 </td>
                 <td>
-                    <a href="#" class="edit-btn">Edytuj</a> ·
-                    <a href="#" class="delete-btn">Usuń</a>
+                    <a href="#" class="edit-btn btn btn-warning btn-sm">Edytuj</a> ·
+                    <a href="#" class="delete-btn btn btn-danger btn-sm">Usuń</a>
                 </td>
             </tr>
         `;
