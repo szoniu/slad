@@ -272,8 +272,10 @@ $('#zapisz_emisje_btn').on('click', function() {
                     ${jednostka}<input type="hidden" name="stacjonarne_emissions[${rowCount}][jednostka]" value="${jednostka}">
                 </td>
                 <td>
-                    <a href="#" class="edit-btn btn btn-warning btn-sm">Edytuj</a> ·
+                <div class="d-flex justify-content-start gap-2">
+                    <a href="#" class="edit-btn btn btn-warning btn-sm">Edytuj</a>
                     <a href="#" class="delete-btn btn btn-danger btn-sm">Usuń</a>
+                    </div>
                 </td>
             </tr>
         `;
@@ -398,8 +400,10 @@ $('#zapisz_energia_elektryczna_btn').on('click', function() {
                     <td>${zuzycie}</td>
                     <td>${jednostka}</td>
                     <td>
-                        <button type="button" class="btn btn-secondary btn-sm edit-entry">Edytuj</button>
+                    <div class="d-flex justify-content-start gap-2">
+                        <button type="button" class="btn btn-warning btn-sm edit-entry">Edytuj</button>
                         <button type="button" class="btn btn-danger btn-sm remove-entry">Usuń</button>
+                    </div>
                     </td>
                 </tr>
             `);
@@ -486,8 +490,10 @@ $('#zapisz_energia_cieplna_btn').on('click', function() {
                     <td>${zuzycie}</td>
                     <td>${jednostka}</td>
                     <td>
-                        <button type="button" class="btn btn-secondary btn-sm edit-entry">Edytuj</button>
+                    <div class="d-flex justify-content-start gap-2">
+                        <button type="button" class="btn btn-warning btn-sm edit-entry">Edytuj</button>
                         <button type="button" class="btn btn-danger btn-sm remove-entry">Usuń</button>
+                    </div>
                     </td>
                 </tr>
             `);
@@ -816,10 +822,13 @@ function addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasi
         <td>${sposobZasilania}</td>
         <td>${zuzyciePaliwa}</td>
         <td>${jednostka}</td>
-        <td>
-            <button type="button" class="btn btn-secondary btn-sm edit-vehicle">Edytuj</button>
-            <button type="button" class="btn btn-danger btn-sm remove-vehicle">Usuń</button>
-        </td>
+<td>
+    <div class="d-flex justify-content-start gap-2">
+        <button type="button" class="btn btn-warning btn-sm edit-vehicle">Edytuj</button>
+        <button type="button" class="btn btn-danger btn-sm remove-vehicle">Usuń</button>
+    </div>
+</td>
+
     `;
     mobilneEmisjeTableBody.appendChild(row);
 }
@@ -831,25 +840,54 @@ function addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasi
         }
     });
 
-    // Obsługa przycisku "Edytuj"
+// Obsługa przycisku "Edytuj"
 mobilneEmisjeTableBody.addEventListener('click', function (event) {
     if (event.target.classList.contains('edit-vehicle')) {
         editedRow = event.target.closest('tr'); // Pobiera edytowany wiersz
 
         // Pobieranie wartości z edytowanego wiersza i ustawianie w formularzu
-        document.getElementById('liczba_pojazdow_modal').value = editedRow.cells[0].textContent;
-        document.getElementById('rodzaj_pojazdu_modal').value = editedRow.cells[1].textContent;
-        document.getElementById('level2_modal').value = editedRow.cells[2].textContent;
-        document.getElementById('level3_modal').value = editedRow.cells[3].textContent;
-        document.getElementById('sposob_zasilania_modal').value = editedRow.cells[4].textContent;
-        document.getElementById('zuzycie_paliwa_modal').value = editedRow.cells[5].textContent;
-        document.getElementById('jednostka_modal').value = editedRow.cells[6].textContent;
+        const liczbaPojazdow = editedRow.cells[0].textContent;
+        const rodzajPojazdu = editedRow.cells[1].textContent;
+        const level2 = editedRow.cells[2].textContent;
+        const level3 = editedRow.cells[3].textContent;
+        const sposobZasilania = editedRow.cells[4].textContent;
+        const zuzyciePaliwa = editedRow.cells[5].textContent;
+        const jednostka = editedRow.cells[6].textContent;
 
-        // Otwiera modal do edycji
-        modal.show();
+        document.getElementById('liczba_pojazdow_modal').value = liczbaPojazdow;
+        document.getElementById('rodzaj_pojazdu_modal').value = rodzajPojazdu;
+        document.getElementById('level2_modal').value = level2;
+        document.getElementById('level3_modal').value = level3;
+        document.getElementById('sposob_zasilania_modal').value = sposobZasilania;
+        document.getElementById('zuzycie_paliwa_modal').value = zuzyciePaliwa;
+        document.getElementById('jednostka_modal').value = jednostka;
+
+        // Ustawienie wybranych opcji w formularzu
+        setSelectedOption(document.getElementById('rodzaj_pojazdu_modal'), rodzajPojazdu);
+        setSelectedOption(document.getElementById('level2_modal'), level2);
+        setSelectedOption(document.getElementById('level3_modal'), level3);
+        setSelectedOption(document.getElementById('sposob_zasilania_modal'), sposobZasilania);
+        setSelectedOption(document.getElementById('jednostka_modal'), jednostka);
+
+        modal.show(); // Otwieranie modala do edycji
         console.log('Otwieram modal do edycji wiersza');
     }
 });
+
+// Funkcja do ustawiania wybranej opcji w select
+function setSelectedOption(selectElement, value) {
+    const options = Array.from(selectElement.options);
+    const matchingOption = options.find(option => option.value === value);
+    if (matchingOption) {
+        selectElement.value = value; // Ustawienie wybranej opcji
+    } else {
+        console.warn(`Opcja "${value}" nie istnieje w ${selectElement.id}`);
+    }
+}
+
+
+
+
 });
 
 
