@@ -433,7 +433,7 @@ $('#stacjonarne_emisje_table').on('click', '.edit-btn', function(e) {
 
 
 
-/ Obsługa usuwania
+// Obsługa usuwania
 $('#stacjonarne_emisje_table').on('click', '.delete-btn', function (e) {
     e.preventDefault();
 
