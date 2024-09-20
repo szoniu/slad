@@ -225,8 +225,11 @@ $('#paliwo').on('change', function() {
     updateUnitsForFuel(selectedFuel);  // Zaktualizowanie jednostek dla wybranego paliwa
 });
 
-// Obsługa przycisku "Zapisz"
-$('#zapisz_emisje_btn').on('click', function() {
+// Tablica do przechowywania wyników obliczeń dla każdej pozycji
+let emissionCalculations = [];
+
+// Główna funkcja obsługująca zapis i edycję emisji
+function handleSaveEmission() {
     var paliwo = $('#paliwo').val();
     var zuzycie = parseFloat($('#zuzycie').val());
     var jednostka = $('#jednostka').val();
@@ -236,7 +239,6 @@ $('#zapisz_emisje_btn').on('click', function() {
         return;
     }
 
-    // Tworzenie obiektu z danymi do wysłania
     const emissionData = {
         level3: paliwo,
         jednostka: jednostka,
@@ -245,7 +247,6 @@ $('#zapisz_emisje_btn').on('click', function() {
 
     console.log('Dane do pobrania wskaźników emisji:', emissionData);
 
-    // Wysłanie danych do backendu w celu pobrania wskaźników emisji
     fetch('/fetch_emission_factors', {
         method: 'POST',
         headers: {
@@ -253,91 +254,141 @@ $('#zapisz_emisje_btn').on('click', function() {
         },
         body: JSON.stringify(emissionData)
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Otrzymane wskaźniki emisji:', data);
+        .then(response => response.json())
+        .then(data => {
+            console.log('Otrzymane wskaźniki emisji:', data);
 
-        // Wyświetlanie wyników obliczeń w modalu
-        showEmissionCalculations(data, zuzycie);
+            if (currentEditRow) {
+                // Logowanie przed aktualizacją rekordu
+                console.log('Indeks aktualizowanego rekordu:', currentEditRow.index());
+                updateExistingRow(paliwo, zuzycie, jednostka, data);
+            } else {
+                addNewRow(paliwo, zuzycie, jednostka, data);
+            }
 
-        // Kontynuowanie dodawania/aktualizacji wiersza po wyświetleniu wyników
-        if (currentEditRow) {
-            // Aktualizacja istniejącego wiersza
-            console.log("Aktualizacja danych w istniejącym wierszu...");
+            $('#stacjonarneEmisjeModal').modal('hide');
+        })
+        .catch(error => {
+            console.error('Błąd przy pobieraniu wskaźników emisji:', error);
+            alert('Wystąpił błąd przy pobieraniu wskaźników emisji.');
+        });
+}
 
-            currentEditRow.find('input[name$="[paliwo]"]').val(paliwo);
-            currentEditRow.find('input[name$="[zuzycie]"]').val(zuzycie);
-            currentEditRow.find('input[name$="[jednostka]"]').val(jednostka);
+// Obsługa przycisku "Zapisz" - jedno miejsce do obsługi zapisów i edycji
+$('#zapisz_emisje_btn').on('click', handleSaveEmission);
 
-            currentEditRow.children('td:eq(0)').html(`${paliwo}<input type="hidden" name="stacjonarne_emissions[0][paliwo]" value="${paliwo}">`);
-            currentEditRow.children('td:eq(1)').html(`${zuzycie}<input type="hidden" name="stacjonarne_emissions[0][zuzycie]" value="${zuzycie}">`);
-            currentEditRow.children('td:eq(2)').html(`${jednostka}<input type="hidden" name="stacjonarne_emissions[0][jednostka]" value="${jednostka}">`);
+// Funkcja do dodawania nowego wiersza do tabeli
+function addNewRow(paliwo, zuzycie, jednostka, data) {
+    console.log("Dodawanie nowego wiersza...");
+    var rowCount = $('#stacjonarne_emisje_table tbody tr').length;
+    var newRow = `
+        <tr>
+            <td>${paliwo}<input type="hidden" name="stacjonarne_emissions[${rowCount}][paliwo]" value="${paliwo}"></td>
+            <td>${zuzycie}<input type="hidden" name="stacjonarne_emissions[${rowCount}][zuzycie]" value="${zuzycie}"></td>
+            <td>${jednostka}<input type="hidden" name="stacjonarne_emissions[${rowCount}][jednostka]" value="${jednostka}"></td>
+            <td>
+                <div class="d-flex justify-content-start gap-2">
+                    <a href="#" class="edit-btn btn btn-warning btn-sm">Edytuj</a>
+                    <a href="#" class="delete-btn btn btn-danger btn-sm">Usuń</a>
+                </div>
+            </td>
+        </tr>
+    `;
+    $('#stacjonarne_emisje_table tbody').append(newRow);
+    addEmissionCalculation(data, zuzycie, paliwo); // Dodanie wyliczeń do podsumowania
+}
 
-            console.log("Po aktualizacji:", {
-                paliwo: currentEditRow.find('input[name$="[paliwo]"]').val(),
-                zuzycie: currentEditRow.find('input[name$="[zuzycie]"]').val(),
-                jednostka: currentEditRow.find('input[name$="[jednostka]"]').val()
-            });
-        } else {
-            // Dodanie nowego wiersza
-            console.log("Dodawanie nowego wiersza...");
-            var rowCount = $('#stacjonarne_emisje_table tbody tr').length;
+// Funkcja do aktualizacji istniejącego wiersza
+function updateExistingRow(paliwo, zuzycie, jednostka, data) {
+    console.log("Aktualizacja danych w istniejącym wierszu...");
+    currentEditRow.find('input[name$="[paliwo]"]').val(paliwo);
+    currentEditRow.find('input[name$="[zuzycie]"]').val(zuzycie);
+    currentEditRow.find('input[name$="[jednostka]"]').val(jednostka);
+    currentEditRow.children('td:eq(0)').html(`${paliwo}<input type="hidden" name="stacjonarne_emissions[0][paliwo]" value="${paliwo}">`);
+    currentEditRow.children('td:eq(1)').html(`${zuzycie}<input type="hidden" name="stacjonarne_emissions[0][zuzycie]" value="${zuzycie}">`);
+    currentEditRow.children('td:eq(2)').html(`${jednostka}<input type="hidden" name="stacjonarne_emissions[0][jednostka]" value="${jednostka}">`);
 
-            var newRow = `
-                <tr>
-                    <td>
-                        ${paliwo}<input type="hidden" name="stacjonarne_emissions[${rowCount}][paliwo]" value="${paliwo}">
-                    </td>
-                    <td>
-                        ${zuzycie}<input type="hidden" name="stacjonarne_emissions[${rowCount}][zuzycie]" value="${zuzycie}">
-                    </td>
-                    <td>
-                        ${jednostka}<input type="hidden" name="stacjonarne_emissions[${rowCount}][jednostka]" value="${jednostka}">
-                    </td>
-                    <td>
-                    <div class="d-flex justify-content-start gap-2">
-                        <a href="#" class="edit-btn btn btn-warning btn-sm">Edytuj</a>
-                        <a href="#" class="delete-btn btn btn-danger btn-sm">Usuń</a>
-                    </div>
-                    </td>
-                </tr>
-            `;
+    // Aktualizacja wyliczeń dla edytowanego rekordu
+    updateEmissionCalculation(currentEditRow.index(), data, zuzycie, paliwo);
+}
 
-            $('#stacjonarne_emisje_table tbody').append(newRow);
-        }
-
-        $('#stacjonarneEmisjeModal').modal('hide');
-    })
-    .catch(error => {
-        console.error('Błąd przy pobieraniu wskaźników emisji:', error);
-        alert('Wystąpił błąd przy pobieraniu wskaźników emisji.');
-    });
-});
-
-// Funkcja do wyświetlania wyników obliczeń w modalu
-function showEmissionCalculations(results, ilosc) {
-    // Oblicz emisje na podstawie otrzymanych wskaźników
-    const CO2e = ilosc * results.CO2e; // Odczytujemy właściwości obiektu
+// Funkcja do dodawania lub aktualizowania obliczeń w tablicy i aktualizacji modala
+function addEmissionCalculation(results, ilosc, paliwo) {
+    const CO2e = ilosc * results.CO2e;
     const CO2 = ilosc * results.CO2;
     const CH4 = ilosc * results.CH4;
     const N2O = ilosc * results.N2O;
 
-    // Tworzenie treści HTML z wynikami
-    const resultsHtml = `
-        <h6>Obliczenia dla każdego gazu:</h6>
-        <p>CO2e (ogólne): ${CO2e.toFixed(2)} kg CO2e</p>
-        <p>CO2 (CO2 na jednostkę): ${CO2.toFixed(2)} kg CO2e</p>
-        <p>CH4 (CH4 na jednostkę): ${CH4.toFixed(2)} kg CO2e CH4</p>
-        <p>N2O (N2O na jednostkę): ${N2O.toFixed(2)} kg CO2e N2O</p>
-        <h6>Całkowita emisja:</h6>
-        <p>Całkowita emisja = ${CO2.toFixed(2)} + ${CH4.toFixed(2)} + ${N2O.toFixed(2)} = ${CO2e.toFixed(2)} kg CO2e</p>
-    `;
+    // Dodajemy wyniki do tablicy przechowującej obliczenia
+    emissionCalculations.push({
+        paliwo: paliwo,
+        CO2e: CO2e.toFixed(2),
+        CO2: CO2.toFixed(2),
+        CH4: CH4.toFixed(2),
+        N2O: N2O.toFixed(2)
+    });
 
-    // Wyświetlenie wyników w oknie modalnym
+    // Aktualizujemy widok modala z wynikami
+    updateModalWithCalculations();
+}
+
+function updateEmissionCalculation(index, results, ilosc, paliwo) {
+    console.log('Aktualizacja obliczeń dla indeksu:', index);
+    console.log('Wyniki obliczeń:', results);
+
+    // Resetowanie istniejącego obiektu przed aktualizacją
+    emissionCalculations[index] = {};
+
+    // Obliczanie emisji na podstawie nowych danych
+    const CO2e = ilosc * results.CO2e;
+    const CO2 = ilosc * results.CO2;
+    const CH4 = ilosc * results.CH4;
+    const N2O = ilosc * results.N2O;
+
+    // Aktualizacja obliczeń w tablicy
+    emissionCalculations[index] = {
+        paliwo: paliwo,
+        CO2e: CO2e.toFixed(2),
+        CO2: CO2.toFixed(2),
+        CH4: CH4.toFixed(2),
+        N2O: N2O.toFixed(2)
+    };
+
+    // Logowanie zaktualizowanych obliczeń
+    console.log('Zaktualizowane obliczenia:', emissionCalculations[index]);
+
+    // Aktualizacja modala z wynikami
+    updateModalWithCalculations();
+}
+
+
+function updateModalWithCalculations() {
+    if (emissionCalculations.length === 0) {
+        // Jeśli nie ma żadnych obliczeń, ukryj modal
+        console.log('Brak obliczeń do wyświetlenia. Modal nie zostanie pokazany.');
+        $('#emissionCalculationsModal').modal('hide');  // Ukryj modal, jeśli nie ma obliczeń
+        return;
+    }
+
+    let resultsHtml = `<h6>Obliczenia dla każdego dodanego źródła emisji:</h6>`;
+
+    emissionCalculations.forEach((calc, index) => {
+        console.log(`Obliczenia dla pozycji ${index + 1}:`, calc);
+
+        resultsHtml += `
+            <h6>Pozycja ${index + 1}: ${calc.paliwo}</h6>
+            <p>CO2e (ogólne): ${calc.CO2e} kg CO2e</p>
+            <p>CO2 (CO2 na jednostkę): ${calc.CO2} kg CO2e</p>
+            <p>CH4 (CH4 na jednostkę): ${calc.CH4} kg CO2e CH4</p>
+            <p>N2O (N2O na jednostkę): ${calc.N2O} kg CO2e N2O</p>
+        `;
+    });
+
     $('#emissionCalculationsModal .modal-body').html(resultsHtml);
     const modal = new bootstrap.Modal(document.getElementById('emissionCalculationsModal'));
     modal.show();
 }
+
 
 
 
@@ -354,7 +405,7 @@ $('#stacjonarne_emisje_table').on('click', '.edit-btn', function(e) {
 
     // Pobranie wartości z wiersza za pomocą ukrytych inputów
     var paliwo = currentEditRow.find('input[name$="[paliwo]"]').val();
-    var zuzycie = currentEditRow.find('input[name$="[zuzycie]"]').val();
+    var zuzycie = parseFloat(currentEditRow.find('input[name$="[zuzycie]"]').val());
     var jednostka = currentEditRow.find('input[name$="[jednostka]"]').val();
 
     // Debugging: sprawdzanie czy inputy mają poprawne wartości
@@ -376,13 +427,27 @@ $('#stacjonarne_emisje_table').on('click', '.edit-btn', function(e) {
     // Ustawienie odpowiedniej jednostki
     $('#jednostka').val(jednostka);
 
+    // Wyświetlenie modala
     $('#stacjonarneEmisjeModal').modal('show');
 });
 
-// Obsługa usuwania
-$('#stacjonarne_emisje_table').on('click', '.delete-btn', function(e) {
+
+
+/ Obsługa usuwania
+$('#stacjonarne_emisje_table').on('click', '.delete-btn', function (e) {
     e.preventDefault();
+
+    const rowIndex = $(this).closest('tr').index();
+    console.log(`Usuwanie rekordu o indeksie: ${rowIndex}`);
+
+    // Usunięcie rekordu z tablicy obliczeń
+    emissionCalculations.splice(rowIndex, 1);
+
+    // Usunięcie wiersza z tabeli
     $(this).closest('tr').remove();
+
+    // Zaktualizowanie modala z wynikami
+    updateModalWithCalculations();
 });
 
 
