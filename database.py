@@ -145,6 +145,7 @@ def get_emission_factors(level3, jednostka):
         SELECT "UOM", "GHG/Unit", "GHG Conversion Factor 2023"
         FROM excel_data
         WHERE "Level 3" = :level3 AND "UOM" = :jednostka
+        AND "Level 1" = 'Paliwa'
         ORDER BY "UOM";
     """)
 

@@ -228,7 +228,7 @@ $('#paliwo').on('change', function() {
 // Obsługa przycisku "Zapisz"
 $('#zapisz_emisje_btn').on('click', function() {
     var paliwo = $('#paliwo').val();
-    var zuzycie = $('#zuzycie').val();
+    var zuzycie = parseFloat($('#zuzycie').val());
     var jednostka = $('#jednostka').val();
 
     if (!paliwo || !zuzycie || !jednostka) {
@@ -238,9 +238,9 @@ $('#zapisz_emisje_btn').on('click', function() {
 
     // Tworzenie obiektu z danymi do wysłania
     const emissionData = {
-        paliwo: paliwo,
-        zuzycie: zuzycie,
-        jednostka: jednostka
+        level3: paliwo,
+        jednostka: jednostka,
+        ilosc: zuzycie
     };
 
     console.log('Dane do pobrania wskaźników emisji:', emissionData);
@@ -257,7 +257,10 @@ $('#zapisz_emisje_btn').on('click', function() {
     .then(data => {
         console.log('Otrzymane wskaźniki emisji:', data);
 
-        // Po pobraniu wskaźników można kontynuować dodawanie/aktualizację wiersza
+        // Wyświetlanie wyników obliczeń w modalu
+        showEmissionCalculations(data, zuzycie);
+
+        // Kontynuowanie dodawania/aktualizacji wiersza po wyświetleniu wyników
         if (currentEditRow) {
             // Aktualizacja istniejącego wiersza
             console.log("Aktualizacja danych w istniejącym wierszu...");
@@ -310,6 +313,33 @@ $('#zapisz_emisje_btn').on('click', function() {
         alert('Wystąpił błąd przy pobieraniu wskaźników emisji.');
     });
 });
+
+// Funkcja do wyświetlania wyników obliczeń w modalu
+function showEmissionCalculations(results, ilosc) {
+    // Oblicz emisje na podstawie otrzymanych wskaźników
+    const CO2e = ilosc * results.CO2e; // Odczytujemy właściwości obiektu
+    const CO2 = ilosc * results.CO2;
+    const CH4 = ilosc * results.CH4;
+    const N2O = ilosc * results.N2O;
+
+    // Tworzenie treści HTML z wynikami
+    const resultsHtml = `
+        <h6>Obliczenia dla każdego gazu:</h6>
+        <p>CO2e (ogólne): ${CO2e.toFixed(2)} kg CO2e</p>
+        <p>CO2 (CO2 na jednostkę): ${CO2.toFixed(2)} kg CO2e</p>
+        <p>CH4 (CH4 na jednostkę): ${CH4.toFixed(2)} kg CO2e CH4</p>
+        <p>N2O (N2O na jednostkę): ${N2O.toFixed(2)} kg CO2e N2O</p>
+        <h6>Całkowita emisja:</h6>
+        <p>Całkowita emisja = ${CO2.toFixed(2)} + ${CH4.toFixed(2)} + ${N2O.toFixed(2)} = ${CO2e.toFixed(2)} kg CO2e</p>
+    `;
+
+    // Wyświetlenie wyników w oknie modalnym
+    $('#emissionCalculationsModal .modal-body').html(resultsHtml);
+    const modal = new bootstrap.Modal(document.getElementById('emissionCalculationsModal'));
+    modal.show();
+}
+
+
 
 
 // Obsługa przycisku "Anuluj"

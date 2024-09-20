@@ -312,66 +312,20 @@ def calculate_emissions(data):
         consumption = float(emission['zuzycie'])
         unit = emission['jednostka']
 
-        # Pobierz wskaźnik emisji z bazy na podstawie typu paliwa i jednostki
+        # Pobieranie wskaźników emisji z bazy danych
         factors = get_emission_factors(fuel_type, unit)
-        print(f"Pobieranie wskaźników dla {fuel_type} w jednostkach {unit}: {factors}")  # Logowanie wskaźników
+        print(f"Pobrane wskaźniki emisji dla {fuel_type} ({unit}): {factors}")
 
-        if factors:
-            # Pobierz pierwszy wskaźnik, zakładając, że jest jeden (można to rozbudować)
-            factor = factors[0][2]  # Zakładamy, że wskaźnik emisji jest na trzeciej pozycji
-            CO2_value = consumption * factor
-            print(
-                f"Obliczenia dla {fuel_type}: Zużycie = {consumption}, Wskaźnik = {factor}, Emisja = {CO2_value}")  # Logowanie obliczeń
-            direct_emissions.append({'type': fuel_type, 'value': CO2_value})
-            total_emissions += CO2_value
-        else:
-            print(f"Brak wskaźnika emisji dla {fuel_type} w jednostkach {unit}")
+        # Obliczenie emisji na podstawie pobranych wskaźników
+        for factor in factors:
+            if factor['GHG_Unit'] == 'kg CO2e':
+                CO2_value = consumption * factor['Conversion_Factor']
+                direct_emissions.append({'type': fuel_type, 'value': CO2_value, 'unit': unit})
+                total_emissions += CO2_value
+                print(f"Obliczona emisja dla {fuel_type} ({unit}): {CO2_value} kg CO2e")
 
-    # Obliczenia emisji dla mobilnych źródeł
-    for emission in data['mobile_emissions']:
-        fuel_type = emission['sposob_zasilania']
-        consumption = float(emission['zuzycie_paliwa'])
-        unit = emission['jednostka']
-
-        # Pobierz wskaźnik emisji z bazy na podstawie rodzaju zasilania i jednostki
-        factors = get_emission_factors(fuel_type, unit)
-        if factors:
-            factor = factors[0][2]
-            CO2_value = consumption * factor
-            direct_emissions.append({'type': f"Paliwo ({fuel_type})", 'value': CO2_value})
-            total_emissions += CO2_value
-        else:
-            print(f"Brak wskaźnika emisji dla {fuel_type} w jednostkach {unit}")
-
-    # Obliczenia emisji dla energii elektrycznej
-    for emission in data['electricity_emissions']:
-        consumption = float(emission['zuzycie'])
-        unit = emission['jednostka']
-
-        # Pobierz wskaźnik emisji dla energii elektrycznej
-        factors = get_emission_factors('energia_elektryczna', unit)
-        if factors:
-            factor = factors[0][2]
-            CO2_value = consumption * factor
-            indirect_emissions.append({'type': 'Energia elektryczna', 'value': CO2_value})
-            total_emissions += CO2_value
-        else:
-            print(f"Brak wskaźnika emisji dla energii elektrycznej w jednostkach {unit}")
-
-    # Obliczenia emisji dla energii cieplnej
-    for emission in data['heat_emissions']:
-        consumption = float(emission['zuzycie_cieplnej'])
-        unit = emission['jednostka']
-
-        # Pobierz wskaźnik emisji dla energii cieplnej
-        factors = get_emission_factors('energia_cieplna', unit)
-        if factors:
-            factor = factors[0][2]
-            CO2_value = consumption * factor
-            indirect_emissions.append({'type': 'Energia cieplna', 'value': CO2_value})
-            total_emissions += CO2_value
-        else:
-            print(f"Brak wskaźnika emisji dla energii cieplnej w jednostkach {unit}")
+    # Możesz rozszerzyć tę logikę na inne źródła emisji w ten sam sposób
+    # Dodaj sekcje dla mobilnych, elektrycznych i cieplnych emisji
 
     return {
         'total_emissions': total_emissions,
@@ -448,20 +402,26 @@ def generate_pdf():
 
 @app.route('/fetch_emission_factors', methods=['POST'])
 def fetch_emission_factors():
+    # Pobranie danych z żądania
     data = request.json
-    level3 = data.get('paliwo')
-    jednostka = data.get('jednostka')
+    level3 = data['level3']
+    jednostka = data['jednostka']
+    ilosc = float(data['ilosc'])
 
-    # Pobieranie wskaźników emisji z bazy danych
+    # Pobranie wskaźników z bazy
     factors = get_emission_factors(level3, jednostka)
 
-    # Przekształcenie wyników na listę słowników z nazwami kolumn
-    factors_list = [{'UOM': row[0], 'GHG_Unit': row[1], 'Conversion_Factor': row[2]} for row in factors]
+    # Obliczenia emisji dla każdego gazu
+    results = {
+        'CO2e': ilosc * factors[0][2],
+        'CO2': ilosc * factors[1][2],
+        'CH4': ilosc * factors[2][2],
+        'N2O': ilosc * factors[3][2]
+    }
 
-    print(f"Pobrane wskaźniki emisji dla {level3} w jednostkach {jednostka}: {factors_list}")
+    print(f"Obliczone emisje: {results}")
 
-    # Zwrócenie wyników jako JSON
-    return jsonify(factors_list)
+    return jsonify(results)
 
 
 if __name__ == '__main__':
