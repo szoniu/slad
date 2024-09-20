@@ -357,25 +357,52 @@ $('#kt_docs_repeater_energia_elektryczna').repeater({
     }
 });
 
+// Funkcja czyszcząca formularz energii elektrycznej
+function clearEnergiaElektrycznaForm() {
+    $('#energia_elektryczna_form').trigger("reset"); // Resetuje cały formularz
+    editedRow = null; // Resetuje zmienną edycji
+}
+
+// Zmienna globalna przechowująca aktualnie edytowany wiersz
+let editedRow = null;
+
+// Otwieranie modala i czyszczenie formularza przed dodaniem nowego dostawcy
+$('#dodaj_energia_elektryczna_btn').on('click', function() {
+    clearEnergiaElektrycznaForm(); // Czyści formularz
+    $('#energiaElektrycznaModal').modal('show'); // Otwiera modal
+});
+
 // Obsługa przycisku "Zapisz" dla energii elektrycznej
 $('#zapisz_energia_elektryczna_btn').on('click', function() {
-    const pochodzenie = $('input[name="energia_elektryczna_pochodzenie"]:checked').val();
+    const pochodzenie = $('input[name="pochodzenie_energii"]:checked').val();
     const dostawca = $('#dostawca_energia_elektryczna').val();
     const zuzycie = $('#zuzycie_energia_elektryczna').val();
     const jednostka = $('#jednostka_energia_elektryczna').val();
 
     if (pochodzenie && dostawca && zuzycie && jednostka) {
-        // Dodanie nowego wiersza do tabeli
-        $('#energia_elektryczna_table tbody').append(`
-            <tr>
-                <td>${pochodzenie}</td>
-                <td>${dostawca}</td>
-                <td>${zuzycie}</td>
-                <td>${jednostka}</td>
-                <td><button type="button" class="btn btn-danger btn-sm remove-entry">Usuń</button></td>
-            </tr>
-        `);
-        // Zamknięcie modala
+        if (editedRow) {
+            // Aktualizacja istniejącego wiersza
+            editedRow.find('td:eq(0)').text(pochodzenie === 'oze' ? 'OZE' : 'nie OZE');
+            editedRow.find('td:eq(1)').text(dostawca);
+            editedRow.find('td:eq(2)').text(zuzycie);
+            editedRow.find('td:eq(3)').text(jednostka);
+            editedRow = null; // Resetowanie zmiennej po edycji
+        } else {
+            // Dodanie nowego wiersza do tabeli
+            $('#energia_elektryczna_table tbody').append(`
+                <tr>
+                    <td>${pochodzenie === 'oze' ? 'OZE' : 'nie OZE'}</td>
+                    <td>${dostawca}</td>
+                    <td>${zuzycie}</td>
+                    <td>${jednostka}</td>
+                    <td>
+                        <button type="button" class="btn btn-secondary btn-sm edit-entry">Edytuj</button>
+                        <button type="button" class="btn btn-danger btn-sm remove-entry">Usuń</button>
+                    </td>
+                </tr>
+            `);
+        }
+        clearEnergiaElektrycznaForm(); // Czyści formularz po zapisaniu
         $('#energiaElektrycznaModal').modal('hide');
     } else {
         alert("Proszę wypełnić wszystkie pola!");
@@ -386,6 +413,28 @@ $('#zapisz_energia_elektryczna_btn').on('click', function() {
 $('#energia_elektryczna_table').on('click', '.remove-entry', function() {
     $(this).closest('tr').remove();
 });
+
+// Obsługa przycisku "Edytuj" dla energii elektrycznej
+$('#energia_elektryczna_table').on('click', '.edit-entry', function() {
+    clearEnergiaElektrycznaForm(); // Czyści formularz przed edycją
+    editedRow = $(this).closest('tr'); // Przechowuje aktualnie edytowany wiersz
+
+    // Pobieranie wartości z edytowanego wiersza
+    const pochodzenie = editedRow.find('td:eq(0)').text() === 'OZE' ? 'oze' : 'nie_oze';
+    const dostawca = editedRow.find('td:eq(1)').text();
+    const zuzycie = editedRow.find('td:eq(2)').text();
+    const jednostka = editedRow.find('td:eq(3)').text();
+
+    // Ustawianie wartości w formularzu
+    $(`input[name="pochodzenie_energii"][value="${pochodzenie}"]`).prop('checked', true);
+    $('#dostawca_energia_elektryczna').val(dostawca);
+    $('#zuzycie_energia_elektryczna').val(zuzycie);
+    $('#jednostka_energia_elektryczna').val(jednostka);
+
+    $('#energiaElektrycznaModal').modal('show'); // Otwieranie modala do edycji
+});
+
+
 
 // Inicjalizacja dla energii cieplnej
 $('#kt_docs_repeater_energia_cieplna').repeater({
@@ -401,6 +450,19 @@ $('#kt_docs_repeater_energia_cieplna').repeater({
     }
 });
 
+// Funkcja czyszcząca formularz energii cieplnej
+function clearEnergiaCieplnaForm() {
+    $('#energia_cieplna_form').trigger("reset"); // Resetuje cały formularz
+    editedRow = null; // Resetuje zmienną edycji
+}
+
+
+// Otwieranie modala i czyszczenie formularza przed dodaniem nowego dostawcy
+$('#dodaj_energia_cieplna_btn').on('click', function() {
+    clearEnergiaCieplnaForm(); // Czyści formularz
+    $('#energiaCieplnaModal').modal('show'); // Otwiera modal
+});
+
 // Obsługa przycisku "Zapisz" dla energii cieplnej
 $('#zapisz_energia_cieplna_btn').on('click', function() {
     const dostawca = $('#dostawca_energia_cieplna').val();
@@ -408,16 +470,27 @@ $('#zapisz_energia_cieplna_btn').on('click', function() {
     const jednostka = $('#jednostka_energia_cieplna').val();
 
     if (dostawca && zuzycie && jednostka) {
-        // Dodanie nowego wiersza do tabeli
-        $('#energia_cieplna_table tbody').append(`
-            <tr>
-                <td>${dostawca}</td>
-                <td>${zuzycie}</td>
-                <td>${jednostka}</td>
-                <td><button type="button" class="btn btn-danger btn-sm remove-entry">Usuń</button></td>
-            </tr>
-        `);
-        // Zamknięcie modala
+        if (editedRow) {
+            // Aktualizacja istniejącego wiersza
+            editedRow.find('td:eq(0)').text(dostawca);
+            editedRow.find('td:eq(1)').text(zuzycie);
+            editedRow.find('td:eq(2)').text(jednostka);
+            editedRow = null; // Resetowanie zmiennej po edycji
+        } else {
+            // Dodanie nowego wiersza do tabeli
+            $('#energia_cieplna_table tbody').append(`
+                <tr>
+                    <td>${dostawca}</td>
+                    <td>${zuzycie}</td>
+                    <td>${jednostka}</td>
+                    <td>
+                        <button type="button" class="btn btn-secondary btn-sm edit-entry">Edytuj</button>
+                        <button type="button" class="btn btn-danger btn-sm remove-entry">Usuń</button>
+                    </td>
+                </tr>
+            `);
+        }
+        clearEnergiaCieplnaForm(); // Czyści formularz po zapisaniu
         $('#energiaCieplnaModal').modal('hide');
     } else {
         alert("Proszę wypełnić wszystkie pola!");
@@ -428,6 +501,25 @@ $('#zapisz_energia_cieplna_btn').on('click', function() {
 $('#energia_cieplna_table').on('click', '.remove-entry', function() {
     $(this).closest('tr').remove();
 });
+
+// Obsługa przycisku "Edytuj" dla energii cieplnej
+$('#energia_cieplna_table').on('click', '.edit-entry', function() {
+    clearEnergiaCieplnaForm(); // Czyści formularz przed edycją
+    editedRow = $(this).closest('tr'); // Przechowuje aktualnie edytowany wiersz
+
+    // Pobieranie wartości z edytowanego wiersza
+    const dostawca = editedRow.find('td:eq(0)').text();
+    const zuzycie = editedRow.find('td:eq(1)').text();
+    const jednostka = editedRow.find('td:eq(2)').text();
+
+    // Ustawianie wartości w formularzu
+    $('#dostawca_energia_cieplna').val(dostawca);
+    $('#zuzycie_energia_cieplna').val(zuzycie);
+    $('#jednostka_energia_cieplna').val(jednostka);
+
+    $('#energiaCieplnaModal').modal('show'); // Otwieranie modala do edycji
+});
+
 
 
     // Tutaj dodajemy logowanie przed wysłaniem formularza:

@@ -438,60 +438,9 @@
                     tej kalkulacji, bo wchodzą w Zakres 3.
                 </div>
 
+                <!-- Repeater for Energia Elektryczna -->
                 <div id="kt_docs_repeater_energia_elektryczna">
-                    <div class="form-group">
-                        <div data-repeater-list="energia_elektryczna">
-                            <div data-repeater-item>
-                                <div class="row mb-4">
-                                    <div class="col-md-3">
-                                        <label class="form-label">Pochodzenie energii:</label>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio"
-                                                   name="energia_elektryczna[0][pochodzenie_energii]"
-                                                   value="oze" required>
-                                            <label class="form-check-label">OZE</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio"
-                                                   name="energia_elektryczna[0][pochodzenie_energii]"
-                                                   value="nie_oze" required>
-                                            <label class="form-check-label">nie OZE</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Dostawca energii elektrycznej:</label>
-                                        <select class="form-select" name="energia_elektryczna[0][dostawca_energii]"
-                                                required>
-                                            <option></option>
-                                            <option value="Alchemia S.A.">Alchemia S.A.</option>
-                                            <option value="Energia Polska">Energia Polska</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Zużycie:</label>
-                                        <input type="number" class="form-control" name="energia_elektryczna[0][zuzycie]"
-                                               placeholder="Wprowadź zużycie" required/>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Jednostka:</label>
-                                        <select class="form-select" name="energia_elektryczna[0][jednostka]" required>
-                                            <option></option>
-                                            <option value="MWh/rok">MWh/rok</option>
-                                            <option value="kWh/rok">kWh/rok</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3 mt-4">
-
-                                        <button type="button" data-repeater-delete
-                                                class="btn btn-danger btn-sm remove-vehicle">Usuń
-                                        </button>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+                    <!-- Tabela do wyświetlania dodanych danych -->
                     <table id="energia_elektryczna_table" class="table">
                         <thead>
                         <tr>
@@ -507,14 +456,79 @@
                         </tbody>
                     </table>
 
-
                     <div class="form-group mt-5">
-                        <button type="button" data-repeater-create class="btn btn-primary">
-                            Dodaj dostawcę energii elektrycznej
+                        <!-- Przycisk dla energii elektrycznej -->
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#energiaElektrycznaModal">Dodaj dostawcę energii elektrycznej
                         </button>
+                    </div>
 
+                    <!-- Modal do dodawania energii elektrycznej -->
+                    <div class="modal fade" id="energiaElektrycznaModal" tabindex="-1"
+                         aria-labelledby="energiaElektrycznaModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="energiaElektrycznaModalLabel">Dodaj dostawcę energii
+                                        elektrycznej</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="energia_elektryczna_form">
+                                        <div class="form-group">
+                                            <label>Pochodzenie energii:</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" id="pochodzenie_oze"
+                                                       name="pochodzenie_energii" value="oze" required>
+                                                <label class="form-check-label" for="pochodzenie_oze">OZE</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" id="pochodzenie_nie_oze"
+                                                       name="pochodzenie_energii" value="nie_oze" required>
+                                                <label class="form-check-label" for="pochodzenie_nie_oze">nie
+                                                    OZE</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="dostawca_energia_elektryczna">Dostawca energii
+                                                elektrycznej:</label>
+                                            <select id="dostawca_energia_elektryczna"
+                                                    name="dostawca_energia_elektryczna"
+                                                    class="form-select" required>
+                                                <option value=""></option>
+                                                <option value="Alchemia S.A.">Alchemia S.A.</option>
+                                                <option value="Energia Polska">Energia Polska</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="zuzycie_energia_elektryczna">Zużycie:</label>
+                                            <input type="number" id="zuzycie_energia_elektryczna"
+                                                   name="zuzycie_energia_elektryczna" class="form-control" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="jednostka_energia_elektryczna">Jednostka:</label>
+                                            <select id="jednostka_energia_elektryczna"
+                                                    name="jednostka_energia_elektryczna"
+                                                    class="form-select" required>
+                                                <option value="MWh/rok">MWh/rok</option>
+                                                <option value="kWh/rok">kWh/rok</option>
+                                            </select>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj
+                                    </button>
+                                    <button type="button" id="zapisz_energia_elektryczna_btn" class="btn btn-primary">
+                                        Zapisz
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
 
                 <div class="form-check mt-5">
                     <label class="form-label">Czy do ładowania samochodów elektrycznych (w tym hybrydowych Plug-in)
@@ -545,45 +559,7 @@
 
                 <!-- Repeater for Energia Cieplna -->
                 <div id="kt_docs_repeater_energia_cieplna">
-                    <div class="form-group">
-                        <div data-repeater-list="energia_cieplna">
-                            <div data-repeater-item>
-                                <div class="row mb-4">
-                                    <div class="col-md-3">
-                                        <label class="form-label">Dostawca energii cieplnej:</label>
-                                        <select class="form-select" name="dostawca_energii_cieplnej" required>
-                                            <option></option>
-                                            <option value="MIEJSKIE PRZEDSIĘBIORSTWO ENERGETYCZNE">MIEJSKIE
-                                                PRZEDSIĘBIORSTWO ENERGETYCZNE
-                                            </option>
-                                            <option value="CESJA_LUBELSKIE PRZEDSIĘBIORSTWO ENERGETYCZNE">
-                                                CESJA_LUBELSKIE PRZEDSIĘBIORSTWO ENERGETYCZNE
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Zużycie:</label>
-                                        <input type="number" class="form-control" name="zuzycie_cieplnej"
-                                               placeholder="Wprowadź zużycie" required/>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Jednostka:</label>
-                                        <select class="form-select" name="jednostka_cieplnej" required>
-                                            <option></option>
-                                            <option value="GJ/rok">GJ/rok</option>
-                                            <option value="MWh/rok">MWh/rok</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3 mt-4">
-                                        <button type="button" data-repeater-delete
-                                                class="btn btn-danger btn-sm remove-vehicle">Usuń
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+                    <!-- Tabela do wyświetlania dodanych danych -->
                     <table id="energia_cieplna_table" class="table">
                         <thead>
                         <tr>
@@ -598,14 +574,62 @@
                         </tbody>
                     </table>
 
-
                     <div class="form-group mt-5">
-                        <button type="button" data-repeater-create class="btn btn-primary">
-                            Dodaj dostawcę energii cieplnej
+                        <!-- Przycisk dla energii cieplnej -->
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#energiaCieplnaModal">Dodaj dostawcę energii cieplnej
                         </button>
+                    </div>
 
+                    <!-- Modal do dodawania energii cieplnej -->
+                    <div class="modal fade" id="energiaCieplnaModal" tabindex="-1"
+                         aria-labelledby="energiaCieplnaModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="energiaCieplnaModalLabel">Dodaj dostawcę energii
+                                        cieplnej</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="energia_cieplna_form">
+                                        <div class="form-group">
+                                            <label for="dostawca_energia_cieplna">Dostawca energii cieplnej:</label>
+                                            <select id="dostawca_energia_cieplna" name="dostawca_energia_cieplna"
+                                                    class="form-select" required>
+                                                <option value=""></option>
+                                                <option value="Dostawca 1">Dostawca 1</option>
+                                                <option value="Dostawca 2">Dostawca 2</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="zuzycie_energia_cieplna">Zużycie:</label>
+                                            <input type="number" id="zuzycie_energia_cieplna"
+                                                   name="zuzycie_energia_cieplna" class="form-control" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="jednostka_energia_cieplna">Jednostka:</label>
+                                            <select id="jednostka_energia_cieplna" name="jednostka_energia_cieplna"
+                                                    class="form-select" required>
+                                                <option value="GJ/rok">GJ/rok</option>
+                                                <option value="kWh/rok">kWh/rok</option>
+                                            </select>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj
+                                    </button>
+                                    <button type="button" id="zapisz_energia_cieplna_btn" class="btn btn-primary">
+                                        Zapisz
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
             </div>
 
             <!-- Step navigation buttons -->
