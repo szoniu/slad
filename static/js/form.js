@@ -165,8 +165,12 @@ $(document).ready(function() {
 // Repeater
 
 
+
+
 $(document).ready(function() {
     console.log("Skrypt załadowany");
+    // Zmienna globalna przechowująca aktualnie edytowany wiersz
+let editedRow = null;
 
     // Parsowanie danych JSON z jednostkami paliw
     var fuelsUnits = JSON.parse($('#dataContainer').attr('data-fuels-units'));
@@ -363,8 +367,6 @@ function clearEnergiaElektrycznaForm() {
     editedRow = null; // Resetuje zmienną edycji
 }
 
-// Zmienna globalna przechowująca aktualnie edytowany wiersz
-let editedRow = null;
 
 // Otwieranie modala i czyszczenie formularza przed dodaniem nowego dostawcy
 $('#dodaj_energia_elektryczna_btn').on('click', function() {
@@ -583,6 +585,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
+// Mobile zrodla emisji
+
+// Funkcja czyszcząca formularz mobilnych emisji
+function clearMobilneEmisjeForm() {
+    document.getElementById('mobilne_emisje_form').reset(); // Resetuje wszystkie pola formularza
+    editedRow = null; // Resetuje zmienną edycji (jeśli będziemy jej później używać)
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     const modal = new bootstrap.Modal(document.getElementById('mobilneEmisjeModal'));
@@ -757,43 +766,63 @@ function loadNextLevel(level, data, targetSelect) {
 
     // Event listener na przycisk "Dodaj pojazd"
     document.getElementById('dodaj_mobilne_btn').addEventListener('click', function () {
+        clearMobilneEmisjeForm();
         populateModalOptions();
         modal.show();
     });
 
-    // Event listener na przycisk "Zapisz" w modalu
-    document.getElementById('zapisz_mobilne_btn').addEventListener('click', function () {
-        const liczbaPojazdow = document.getElementById('liczba_pojazdow_modal').value;
-        const rodzajPojazdu = document.getElementById('rodzaj_pojazdu_modal').value;
-        const level2 = document.getElementById('level2_modal').value;
-        const level3 = document.getElementById('level3_modal').value;
-        const sposobZasilania = document.getElementById('sposob_zasilania_modal').value;
-        const zuzyciePaliwa = document.getElementById('zuzycie_paliwa_modal').value;
-        const jednostka = document.getElementById('jednostka_modal').value;
+// Obsługa przycisku "Zapisz" w modalu
+document.getElementById('zapisz_mobilne_btn').addEventListener('click', function () {
+    const liczbaPojazdow = document.getElementById('liczba_pojazdow_modal').value;
+    const rodzajPojazdu = document.getElementById('rodzaj_pojazdu_modal').value;
+    const level2 = document.getElementById('level2_modal').value;
+    const level3 = document.getElementById('level3_modal').value;
+    const sposobZasilania = document.getElementById('sposob_zasilania_modal').value;
+    const zuzyciePaliwa = document.getElementById('zuzycie_paliwa_modal').value;
+    const jednostka = document.getElementById('jednostka_modal').value;
 
-        if (liczbaPojazdow && rodzajPojazdu && level2 && level3 && sposobZasilania && zuzyciePaliwa && jednostka) {
-            addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka);
-            modal.hide();
+    if (liczbaPojazdow && rodzajPojazdu && level2 && level3 && sposobZasilania && zuzyciePaliwa && jednostka) {
+        if (editedRow) {
+            // Aktualizacja istniejącego wiersza
+            editedRow.cells[0].textContent = liczbaPojazdow;
+            editedRow.cells[1].textContent = rodzajPojazdu;
+            editedRow.cells[2].textContent = level2;
+            editedRow.cells[3].textContent = level3;
+            editedRow.cells[4].textContent = sposobZasilania;
+            editedRow.cells[5].textContent = zuzyciePaliwa;
+            editedRow.cells[6].textContent = jednostka;
+            editedRow = null; // Resetowanie zmiennej po edycji
         } else {
-            alert("Proszę wypełnić wszystkie pola!");
+            // Dodanie nowego wiersza do tabeli
+            addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka);
         }
-    });
-
-    // Funkcja do dodawania wiersza do tabeli
-    function addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka) {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${liczbaPojazdow}</td>
-            <td>${rodzajPojazdu}</td>
-            <td>${level2}</td>
-            <td>${level3}</td>
-            <td>${sposobZasilania}</td>
-            <td>${zuzyciePaliwa}</td>
-            <td>${jednostka}</td>
-            <td><button type="button" class="btn btn-danger btn-sm remove-vehicle">Usuń</button></td>
-        `;
-        mobilneEmisjeTableBody.appendChild(row);
+        clearMobilneEmisjeForm(); // Czyści formularz po zapisaniu
+        modal.hide();
+        console.log('Dane zostały zapisane, modal zamknięty');
+    } else {
+        alert("Proszę wypełnić wszystkie pola!");
     }
+});
+
+
+// Funkcja do dodawania wiersza do tabeli
+function addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka) {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td>${liczbaPojazdow}</td>
+        <td>${rodzajPojazdu}</td>
+        <td>${level2}</td>
+        <td>${level3}</td>
+        <td>${sposobZasilania}</td>
+        <td>${zuzyciePaliwa}</td>
+        <td>${jednostka}</td>
+        <td>
+            <button type="button" class="btn btn-secondary btn-sm edit-vehicle">Edytuj</button>
+            <button type="button" class="btn btn-danger btn-sm remove-vehicle">Usuń</button>
+        </td>
+    `;
+    mobilneEmisjeTableBody.appendChild(row);
+}
 
     // Event listener do usuwania wierszy
     mobilneEmisjeTableBody.addEventListener('click', function (event) {
@@ -801,6 +830,26 @@ function loadNextLevel(level, data, targetSelect) {
             event.target.closest('tr').remove();
         }
     });
+
+    // Obsługa przycisku "Edytuj"
+mobilneEmisjeTableBody.addEventListener('click', function (event) {
+    if (event.target.classList.contains('edit-vehicle')) {
+        editedRow = event.target.closest('tr'); // Pobiera edytowany wiersz
+
+        // Pobieranie wartości z edytowanego wiersza i ustawianie w formularzu
+        document.getElementById('liczba_pojazdow_modal').value = editedRow.cells[0].textContent;
+        document.getElementById('rodzaj_pojazdu_modal').value = editedRow.cells[1].textContent;
+        document.getElementById('level2_modal').value = editedRow.cells[2].textContent;
+        document.getElementById('level3_modal').value = editedRow.cells[3].textContent;
+        document.getElementById('sposob_zasilania_modal').value = editedRow.cells[4].textContent;
+        document.getElementById('zuzycie_paliwa_modal').value = editedRow.cells[5].textContent;
+        document.getElementById('jednostka_modal').value = editedRow.cells[6].textContent;
+
+        // Otwiera modal do edycji
+        modal.show();
+        console.log('Otwieram modal do edycji wiersza');
+    }
+});
 });
 
 
