@@ -6,7 +6,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 
 from database import engine_company, engine_excel, CompanyProfile, StationaryEmission, MobileEmission, \
-    ElectricityEmission, HeatEmission
+    ElectricityEmission, HeatEmission, get_emission_factors
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
 
@@ -235,7 +235,7 @@ ORDER BY "Level 3";
                      for row in vehicles_data]
 
     # Debugowanie JSON-a w backendzie
-    print(vehicles_data)
+    # print(vehicles_data)
     # Przekazanie JSON-ów do szablonu
     return render_template('index.html',
                            fuels_units=json.dumps(fuels_units_dict, ensure_ascii=False),
@@ -298,18 +298,10 @@ def show_database():
                            unique_ghg_unit=unique_ghg_unit)
 
 
-def calculate_emissions(data):
-    # Przykładowe współczynniki emisji
-    CO2_FACTORS = {
-        'olej_opalowy': 2.52,  # kg CO2e/l
-        'gaz_ziemny': 0.202,  # kg CO2e/kWh
-        'benzyna': 2.31,  # kg CO2e/l
-        'diesel': 2.68,  # kg CO2e/l
-        'energia_elektryczna': 0.45,  # kg CO2e/kWh
-        'energia_cieplna': 0.25  # kg CO2e/kWh
-    }
+from database import get_emission_factors
 
-    # Oblicz emisje dla każdej kategorii
+
+def calculate_emissions(data):
     total_emissions = 0
     direct_emissions = []
     indirect_emissions = []
@@ -320,35 +312,66 @@ def calculate_emissions(data):
         consumption = float(emission['zuzycie'])
         unit = emission['jednostka']
 
-        if fuel_type == 'węgiel':
-            # Przykładowy przelicznik dla węgla
-            CO2_value = consumption * CO2_FACTORS['gaz_ziemny']
+        # Pobierz wskaźnik emisji z bazy na podstawie typu paliwa i jednostki
+        factors = get_emission_factors(fuel_type, unit)
+        print(f"Pobieranie wskaźników dla {fuel_type} w jednostkach {unit}: {factors}")  # Logowanie wskaźników
+
+        if factors:
+            # Pobierz pierwszy wskaźnik, zakładając, że jest jeden (można to rozbudować)
+            factor = factors[0][2]  # Zakładamy, że wskaźnik emisji jest na trzeciej pozycji
+            CO2_value = consumption * factor
+            print(
+                f"Obliczenia dla {fuel_type}: Zużycie = {consumption}, Wskaźnik = {factor}, Emisja = {CO2_value}")  # Logowanie obliczeń
             direct_emissions.append({'type': fuel_type, 'value': CO2_value})
             total_emissions += CO2_value
+        else:
+            print(f"Brak wskaźnika emisji dla {fuel_type} w jednostkach {unit}")
 
     # Obliczenia emisji dla mobilnych źródeł
     for emission in data['mobile_emissions']:
         fuel_type = emission['sposob_zasilania']
         consumption = float(emission['zuzycie_paliwa'])
+        unit = emission['jednostka']
 
-        if fuel_type in CO2_FACTORS:
-            CO2_value = consumption * CO2_FACTORS[fuel_type]
+        # Pobierz wskaźnik emisji z bazy na podstawie rodzaju zasilania i jednostki
+        factors = get_emission_factors(fuel_type, unit)
+        if factors:
+            factor = factors[0][2]
+            CO2_value = consumption * factor
             direct_emissions.append({'type': f"Paliwo ({fuel_type})", 'value': CO2_value})
             total_emissions += CO2_value
+        else:
+            print(f"Brak wskaźnika emisji dla {fuel_type} w jednostkach {unit}")
 
     # Obliczenia emisji dla energii elektrycznej
     for emission in data['electricity_emissions']:
         consumption = float(emission['zuzycie'])
-        CO2_value = consumption * CO2_FACTORS['energia_elektryczna']
-        indirect_emissions.append({'type': 'Energia elektryczna', 'value': CO2_value})
-        total_emissions += CO2_value
+        unit = emission['jednostka']
+
+        # Pobierz wskaźnik emisji dla energii elektrycznej
+        factors = get_emission_factors('energia_elektryczna', unit)
+        if factors:
+            factor = factors[0][2]
+            CO2_value = consumption * factor
+            indirect_emissions.append({'type': 'Energia elektryczna', 'value': CO2_value})
+            total_emissions += CO2_value
+        else:
+            print(f"Brak wskaźnika emisji dla energii elektrycznej w jednostkach {unit}")
 
     # Obliczenia emisji dla energii cieplnej
     for emission in data['heat_emissions']:
         consumption = float(emission['zuzycie_cieplnej'])
-        CO2_value = consumption * CO2_FACTORS['energia_cieplna']
-        indirect_emissions.append({'type': 'Energia cieplna', 'value': CO2_value})
-        total_emissions += CO2_value
+        unit = emission['jednostka']
+
+        # Pobierz wskaźnik emisji dla energii cieplnej
+        factors = get_emission_factors('energia_cieplna', unit)
+        if factors:
+            factor = factors[0][2]
+            CO2_value = consumption * factor
+            indirect_emissions.append({'type': 'Energia cieplna', 'value': CO2_value})
+            total_emissions += CO2_value
+        else:
+            print(f"Brak wskaźnika emisji dla energii cieplnej w jednostkach {unit}")
 
     return {
         'total_emissions': total_emissions,
@@ -358,9 +381,15 @@ def calculate_emissions(data):
 
 
 def calculate_emission_metrics(total_emissions, employee_count, usable_area, annual_revenue):
-    emissions_per_m2 = total_emissions / usable_area
-    emissions_per_employee = total_emissions / employee_count
-    emissions_per_revenue = (total_emissions / annual_revenue) * 1000  # per 1000 zł obrotu
+    # Obliczanie wskaźników emisji
+    emissions_per_m2 = total_emissions / usable_area if usable_area else 0
+    emissions_per_employee = total_emissions / employee_count if employee_count else 0
+    emissions_per_revenue = (total_emissions / annual_revenue) * 1000 if annual_revenue else 0  # per 1000 zł obrotu
+
+    # Debugowanie obliczeń wskaźników
+    print(f"Emisje na m2: {emissions_per_m2}")
+    print(f"Emisje na pracownika: {emissions_per_employee}")
+    print(f"Emisje na 1000 zł obrotu: {emissions_per_revenue}")
 
     return {
         'emissions_per_m2': emissions_per_m2,
@@ -371,11 +400,16 @@ def calculate_emission_metrics(total_emissions, employee_count, usable_area, ann
 
 @app.route('/generate_pdf')
 def generate_pdf():
-    # Pobranie danych z formularza
-    form_data = ...  # zbierz dane z formularza
+    # Pobranie danych z formularza - zakładam, że dane są przekazywane przez formularz lub inny sposób
+    form_data = request.get_json()  # Zbieramy dane w formacie JSON
 
-    # Obliczenia emisji
+    # Debugowanie danych z formularza
+    print(f"Pobrane dane z formularza: {form_data}")
+
+    # Obliczenia emisji na podstawie dynamicznych wskaźników
     emissions = calculate_emissions(form_data)
+
+    # Obliczenia metryk na podstawie łącznych emisji i dodatkowych danych z formularza
     metrics = calculate_emission_metrics(
         total_emissions=emissions['total_emissions'],
         employee_count=int(form_data['employee_count']),
@@ -383,10 +417,11 @@ def generate_pdf():
         annual_revenue=float(form_data['annual_revenue'])
     )
 
+    # Przygotowanie danych do raportu
     data = {
         'company_name': form_data['company_name'],
         'reporting_period': form_data['reporting_period'],
-        'total_emissions': f"{metrics['total_emissions']:.2f} t CO2e/rok",
+        'total_emissions': f"{emissions['total_emissions']:.2f} t CO2e/rok",  # Poprawka tutaj, aby używać emisji
         'emissions_per_m2': f"{metrics['emissions_per_m2']:.2f} t CO2e/rok",
         'emissions_per_employee': f"{metrics['emissions_per_employee']:.2f} t CO2e/rok na pracownika",
         'emissions_per_revenue': f"{metrics['emissions_per_revenue']:.2f} t CO2e/rok na 1000 zł obrotu",
@@ -394,14 +429,39 @@ def generate_pdf():
         'indirect_emissions': emissions['indirect_emissions'],
     }
 
+    # Debugowanie danych do raportu
+    print(f"Dane do raportu: {data}")
+
+    # Renderowanie treści HTML raportu
     html_content = render_template('report_template.html', data=data)
+
+    # Generowanie PDF z treści HTML
     pdf = pdfkit.from_string(html_content, False)
 
+    # Przygotowanie odpowiedzi z PDF
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = 'attachment; filename=raport_weglowy.pdf'
 
     return response
+
+
+@app.route('/fetch_emission_factors', methods=['POST'])
+def fetch_emission_factors():
+    data = request.json
+    level3 = data.get('paliwo')
+    jednostka = data.get('jednostka')
+
+    # Pobieranie wskaźników emisji z bazy danych
+    factors = get_emission_factors(level3, jednostka)
+
+    # Przekształcenie wyników na listę słowników z nazwami kolumn
+    factors_list = [{'UOM': row[0], 'GHG_Unit': row[1], 'Conversion_Factor': row[2]} for row in factors]
+
+    print(f"Pobrane wskaźniki emisji dla {level3} w jednostkach {jednostka}: {factors_list}")
+
+    # Zwrócenie wyników jako JSON
+    return jsonify(factors_list)
 
 
 if __name__ == '__main__':

@@ -132,3 +132,31 @@ def load_excel_data():
         result = connection.execute(text(f"SELECT COUNT(*) FROM {table_name}"))
         row_count = result.scalar()
         print(f"Liczba wierszy zaimportowanych do tabeli '{table_name}': {row_count}")
+
+
+# Funkcja pobierająca wskaźniki emisji z bazy danych
+def get_emission_factors(level3, jednostka):
+    session = get_session(engine_excel)  # Tworzenie sesji za pomocą istniejącej funkcji
+
+    # Usunięcie sufiksu "/rok" z jednostki
+    jednostka_clean = jednostka.replace("/rok", "") if "/rok" in jednostka else jednostka
+
+    query = text("""
+        SELECT "UOM", "GHG/Unit", "GHG Conversion Factor 2023"
+        FROM excel_data
+        WHERE "Level 3" = :level3 AND "UOM" = :jednostka
+        ORDER BY "UOM";
+    """)
+
+    # Wyświetl zapytanie SQL oraz parametry, które są przekazywane
+    print(f"Generowane zapytanie SQL: {query}")
+    print(f"Parametry zapytania: level3={level3}, jednostka={jednostka_clean}")
+
+    # Wykonanie zapytania
+    factors = session.execute(query, {'level3': level3, 'jednostka': jednostka_clean}).fetchall()
+
+    # Logowanie wyników
+    print(f"Pobrane wskaźniki emisji: {factors}")
+
+    session.close()
+    return factors

@@ -174,7 +174,7 @@ let editedRow = null;
 
     // Parsowanie danych JSON z jednostkami paliw
     var fuelsUnits = JSON.parse($('#dataContainer').attr('data-fuels-units'));
-    console.log('Dane fuelsUnits po parsowaniu:', fuelsUnits);
+//    console.log('Dane fuelsUnits po parsowaniu:', fuelsUnits);
 
     var currentEditRow = null;  // Przechowywanie aktualnie edytowanego wiersza
 
@@ -236,55 +236,81 @@ $('#zapisz_emisje_btn').on('click', function() {
         return;
     }
 
-    if (currentEditRow) {
-        // Aktualizacja istniejącego wiersza
-        console.log("Aktualizacja danych w istniejącym wierszu...");
+    // Tworzenie obiektu z danymi do wysłania
+    const emissionData = {
+        paliwo: paliwo,
+        zuzycie: zuzycie,
+        jednostka: jednostka
+    };
 
-        // Znalezienie ukrytych inputów w wierszu i aktualizacja ich wartości
-        currentEditRow.find('input[name$="[paliwo]"]').val(paliwo);
-        currentEditRow.find('input[name$="[zuzycie]"]').val(zuzycie);
-        currentEditRow.find('input[name$="[jednostka]"]').val(jednostka);
+    console.log('Dane do pobrania wskaźników emisji:', emissionData);
 
-        // Aktualizacja widocznych danych w komórkach BEZ usuwania ukrytych inputów
-        currentEditRow.children('td:eq(0)').html(`${paliwo}<input type="hidden" name="stacjonarne_emissions[0][paliwo]" value="${paliwo}">`);
-        currentEditRow.children('td:eq(1)').html(`${zuzycie}<input type="hidden" name="stacjonarne_emissions[0][zuzycie]" value="${zuzycie}">`);
-        currentEditRow.children('td:eq(2)').html(`${jednostka}<input type="hidden" name="stacjonarne_emissions[0][jednostka]" value="${jednostka}">`);
+    // Wysłanie danych do backendu w celu pobrania wskaźników emisji
+    fetch('/fetch_emission_factors', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(emissionData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Otrzymane wskaźniki emisji:', data);
 
-        console.log("Po aktualizacji:", {
-            paliwo: currentEditRow.find('input[name$="[paliwo]"]').val(),
-            zuzycie: currentEditRow.find('input[name$="[zuzycie]"]').val(),
-            jednostka: currentEditRow.find('input[name$="[jednostka]"]').val()
-        });
-    } else {
-        // Dodanie nowego wiersza
-        console.log("Dodawanie nowego wiersza...");
-        var rowCount = $('#stacjonarne_emisje_table tbody tr').length;
+        // Po pobraniu wskaźników można kontynuować dodawanie/aktualizację wiersza
+        if (currentEditRow) {
+            // Aktualizacja istniejącego wiersza
+            console.log("Aktualizacja danych w istniejącym wierszu...");
 
-        var newRow = `
-            <tr>
-                <td>
-                    ${paliwo}<input type="hidden" name="stacjonarne_emissions[${rowCount}][paliwo]" value="${paliwo}">
-                </td>
-                <td>
-                    ${zuzycie}<input type="hidden" name="stacjonarne_emissions[${rowCount}][zuzycie]" value="${zuzycie}">
-                </td>
-                <td>
-                    ${jednostka}<input type="hidden" name="stacjonarne_emissions[${rowCount}][jednostka]" value="${jednostka}">
-                </td>
-                <td>
-                <div class="d-flex justify-content-start gap-2">
-                    <a href="#" class="edit-btn btn btn-warning btn-sm">Edytuj</a>
-                    <a href="#" class="delete-btn btn btn-danger btn-sm">Usuń</a>
+            currentEditRow.find('input[name$="[paliwo]"]').val(paliwo);
+            currentEditRow.find('input[name$="[zuzycie]"]').val(zuzycie);
+            currentEditRow.find('input[name$="[jednostka]"]').val(jednostka);
+
+            currentEditRow.children('td:eq(0)').html(`${paliwo}<input type="hidden" name="stacjonarne_emissions[0][paliwo]" value="${paliwo}">`);
+            currentEditRow.children('td:eq(1)').html(`${zuzycie}<input type="hidden" name="stacjonarne_emissions[0][zuzycie]" value="${zuzycie}">`);
+            currentEditRow.children('td:eq(2)').html(`${jednostka}<input type="hidden" name="stacjonarne_emissions[0][jednostka]" value="${jednostka}">`);
+
+            console.log("Po aktualizacji:", {
+                paliwo: currentEditRow.find('input[name$="[paliwo]"]').val(),
+                zuzycie: currentEditRow.find('input[name$="[zuzycie]"]').val(),
+                jednostka: currentEditRow.find('input[name$="[jednostka]"]').val()
+            });
+        } else {
+            // Dodanie nowego wiersza
+            console.log("Dodawanie nowego wiersza...");
+            var rowCount = $('#stacjonarne_emisje_table tbody tr').length;
+
+            var newRow = `
+                <tr>
+                    <td>
+                        ${paliwo}<input type="hidden" name="stacjonarne_emissions[${rowCount}][paliwo]" value="${paliwo}">
+                    </td>
+                    <td>
+                        ${zuzycie}<input type="hidden" name="stacjonarne_emissions[${rowCount}][zuzycie]" value="${zuzycie}">
+                    </td>
+                    <td>
+                        ${jednostka}<input type="hidden" name="stacjonarne_emissions[${rowCount}][jednostka]" value="${jednostka}">
+                    </td>
+                    <td>
+                    <div class="d-flex justify-content-start gap-2">
+                        <a href="#" class="edit-btn btn btn-warning btn-sm">Edytuj</a>
+                        <a href="#" class="delete-btn btn btn-danger btn-sm">Usuń</a>
                     </div>
-                </td>
-            </tr>
-        `;
+                    </td>
+                </tr>
+            `;
 
-        $('#stacjonarne_emisje_table tbody').append(newRow);
-    }
+            $('#stacjonarne_emisje_table tbody').append(newRow);
+        }
 
-    $('#stacjonarneEmisjeModal').modal('hide');
+        $('#stacjonarneEmisjeModal').modal('hide');
+    })
+    .catch(error => {
+        console.error('Błąd przy pobieraniu wskaźników emisji:', error);
+        alert('Wystąpił błąd przy pobieraniu wskaźników emisji.');
+    });
 });
+
 
 // Obsługa przycisku "Anuluj"
 $('#anuluj_emisje_btn').on('click', function() {
@@ -336,17 +362,17 @@ console.log('Skrypt załadowany - mobilne źródła emisji.');
 
 // Parsowanie danych JSON z pojazdami
 
-var mobilneDataContainer = document.getElementById('mobilneDataContainer');
-console.log(mobilneDataContainer.getAttribute('data-vehicles-data'));
-var vehiclesData = JSON.parse(mobilneDataContainer.getAttribute('data-vehicles-data'));
-console.log('Dane vehiclesData:', vehiclesData);
+//var mobilneDataContainer = document.getElementById('mobilneDataContainer');
+//console.log(mobilneDataContainer.getAttribute('data-vehicles-data'));
+//var vehiclesData = JSON.parse(mobilneDataContainer.getAttribute('data-vehicles-data'));
+//console.log('Dane vehiclesData:', vehiclesData);
 
 // Sprawdzenie struktury obiektów w vehiclesData
-console.log('Pełne dane vehiclesData (struktura obiektów):');
-vehiclesData.forEach((vehicle, index) => {
-    console.log(`Obiekt ${index}:`, vehicle);
-    console.log('Dostępne klucze w obiekcie:', Object.keys(vehicle)); // Wyświetlenie dostępnych kluczy
-});
+//console.log('Pełne dane vehiclesData (struktura obiektów):');
+//vehiclesData.forEach((vehicle, index) => {
+//    console.log(`Obiekt ${index}:`, vehicle);
+//    console.log('Dostępne klucze w obiekcie:', Object.keys(vehicle)); // Wyświetlenie dostępnych kluczy
+//});
 
 
 // Inicjalizacja dla energii elektrycznej
@@ -563,7 +589,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Pobierz dane JSON dla paliw
     var dataContainer = document.getElementById('dataContainer');
     var fuelsUnits = JSON.parse(dataContainer.getAttribute('data-fuels-units'));
-    console.log('Dane fuelsUnits:', fuelsUnits);
+//    console.log('Dane fuelsUnits:', fuelsUnits);
 
     var fuelSelects = document.querySelectorAll('select[name="paliwo"]');
     var unitSelects = document.querySelectorAll('select[name="jednostka"]');
@@ -604,7 +630,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const mobilneEmisjeTableBody = document.querySelector('#mobilne_emisje_table tbody');
 
     const vehiclesData = JSON.parse(document.getElementById('mobilneDataContainer').getAttribute('data-vehicles-data'));
-    console.log('Pełne dane vehiclesData:', vehiclesData);
+//    console.log('Pełne dane vehiclesData:', vehiclesData);
 // Przypisanie elementu do zmiennej na początku skryptu
 const level3Select = document.getElementById('level3_modal');
 
@@ -954,3 +980,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Obliczenia
+
+
