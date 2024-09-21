@@ -298,6 +298,9 @@ function addNewRow(paliwo, zuzycie, jednostka, data) {
     `;
     $('#stacjonarne_emisje_table tbody').append(newRow);
     addEmissionCalculation(data, zuzycie, paliwo); // Dodanie wyliczeń do podsumowania
+
+    // Wyświetlenie modala z obliczeniami po dodaniu nowego wiersza
+    showEmissionCalculationsModal();
 }
 
 // Funkcja do aktualizacji istniejącego wiersza z pobieraniem nowych danych
@@ -314,80 +317,93 @@ function updateExistingRow(paliwo, zuzycie, jednostka, data) {
 
     // Aktualizacja wyliczeń dla edytowanego rekordu
     updateEmissionCalculation(currentEditRow.index(), data, zuzycie, paliwo);
+
+    // Wyświetlenie modala z zaktualizowanymi obliczeniami po edycji wiersza
+    showEmissionCalculationsModal();
 }
 
-// Funkcja do dodawania lub aktualizowania obliczeń w tablicy i aktualizacji modala
-function addEmissionCalculation(results, ilosc, paliwo) {
+
+/// Funkcja do dodawania lub aktualizowania obliczeń w tablicy i aktualizacji modala
+function addEmissionCalculation(results, ilosc, paliwo, jednostka) {
     const CO2e = ilosc * results.CO2e;
     const CO2 = ilosc * results.CO2;
     const CH4 = ilosc * results.CH4;
     const N2O = ilosc * results.N2O;
+    const totalEmission = CO2e + CO2 + CH4 + N2O;
 
     // Dodajemy wyniki do tablicy przechowującej obliczenia
     emissionCalculations.push({
         paliwo: paliwo,
+        zuzycie: ilosc,
+        jednostka: jednostka,
         CO2e: CO2e.toFixed(2),
         CO2: CO2.toFixed(2),
         CH4: CH4.toFixed(2),
-        N2O: N2O.toFixed(2)
+        N2O: N2O.toFixed(2),
+        totalEmission: totalEmission.toFixed(2),
     });
-
-    // Aktualizujemy widok modala z wynikami
-    updateModalWithCalculations();
 }
 
 // Funkcja do aktualizacji obliczeń w tablicy po edycji
-function updateEmissionCalculation(index, results, ilosc, paliwo) {
+function updateEmissionCalculation(index, results, ilosc, paliwo, jednostka) {
     const CO2e = ilosc * results.CO2e;
     const CO2 = ilosc * results.CO2;
     const CH4 = ilosc * results.CH4;
     const N2O = ilosc * results.N2O;
+    const totalEmission = CO2e + CO2 + CH4 + N2O;
 
-    // Sprawdzenie czy indeks istnieje w tablicy - zapobiega dodawaniu nowego elementu
     if (emissionCalculations[index]) {
         // Aktualizacja obliczeń w istniejącym indeksie
         emissionCalculations[index] = {
             paliwo: paliwo,
+            zuzycie: ilosc,
+            jednostka: jednostka,
             CO2e: CO2e.toFixed(2),
             CO2: CO2.toFixed(2),
             CH4: CH4.toFixed(2),
-            N2O: N2O.toFixed(2)
+            N2O: N2O.toFixed(2),
+            totalEmission: totalEmission.toFixed(2),
         };
 
         console.log('Zaktualizowano obliczenia:', emissionCalculations[index]);
     } else {
         console.error('Błąd: próba aktualizacji nieistniejącego rekordu!');
     }
-
-    // Aktualizujemy widok modala z wynikami
-    updateModalWithCalculations();
 }
 
 
-// Funkcja do aktualizacji treści modala z wynikami
-function updateModalWithCalculations() {
-    if (emissionCalculations.length === 0) {
-        // Jeśli tablica jest pusta, ukryj modal lub wyczyść jego zawartość
-        $('#emissionCalculationsModal .modal-body').html('<p>Brak obliczeń do wyświetlenia.</p>');
-        return;
+// Funkcja do aktualizacji treści modala z wynikami i wyświetlania go
+function showEmissionCalculationsModal() {
+    if (emissionCalculations.length > 0) {
+        let resultsHtml = `<h6>Obliczenia dla każdego dodanego źródła emisji:</h6>`;
+        let totalOverallEmission = 0;
+
+        // Iteracja przez wszystkie obliczenia i tworzenie HTML
+        emissionCalculations.forEach((calc, index) => {
+            totalOverallEmission += parseFloat(calc.totalEmission);
+            resultsHtml += `
+                <h6>Pozycja ${index + 1}: ${calc.paliwo}</h6>
+                <p>Zużycie: ${calc.zuzycie} ${calc.jednostka}</p>
+                <p>CO2e (ogólne): ${calc.CO2e} kg CO2e</p>
+                <p>CO2 (CO2 na jednostkę): ${calc.CO2} kg CO2e</p>
+                <p>CH4 (CH4 na jednostkę): ${calc.CH4} kg CO2e CH4</p>
+                <p>N2O (N2O na jednostkę): ${calc.N2O} kg CO2e N2O</p>
+                <p>Sumaryczny ślad węglowy tej pozycji: ${calc.totalEmission} kg CO2e</p>
+            `;
+        });
+
+        // Dodanie całkowitego śladu węglowego wszystkich pozycji
+        resultsHtml += `<h6>Sumaryczny ślad węglowy wszystkich pozycji: ${totalOverallEmission.toFixed(2)} kg CO2e</h6>`;
+
+        // Wyświetlenie wyników w oknie modalnym
+        $('#emissionResults').html(resultsHtml);
+        const modal = new bootstrap.Modal(document.getElementById('emissionCalculationsModal'));
+        modal.show();
     }
-
-    let resultsHtml = `<h6>Obliczenia dla każdego dodanego źródła emisji:</h6>`;
-
-    // Iteracja przez wszystkie obliczenia i tworzenie HTML
-    emissionCalculations.forEach((calc, index) => {
-        resultsHtml += `
-            <h6>Pozycja ${index + 1}: ${calc.paliwo}</h6>
-            <p>CO2e (ogólne): ${calc.CO2e} kg CO2e</p>
-            <p>CO2 (CO2 na jednostkę): ${calc.CO2} kg CO2e</p>
-            <p>CH4 (CH4 na jednostkę): ${calc.CH4} kg CO2e CH4</p>
-            <p>N2O (N2O na jednostkę): ${calc.N2O} kg CO2e N2O</p>
-        `;
-    });
-
-    // Wyświetlenie wyników w oknie modalnym
-    $('#emissionCalculationsModal .modal-body').html(resultsHtml);
 }
+
+
+
 
 
 
@@ -435,9 +451,16 @@ $('#stacjonarne_emisje_table').on('click', '.delete-btn', function(e) {
     emissionCalculations.splice(rowIndex, 1);
     $(this).closest('tr').remove();
 
-    // Zaktualizuj modal z obliczeniami po usunięciu
-    updateModalWithCalculations();
+    // Sprawdzenie, czy są jakieś obliczenia po usunięciu wiersza
+    if (emissionCalculations.length > 0) {
+        showEmissionCalculationsModal(); // Aktualizuj modal tylko, jeśli są obliczenia
+    } else {
+        // Ukryj modal, jeśli nie ma żadnych emisji
+        const modal = bootstrap.Modal.getInstance(document.getElementById('emissionCalculationsModal'));
+        if (modal) modal.hide();
+    }
 });
+
 
 
 

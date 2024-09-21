@@ -406,20 +406,19 @@ def fetch_emission_factors():
     data = request.json
     level3 = data['level3']
     jednostka = data['jednostka']
-    ilosc = float(data['ilosc'])
 
     # Pobranie wskaźników z bazy
     factors = get_emission_factors(level3, jednostka)
 
-    # Obliczenia emisji dla każdego gazu
+    # Zwracanie wskaźników emisji bez mnożenia przez `ilosc`
     results = {
-        'CO2e': ilosc * factors[0][2],
-        'CO2': ilosc * factors[1][2],
-        'CH4': ilosc * factors[2][2],
-        'N2O': ilosc * factors[3][2]
+        'CO2e': factors[0][2],
+        'CO2': factors[1][2],
+        'CH4': factors[2][2],
+        'N2O': factors[3][2]
     }
 
-    print(f"Obliczone emisje: {results}")
+    print(f"Wskaźniki emisji: {results}")
 
     return jsonify(results)
 
