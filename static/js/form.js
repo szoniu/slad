@@ -297,7 +297,7 @@ function addNewRow(paliwo, zuzycie, jednostka, data) {
         </tr>
     `;
     $('#stacjonarne_emisje_table tbody').append(newRow);
-    addEmissionCalculation(data, zuzycie, paliwo); // Dodanie wyliczeń do podsumowania
+    addEmissionCalculation(data, zuzycie, paliwo, jednostka);  // Dodanie wyliczeń do podsumowania
 
     // Wyświetlenie modala z obliczeniami po dodaniu nowego wiersza
     showEmissionCalculationsModal();
@@ -316,14 +316,43 @@ function updateExistingRow(paliwo, zuzycie, jednostka, data) {
     currentEditRow.children('td:eq(2)').html(`${jednostka}<input type="hidden" name="stacjonarne_emissions[0][jednostka]" value="${jednostka}">`);
 
     // Aktualizacja wyliczeń dla edytowanego rekordu
-    updateEmissionCalculation(currentEditRow.index(), data, zuzycie, paliwo);
+    updateEmissionCalculation(currentEditRow.index(), data, zuzycie, paliwo, jednostka); // Dodajemy jednostkę
+
 
     // Wyświetlenie modala z zaktualizowanymi obliczeniami po edycji wiersza
     showEmissionCalculationsModal();
 }
 
+// Funkcja do aktualizacji treści modala z wynikami
+function updateModalWithCalculations() {
+    let totalEmissions = 0;
+    let resultsHtml = `<h6>Obliczenia dla każdego dodanego źródła emisji:</h6>`;
 
-/// Funkcja do dodawania lub aktualizowania obliczeń w tablicy i aktualizacji modala
+    // Iteracja przez wszystkie obliczenia i tworzenie HTML
+    emissionCalculations.forEach((calc, index) => {
+        totalEmissions += parseFloat(calc.totalEmission); // Sumujemy emisję każdej pozycji
+        resultsHtml += `
+            <h6>Pozycja ${index + 1}: ${calc.paliwo}</h6>
+            <p>Zużycie: ${calc.zuzycie} ${calc.jednostka}</p>
+            <p>CO2e (ogólne): ${calc.CO2e} kg CO2e</p>
+            <p>CO2 (CO2 na jednostkę): ${calc.CO2} kg CO2e</p>
+            <p>CH4 (CH4 na jednostkę): ${calc.CH4} kg CO2e CH4</p>
+            <p>N2O (N2O na jednostkę): ${calc.N2O} kg CO2e N2O</p>
+            <p>Sumaryczny ślad węglowy tej pozycji: ${calc.totalEmission} kg CO2e</p>
+        `;
+    });
+
+    // Dodanie sumarycznego śladu węglowego dla wszystkich pozycji
+    resultsHtml += `<p>Sumaryczny ślad węglowy wszystkich pozycji: ${totalEmissions.toFixed(2)} kg CO2e</p>`;
+
+    // Wyświetlenie wyników w oknie modalnym
+    $('#emissionResults').html(resultsHtml);
+    const modal = new bootstrap.Modal(document.getElementById('emissionCalculationsModal'));
+    modal.show();
+}
+
+
+// Funkcja do dodawania obliczeń do listy i aktualizacji modala
 function addEmissionCalculation(results, ilosc, paliwo, jednostka) {
     const CO2e = ilosc * results.CO2e;
     const CO2 = ilosc * results.CO2;
@@ -335,13 +364,15 @@ function addEmissionCalculation(results, ilosc, paliwo, jednostka) {
     emissionCalculations.push({
         paliwo: paliwo,
         zuzycie: ilosc,
-        jednostka: jednostka,
+        jednostka: jednostka, // Zapisujemy jednostkę
         CO2e: CO2e.toFixed(2),
         CO2: CO2.toFixed(2),
         CH4: CH4.toFixed(2),
         N2O: N2O.toFixed(2),
         totalEmission: totalEmission.toFixed(2),
     });
+
+    updateModalWithCalculations(); // Zaktualizuj modal
 }
 
 // Funkcja do aktualizacji obliczeń w tablicy po edycji
@@ -357,7 +388,7 @@ function updateEmissionCalculation(index, results, ilosc, paliwo, jednostka) {
         emissionCalculations[index] = {
             paliwo: paliwo,
             zuzycie: ilosc,
-            jednostka: jednostka,
+            jednostka: jednostka, // Zapisujemy jednostkę
             CO2e: CO2e.toFixed(2),
             CO2: CO2.toFixed(2),
             CH4: CH4.toFixed(2),
@@ -369,7 +400,10 @@ function updateEmissionCalculation(index, results, ilosc, paliwo, jednostka) {
     } else {
         console.error('Błąd: próba aktualizacji nieistniejącego rekordu!');
     }
+
+    updateModalWithCalculations(); // Zaktualizuj modal
 }
+
 
 
 // Funkcja do aktualizacji treści modala z wynikami i wyświetlania go
@@ -1006,6 +1040,13 @@ mobilneEmisjeTableBody.addEventListener('click', function (event) {
         console.log('Otwieram modal do edycji wiersza');
     }
 });
+
+// Usuwanie tła modala po jego zamknięciu
+$('#emissionCalculationsModal').on('hidden.bs.modal', function () {
+    // Usunięcie klasy modal-backdrop, jeśli nadal istnieje
+    $('.modal-backdrop').remove();
+});
+
 
 // Funkcja do ustawiania wybranej opcji w select
 function setSelectedOption(selectElement, value) {
