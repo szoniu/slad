@@ -389,6 +389,25 @@ function handleSaveEmission() {
         });
 }
 
+
+function updateExistingRowMobile(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka) {
+    console.log("Aktualizacja danych w istniejącym wierszu mobilnym...");
+
+    currentEditRow.cells[0].textContent = liczbaPojazdow;
+    currentEditRow.cells[1].textContent = rodzajPojazdu;
+    currentEditRow.cells[2].textContent = level2;
+    currentEditRow.cells[3].textContent = level3;
+    currentEditRow.cells[4].textContent = sposobZasilania;
+    currentEditRow.cells[5].textContent = zuzyciePaliwa;
+    currentEditRow.cells[6].textContent = jednostka;
+
+    // Resetowanie zmiennej po zakończeniu edycji
+    currentEditRow = null;
+
+    // Wyświetlenie modala z zaktualizowanymi obliczeniami po edycji wiersza
+    showEmissionCalculationsModal();
+}
+
 function handleSaveMobileEmission() {
     var liczbaPojazdow = parseFloat($('#liczba_pojazdow_modal').val());
     var rodzajPojazdu = $('#rodzaj_pojazdu_modal').val();
@@ -422,19 +441,24 @@ function handleSaveMobileEmission() {
         .then((data) => {
             console.log('Otrzymane wskaźniki emisji dla mobilnych:', data);
 
-            // Dodanie obliczeń do wspólnej tablicy i aktualizacja modala
-            addEmissionCalculation(data, zuzyciePaliwa, `${rodzajPojazdu} - ${level2} - ${level3}`, jednostka);
+            if (currentEditRow) {
+                // Aktualizacja istniejącego wiersza
+                updateExistingRowMobile(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka);
+            } else {
+                // Dodanie nowego wiersza do tabeli
+                addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka);
+            }
+
+            // Zamknięcie modala po operacji
             $('#mobilneEmisjeModal').modal('hide');
         })
         .catch((error) => {
             console.error('Błąd przy pobieraniu wskaźników emisji:', error);
             alert('Wystąpił błąd przy pobieraniu wskaźników emisji.');
         });
-
-            // Wyświetlenie wyników w oknie modalnym
-            $('#mobilneEmisjeModal').modal('hide');
-    showEmissionCalculationsModal();
 }
+
+
 
 
 // Obsługa przycisku "Zapisz" - jedno miejsce do obsługi zapisów i edycji
@@ -1112,12 +1136,25 @@ function loadNextLevel(level, data, targetSelect) {
 
 
 
-    // Event listener do usuwania wierszy
-    mobilneEmisjeTableBody.addEventListener('click', function (event) {
-        if (event.target.classList.contains('remove-vehicle')) {
-            event.target.closest('tr').remove();
+// Event listener do usuwania wierszy
+mobilneEmisjeTableBody.addEventListener('click', function (event) {
+    if (event.target.classList.contains('remove-vehicle')) {
+        const rowToRemove = event.target.closest('tr');
+        const rowIndex = Array.from(mobilneEmisjeTableBody.children).indexOf(rowToRemove);
+
+        // Usuwamy element z tablicy obliczeń, jeśli istnieje
+        emissionCalculations.splice(rowIndex, 1);
+        rowToRemove.remove();
+
+        // Aktualizacja modala z obliczeniami po usunięciu wiersza
+        if (emissionCalculations.length > 0) {
+            showEmissionCalculationsModal();
+        } else {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('emissionCalculationsModal'));
+            if (modal) modal.hide();
         }
-    });
+    }
+});
 
 // Obsługa przycisku "Edytuj"
 mobilneEmisjeTableBody.addEventListener('click', function (event) {
@@ -1133,6 +1170,7 @@ mobilneEmisjeTableBody.addEventListener('click', function (event) {
         const zuzyciePaliwa = editedRow.cells[5].textContent;
         const jednostka = editedRow.cells[6].textContent;
 
+        // Ustawianie wartości w formularzu modala
         document.getElementById('liczba_pojazdow_modal').value = liczbaPojazdow;
         document.getElementById('rodzaj_pojazdu_modal').value = rodzajPojazdu;
         document.getElementById('level2_modal').value = level2;
@@ -1152,6 +1190,7 @@ mobilneEmisjeTableBody.addEventListener('click', function (event) {
         console.log('Otwieram modal do edycji wiersza');
     }
 });
+
 
 // Usuwanie tła modala po jego zamknięciu
 $('#emissionCalculationsModal').on('hidden.bs.modal', function () {
