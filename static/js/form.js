@@ -166,7 +166,7 @@ $(document).ready(function() {
 
 
 
-
+const mobilneEmisjeTableBody = document.querySelector('#mobilne_emisje_table tbody');
 $(document).ready(function() {
     console.log("Skrypt załadowany");
     // Zmienna globalna przechowująca aktualnie edytowany wiersz
@@ -225,6 +225,96 @@ function addEmissionCalculationForMobile(results, zuzycie, paliwo, jednostka) {
             console.log('Brak dostępnych jednostek dla wybranego paliwa.');
         }
     }
+// Funkcja do dodawania wiersza do tabeli
+function addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka) {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td>${liczbaPojazdow}</td>
+        <td>${rodzajPojazdu}</td>
+        <td>${level2}</td>
+        <td>${level3}</td>
+        <td>${sposobZasilania}</td>
+        <td>${zuzyciePaliwa}</td>
+        <td>${jednostka}</td>
+<td>
+    <div class="d-flex justify-content-start gap-2">
+        <button type="button" class="btn btn-warning btn-sm edit-vehicle">Edytuj</button>
+        <button type="button" class="btn btn-danger btn-sm remove-vehicle">Usuń</button>
+    </div>
+</td>
+
+    `;
+    mobilneEmisjeTableBody.appendChild(row);
+}
+
+
+// Obsługa przycisku "Zapisz" w modalu
+document.getElementById('zapisz_mobilne_btn').addEventListener('click', function () {
+    // Pobieranie wartości z formularza
+    const liczbaPojazdow = document.getElementById('liczba_pojazdow_modal').value;
+    const rodzajPojazdu = document.getElementById('rodzaj_pojazdu_modal').value;
+    const level2 = document.getElementById('level2_modal').value;
+    const level3 = document.getElementById('level3_modal').value;
+    const sposobZasilania = document.getElementById('sposob_zasilania_modal').value;
+    const zuzyciePaliwa = document.getElementById('zuzycie_paliwa_modal').value;
+    const jednostka = document.getElementById('jednostka_modal').value;
+
+    // Przesyłanie danych do backendu
+    fetch('/fetch_emission_factors_mobilne', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            level1: rodzajPojazdu,
+            level2: level2,
+            level3: level3,
+            jednostka: jednostka,
+            fuel_type: sposobZasilania,
+            ilosc: zuzyciePaliwa
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Otrzymane wskaźniki emisji dla mobilnych:', data);
+
+        // Dodanie obliczeń do tabeli
+        addEmissionCalculationForMobile(data, zuzyciePaliwa, rodzajPojazdu, jednostka);
+
+        // Zamknij modal dodawania pojazdu przed wyświetleniem modala z obliczeniami
+        $('#mobilneEmisjeModal').modal('hide');
+
+        // Wyświetlenie wyników w oknie modalnym
+        showEmissionCalculationsModal();
+    })
+    .catch(error => {
+        console.error('Błąd przy pobieraniu wskaźników emisji:', error);
+    });
+
+    // Sprawdzenie wypełnienia wszystkich pól i dodanie lub aktualizacja wiersza
+    if (liczbaPojazdow && rodzajPojazdu && level2 && level3 && sposobZasilania && zuzyciePaliwa && jednostka) {
+        if (editedRow) {
+            // Aktualizacja istniejącego wiersza
+            editedRow.cells[0].textContent = liczbaPojazdow;
+            editedRow.cells[1].textContent = rodzajPojazdu;
+            editedRow.cells[2].textContent = level2;
+            editedRow.cells[3].textContent = level3;
+            editedRow.cells[4].textContent = sposobZasilania;
+            editedRow.cells[5].textContent = zuzyciePaliwa;
+            editedRow.cells[6].textContent = jednostka;
+            editedRow = null; // Resetowanie zmiennej po edycji
+        } else {
+            // Dodanie nowego wiersza do tabeli
+            addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka);
+        }
+        clearMobilneEmisjeForm(); // Czyści formularz po zapisaniu
+        console.log('Dane zostały zapisane, modal zamknięty');
+    } else {
+        alert("Proszę wypełnić wszystkie pola!");
+    }
+});
+
+
 
 // Funkcja do czyszczenia pól formularza przy dodawaniu nowego wiersza
 function clearFormForNewEntry() {
@@ -342,6 +432,7 @@ function handleSaveMobileEmission() {
         });
 
             // Wyświetlenie wyników w oknie modalnym
+            $('#mobilneEmisjeModal').modal('hide');
     showEmissionCalculationsModal();
 }
 
@@ -840,7 +931,7 @@ function clearMobilneEmisjeForm() {
 
 document.addEventListener('DOMContentLoaded', function () {
     const modal = new bootstrap.Modal(document.getElementById('mobilneEmisjeModal'));
-    const mobilneEmisjeTableBody = document.querySelector('#mobilne_emisje_table tbody');
+
 
     const vehiclesData = JSON.parse(document.getElementById('mobilneDataContainer').getAttribute('data-vehicles-data'));
 //    console.log('Pełne dane vehiclesData:', vehiclesData);
@@ -1016,92 +1107,10 @@ function loadNextLevel(level, data, targetSelect) {
         modal.show();
     });
 
-// Obsługa przycisku "Zapisz" w modalu
-document.getElementById('zapisz_mobilne_btn').addEventListener('click', function () {
-    // Pobieranie wartości z formularza
-    const liczbaPojazdow = document.getElementById('liczba_pojazdow_modal').value;
-    const rodzajPojazdu = document.getElementById('rodzaj_pojazdu_modal').value;
-    const level2 = document.getElementById('level2_modal').value;
-    const level3 = document.getElementById('level3_modal').value;
-    const sposobZasilania = document.getElementById('sposob_zasilania_modal').value;
-    const zuzyciePaliwa = document.getElementById('zuzycie_paliwa_modal').value;
-    const jednostka = document.getElementById('jednostka_modal').value;
-
-    // Przesyłanie danych do backendu
-    fetch('/fetch_emission_factors_mobilne', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            level1: rodzajPojazdu,
-            level2: level2,
-            level3: level3,
-            jednostka: jednostka,
-            fuel_type: sposobZasilania,
-            ilosc: zuzyciePaliwa
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Otrzymane wskaźniki emisji dla mobilnych:', data);
-
-        // Dodanie obliczeń do tabeli i wyświetlenie w modalu
-        addEmissionCalculationForMobile(data, zuzyciePaliwa, rodzajPojazdu, jednostka);
-    })
-    .catch(error => {
-        console.error('Błąd przy pobieraniu wskaźników emisji:', error);
-    });
 
 
 
 
-
-    if (liczbaPojazdow && rodzajPojazdu && level2 && level3 && sposobZasilania && zuzyciePaliwa && jednostka) {
-        if (editedRow) {
-            // Aktualizacja istniejącego wiersza
-            editedRow.cells[0].textContent = liczbaPojazdow;
-            editedRow.cells[1].textContent = rodzajPojazdu;
-            editedRow.cells[2].textContent = level2;
-            editedRow.cells[3].textContent = level3;
-            editedRow.cells[4].textContent = sposobZasilania;
-            editedRow.cells[5].textContent = zuzyciePaliwa;
-            editedRow.cells[6].textContent = jednostka;
-            editedRow = null; // Resetowanie zmiennej po edycji
-        } else {
-            // Dodanie nowego wiersza do tabeli
-            addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka);
-        }
-        clearMobilneEmisjeForm(); // Czyści formularz po zapisaniu
-        modal.hide();
-        console.log('Dane zostały zapisane, modal zamknięty');
-    } else {
-        alert("Proszę wypełnić wszystkie pola!");
-    }
-});
-
-
-// Funkcja do dodawania wiersza do tabeli
-function addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka) {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-        <td>${liczbaPojazdow}</td>
-        <td>${rodzajPojazdu}</td>
-        <td>${level2}</td>
-        <td>${level3}</td>
-        <td>${sposobZasilania}</td>
-        <td>${zuzyciePaliwa}</td>
-        <td>${jednostka}</td>
-<td>
-    <div class="d-flex justify-content-start gap-2">
-        <button type="button" class="btn btn-warning btn-sm edit-vehicle">Edytuj</button>
-        <button type="button" class="btn btn-danger btn-sm remove-vehicle">Usuń</button>
-    </div>
-</td>
-
-    `;
-    mobilneEmisjeTableBody.appendChild(row);
-}
 
     // Event listener do usuwania wierszy
     mobilneEmisjeTableBody.addEventListener('click', function (event) {
