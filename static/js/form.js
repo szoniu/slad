@@ -172,12 +172,37 @@ $(document).ready(function() {
     // Zmienna globalna przechowująca aktualnie edytowany wiersz
 let editedRow = null;
 
+// Tablica do przechowywania wyników obliczeń dla każdej pozycji
+let emissionCalculations = [];
     // Parsowanie danych JSON z jednostkami paliw
     var fuelsUnits = JSON.parse($('#dataContainer').attr('data-fuels-units'));
 //    console.log('Dane fuelsUnits po parsowaniu:', fuelsUnits);
 
     var currentEditRow = null;  // Przechowywanie aktualnie edytowanego wiersza
 
+
+// Funkcja do obliczania emisji i aktualizacji modala dla mobilnych źródeł emisji
+function addEmissionCalculationForMobile(results, zuzycie, paliwo, jednostka) {
+    const CO2e = zuzycie * results.CO2e;
+    const CO2 = zuzycie * results.CO2;
+    const CH4 = zuzycie * results.CH4;
+    const N2O = zuzycie * results.N2O;
+    const totalEmission = CO2e + CO2 + CH4 + N2O;
+
+    // Dodaj wyniki do tablicy przechowującej obliczenia
+    emissionCalculations.push({
+        paliwo: paliwo,
+        zuzycie: zuzycie,
+        jednostka: jednostka,
+        CO2e: CO2e.toFixed(2),
+        CO2: CO2.toFixed(2),
+        CH4: CH4.toFixed(2),
+        N2O: N2O.toFixed(2),
+        totalEmission: totalEmission.toFixed(2),
+    });
+
+    updateModalWithCalculations(); // Zaktualizuj modal
+}
     // Funkcja do dynamicznego ładowania jednostek na podstawie paliwa
     function updateUnitsForFuel(selectedFuel) {
         console.log('Wybrane paliwo:', selectedFuel);
@@ -225,8 +250,6 @@ $('#paliwo').on('change', function() {
     updateUnitsForFuel(selectedFuel);  // Zaktualizowanie jednostek dla wybranego paliwa
 });
 
-// Tablica do przechowywania wyników obliczeń dla każdej pozycji
-let emissionCalculations = [];
 
 // Główna funkcja obsługująca zapis i edycję emisji
 function handleSaveEmission() {
@@ -275,6 +298,53 @@ function handleSaveEmission() {
             alert('Wystąpił błąd przy pobieraniu wskaźników emisji.');
         });
 }
+
+function handleSaveMobileEmission() {
+    var liczbaPojazdow = parseFloat($('#liczba_pojazdow_modal').val());
+    var rodzajPojazdu = $('#rodzaj_pojazdu_modal').val();
+    var level2 = $('#level2_modal').val();
+    var level3 = $('#level3_modal').val();
+    var sposobZasilania = $('#sposob_zasilania_modal').val();
+    var zuzyciePaliwa = parseFloat($('#zuzycie_paliwa_modal').val());
+    var jednostka = $('#jednostka_modal').val();
+
+    if (!liczbaPojazdow || !rodzajPojazdu || !level2 || !level3 || !sposobZasilania || !zuzyciePaliwa || !jednostka) {
+        alert("Wszystkie pola muszą być wypełnione!");
+        return;
+    }
+
+    const emissionData = {
+        level3: level3,
+        jednostka: jednostka,
+        ilosc: zuzyciePaliwa,
+    };
+
+    console.log('Dane do pobrania wskaźników emisji dla mobilnych:', emissionData);
+
+    fetch('/fetch_emission_factors_mobilne', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(emissionData),
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log('Otrzymane wskaźniki emisji dla mobilnych:', data);
+
+            // Dodanie obliczeń do wspólnej tablicy i aktualizacja modala
+            addEmissionCalculation(data, zuzyciePaliwa, `${rodzajPojazdu} - ${level2} - ${level3}`, jednostka);
+            $('#mobilneEmisjeModal').modal('hide');
+        })
+        .catch((error) => {
+            console.error('Błąd przy pobieraniu wskaźników emisji:', error);
+            alert('Wystąpił błąd przy pobieraniu wskaźników emisji.');
+        });
+
+            // Wyświetlenie wyników w oknie modalnym
+    showEmissionCalculationsModal();
+}
+
 
 // Obsługa przycisku "Zapisz" - jedno miejsce do obsługi zapisów i edycji
 $('#zapisz_emisje_btn').on('click', handleSaveEmission);
@@ -375,6 +445,9 @@ function addEmissionCalculation(results, ilosc, paliwo, jednostka) {
     updateModalWithCalculations(); // Zaktualizuj modal
 }
 
+
+
+
 // Funkcja do aktualizacji obliczeń w tablicy po edycji
 function updateEmissionCalculation(index, results, ilosc, paliwo, jednostka) {
     const CO2e = ilosc * results.CO2e;
@@ -435,6 +508,9 @@ function showEmissionCalculationsModal() {
         modal.show();
     }
 }
+
+
+
 
 
 // Obsługa przycisku "Anuluj"
@@ -713,7 +789,7 @@ $('#energia_cieplna_table').on('click', '.edit-entry', function() {
         // Programowe wysłanie formularza po sprawdzeniu danych
         this.submit();
     });
-    });
+
 
 
 // SQL - Obsługa pierwszego formularza
@@ -754,36 +830,8 @@ document.addEventListener('DOMContentLoaded', function() {
 // Mobile zrodla emisji
 
 
-// Funkcja do obliczania emisji i aktualizacji modala dla mobilnych źródeł emisji
-function addEmissionCalculationForMobile(results, zuzycie, paliwo, jednostka) {
-    const CO2e = zuzycie * results.CO2e;
-    const CO2 = zuzycie * results.CO2;
-    const CH4 = zuzycie * results.CH4;
-    const N2O = zuzycie * results.N2O;
-    const totalEmission = CO2e + CO2 + CH4 + N2O;
 
-    // Dodaj wyniki do tablicy przechowującej obliczenia
-    emissionCalculations.push({
-        paliwo: paliwo,
-        zuzycie: zuzycie,
-        jednostka: jednostka,
-        CO2e: CO2e.toFixed(2),
-        CO2: CO2.toFixed(2),
-        CH4: CH4.toFixed(2),
-        N2O: N2O.toFixed(2),
-        totalEmission: totalEmission.toFixed(2),
-    });
-
-    // Wyświetlenie wyników w oknie modalnym
-    showEmissionCalculationsModal();
-}
-
-
-
-
-
-
-
+});
 // Funkcja czyszcząca formularz mobilnych emisji
 function clearMobilneEmisjeForm() {
     document.getElementById('mobilne_emisje_form').reset(); // Resetuje wszystkie pola formularza
