@@ -6,7 +6,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 
 from database import engine_company, engine_excel, CompanyProfile, StationaryEmission, MobileEmission, \
-    ElectricityEmission, HeatEmission, get_emission_factors
+    ElectricityEmission, HeatEmission, get_emission_factors, get_emission_factors_mobilne
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
 
@@ -220,7 +220,7 @@ ORDER BY "Level 3";
                "GHG Conversion Factor 2023" AS conversion_factor
         FROM excel_data
         WHERE "Level 1" LIKE '%Pojazdy%'
-
+        AND "UOM" <> 'mile'
         ORDER BY "Level 1";
     ''')).fetchall()
 
@@ -296,9 +296,6 @@ def show_database():
                            unique_column_text=unique_column_text,
                            unique_uom=unique_uom,
                            unique_ghg_unit=unique_ghg_unit)
-
-
-from database import get_emission_factors
 
 
 def calculate_emissions(data):
@@ -419,6 +416,41 @@ def fetch_emission_factors():
     }
 
     print(f"Wskaźniki emisji: {results}")
+
+    return jsonify(results)
+
+
+@app.route('/fetch_emission_factors_mobilne', methods=['POST'])
+def fetch_emission_factors_mobilne():
+    # Pobranie danych z żądania
+    data = request.json
+
+    # Poprawne przypisanie zmiennych z obiektu `data`
+    level1 = data.get('level1')
+    level2 = data.get('level2')
+    level3 = data.get('level3')
+    jednostka = data.get('jednostka')
+    fuel_type = data.get('fuel_type')
+
+    # Logowanie przypisanych wartości do debugowania
+    print(
+        f"Parametry zapytania: level1={level1}, level2={level2}, level3={level3}, jednostka={jednostka}, fuel_type={fuel_type}")
+
+    # Pobranie wskaźników z bazy danych
+    factors = get_emission_factors_mobilne(level3, jednostka, level2, level1, fuel_type)
+
+    if not factors:
+        return jsonify({"error": "Brak danych wskaźników emisji dla podanych parametrów."}), 400
+
+    # Tworzenie wyników emisji
+    results = {
+        'CO2e': factors[0][2] if len(factors) > 0 else None,
+        'CO2': factors[1][2] if len(factors) > 1 else None,
+        'CH4': factors[2][2] if len(factors) > 2 else None,
+        'N2O': factors[3][2] if len(factors) > 3 else None
+    }
+
+    print(f"Otrzymane wskaźniki emisji: {results}")
 
     return jsonify(results)
 

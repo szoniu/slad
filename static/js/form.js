@@ -437,12 +437,6 @@ function showEmissionCalculationsModal() {
 }
 
 
-
-
-
-
-
-
 // Obsługa przycisku "Anuluj"
 $('#anuluj_emisje_btn').on('click', function() {
     $('#stacjonarneEmisjeModal').modal('hide');
@@ -474,7 +468,6 @@ $('#stacjonarne_emisje_table').on('click', '.edit-btn', function(e) {
 
     $('#stacjonarneEmisjeModal').modal('show');
 });
-
 
 
 // Obsługa usuwania
@@ -760,6 +753,37 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Mobile zrodla emisji
 
+
+// Funkcja do obliczania emisji i aktualizacji modala dla mobilnych źródeł emisji
+function addEmissionCalculationForMobile(results, zuzycie, paliwo, jednostka) {
+    const CO2e = zuzycie * results.CO2e;
+    const CO2 = zuzycie * results.CO2;
+    const CH4 = zuzycie * results.CH4;
+    const N2O = zuzycie * results.N2O;
+    const totalEmission = CO2e + CO2 + CH4 + N2O;
+
+    // Dodaj wyniki do tablicy przechowującej obliczenia
+    emissionCalculations.push({
+        paliwo: paliwo,
+        zuzycie: zuzycie,
+        jednostka: jednostka,
+        CO2e: CO2e.toFixed(2),
+        CO2: CO2.toFixed(2),
+        CH4: CH4.toFixed(2),
+        N2O: N2O.toFixed(2),
+        totalEmission: totalEmission.toFixed(2),
+    });
+
+    // Wyświetlenie wyników w oknie modalnym
+    showEmissionCalculationsModal();
+}
+
+
+
+
+
+
+
 // Funkcja czyszcząca formularz mobilnych emisji
 function clearMobilneEmisjeForm() {
     document.getElementById('mobilne_emisje_form').reset(); // Resetuje wszystkie pola formularza
@@ -946,6 +970,7 @@ function loadNextLevel(level, data, targetSelect) {
 
 // Obsługa przycisku "Zapisz" w modalu
 document.getElementById('zapisz_mobilne_btn').addEventListener('click', function () {
+    // Pobieranie wartości z formularza
     const liczbaPojazdow = document.getElementById('liczba_pojazdow_modal').value;
     const rodzajPojazdu = document.getElementById('rodzaj_pojazdu_modal').value;
     const level2 = document.getElementById('level2_modal').value;
@@ -953,6 +978,36 @@ document.getElementById('zapisz_mobilne_btn').addEventListener('click', function
     const sposobZasilania = document.getElementById('sposob_zasilania_modal').value;
     const zuzyciePaliwa = document.getElementById('zuzycie_paliwa_modal').value;
     const jednostka = document.getElementById('jednostka_modal').value;
+
+    // Przesyłanie danych do backendu
+    fetch('/fetch_emission_factors_mobilne', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            level1: rodzajPojazdu,
+            level2: level2,
+            level3: level3,
+            jednostka: jednostka,
+            fuel_type: sposobZasilania,
+            ilosc: zuzyciePaliwa
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Otrzymane wskaźniki emisji dla mobilnych:', data);
+
+        // Dodanie obliczeń do tabeli i wyświetlenie w modalu
+        addEmissionCalculationForMobile(data, zuzyciePaliwa, rodzajPojazdu, jednostka);
+    })
+    .catch(error => {
+        console.error('Błąd przy pobieraniu wskaźników emisji:', error);
+    });
+
+
+
+
 
     if (liczbaPojazdow && rodzajPojazdu && level2 && level3 && sposobZasilania && zuzyciePaliwa && jednostka) {
         if (editedRow) {

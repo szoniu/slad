@@ -161,3 +161,37 @@ def get_emission_factors(level3, jednostka):
 
     session.close()
     return factors
+
+
+# Funkcja pobierająca wskaźniki emisji dla mobilnych źródeł emisji
+def get_emission_factors_mobilne(level3, jednostka, level2, level1, fuel_type):
+    session = get_session(engine_excel)
+
+    query = text("""
+        SELECT "UOM", "GHG/Unit", "GHG Conversion Factor 2023"
+        FROM excel_data
+        WHERE "Column Text" = :fuel_type
+          AND "UOM" = :jednostka
+          AND "Level 2" = :level2
+          AND "Level 1" LIKE :level1
+        ORDER BY "UOM";
+    """)
+
+    # Przekazywanie poprawnych wartości do zapytania
+    params = {
+        'level1': f'%{level1}%',  # Dodanie LIKE dla Level 1
+        'level2': level2,
+        'level3': level3,
+        'jednostka': jednostka,
+        'fuel_type': fuel_type
+    }
+
+    print(f"Generowane zapytanie SQL: {query}")
+    print(f"Parametry zapytania: {params}")
+
+    factors = session.execute(query, params).fetchall()
+
+    print(f"Pobrane wskaźniki emisji: {factors}")
+
+    session.close()
+    return factors
