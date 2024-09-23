@@ -393,20 +393,21 @@ function handleSaveEmission() {
 function updateExistingRowMobile(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka) {
     console.log("Aktualizacja danych w istniejącym wierszu mobilnym...");
 
-    currentEditRow.cells[0].textContent = liczbaPojazdow;
-    currentEditRow.cells[1].textContent = rodzajPojazdu;
-    currentEditRow.cells[2].textContent = level2;
-    currentEditRow.cells[3].textContent = level3;
-    currentEditRow.cells[4].textContent = sposobZasilania;
-    currentEditRow.cells[5].textContent = zuzyciePaliwa;
-    currentEditRow.cells[6].textContent = jednostka;
+    editedRow.cells[0].textContent = liczbaPojazdow;
+    editedRow.cells[1].textContent = rodzajPojazdu;
+    editedRow.cells[2].textContent = level2;
+    editedRow.cells[3].textContent = level3;
+    editedRow.cells[4].textContent = sposobZasilania;
+    editedRow.cells[5].textContent = zuzyciePaliwa;
+    editedRow.cells[6].textContent = jednostka;
 
     // Resetowanie zmiennej po zakończeniu edycji
-    currentEditRow = null;
+    editedRow = null;
 
     // Wyświetlenie modala z zaktualizowanymi obliczeniami po edycji wiersza
     showEmissionCalculationsModal();
 }
+
 
 function handleSaveMobileEmission() {
     var liczbaPojazdow = parseFloat($('#liczba_pojazdow_modal').val());
@@ -441,7 +442,8 @@ function handleSaveMobileEmission() {
         .then((data) => {
             console.log('Otrzymane wskaźniki emisji dla mobilnych:', data);
 
-            if (currentEditRow) {
+            // Sprawdzenie, czy wiersz jest edytowany
+            if (editedRow) {
                 // Aktualizacja istniejącego wiersza
                 updateExistingRowMobile(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka);
             } else {
@@ -457,6 +459,8 @@ function handleSaveMobileEmission() {
             alert('Wystąpił błąd przy pobieraniu wskaźników emisji.');
         });
 }
+
+
 
 
 
