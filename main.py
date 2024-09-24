@@ -351,7 +351,7 @@ def calculate_emission_metrics(total_emissions, employee_count, usable_area, ann
 
 @app.route('/generate_pdf')
 def generate_pdf():
-    # Pobranie danych z formularza - zakładam, że dane są przekazywane przez formularz lub inny sposób
+    # Pobranie danych z formularza-zakładam, że dane są przekazywane przez formularz lub inny sposób
     form_data = request.get_json()  # Zbieramy dane w formacie JSON
 
     # Debugowanie danych z formularza
