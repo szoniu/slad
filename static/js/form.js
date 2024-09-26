@@ -166,11 +166,12 @@ $(document).ready(function() {
 
 
 
-const mobilneEmisjeTableBody = document.querySelector('#mobilne_emisje_table tbody');
+    const mobilneEmisjeTableBody = document.querySelector('#mobilne_emisje_table tbody');
+        let currentEditRow = null;  // Przechowywanie aktualnie edytowanego wiersza
 $(document).ready(function() {
     console.log("Skrypt załadowany");
     // Zmienna globalna przechowująca aktualnie edytowany wiersz
-let editedRow = null;
+//let currentEditRow = null;
 
 // Tablica do przechowywania wyników obliczeń dla każdej pozycji
 let emissionCalculations = [];
@@ -178,7 +179,7 @@ let emissionCalculations = [];
     var fuelsUnits = JSON.parse($('#dataContainer').attr('data-fuels-units'));
 //    console.log('Dane fuelsUnits po parsowaniu:', fuelsUnits);
 
-    var currentEditRow = null;  // Przechowywanie aktualnie edytowanego wiersza
+
 
 
 // Funkcja do obliczania emisji i aktualizacji modala dla mobilnych źródeł emisji
@@ -225,8 +226,19 @@ function addEmissionCalculationForMobile(results, zuzycie, paliwo, jednostka) {
             console.log('Brak dostępnych jednostek dla wybranego paliwa.');
         }
     }
-// Funkcja do dodawania wiersza do tabeli
+
+
+// Funkcja do dodawania wiersza do tabeli mobilnych emisji
 function addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka) {
+    console.log('Dodaję nowy wiersz z wartościami:', {
+        liczbaPojazdow,
+        rodzajPojazdu,
+        level2,
+        level3,
+        sposobZasilania,
+        zuzyciePaliwa,
+        jednostka
+    });
     const row = document.createElement('tr');
     row.innerHTML = `
         <td>${liczbaPojazdow}</td>
@@ -236,21 +248,22 @@ function addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasi
         <td>${sposobZasilania}</td>
         <td>${zuzyciePaliwa}</td>
         <td>${jednostka}</td>
-<td>
-    <div class="d-flex justify-content-start gap-2">
-        <button type="button" class="btn btn-warning btn-sm edit-vehicle">Edytuj</button>
-        <button type="button" class="btn btn-danger btn-sm remove-vehicle">Usuń</button>
-    </div>
-</td>
-
+        <td>
+            <div class="d-flex justify-content-start gap-2">
+                <button type="button" class="btn btn-warning btn-sm edit-vehicle">Edytuj</button>
+                <button type="button" class="btn btn-danger btn-sm remove-vehicle">Usuń</button>
+            </div>
+        </td>
     `;
     mobilneEmisjeTableBody.appendChild(row);
+    console.log('Nowy wiersz dodany:', row);
 }
+
 
 
 // Obsługa przycisku "Zapisz" w modalu
 document.getElementById('zapisz_mobilne_btn').addEventListener('click', function () {
-    // Pobieranie wartości z formularza
+    console.log('Klawisz Zapisz 1 Stan currentEditRow przed zapisaniem:', currentEditRow);
     const liczbaPojazdow = document.getElementById('liczba_pojazdow_modal').value;
     const rodzajPojazdu = document.getElementById('rodzaj_pojazdu_modal').value;
     const level2 = document.getElementById('level2_modal').value;
@@ -258,6 +271,9 @@ document.getElementById('zapisz_mobilne_btn').addEventListener('click', function
     const sposobZasilania = document.getElementById('sposob_zasilania_modal').value;
     const zuzyciePaliwa = document.getElementById('zuzycie_paliwa_modal').value;
     const jednostka = document.getElementById('jednostka_modal').value;
+
+    console.log('Klawisz Zapisz 2 Stan currentEditRow przed zapisaniem:', currentEditRow);
+
 
     // Przesyłanie danych do backendu
     fetch('/fetch_emission_factors_mobilne', {
@@ -291,24 +307,27 @@ document.getElementById('zapisz_mobilne_btn').addEventListener('click', function
         console.error('Błąd przy pobieraniu wskaźników emisji:', error);
     });
 
+
     // Sprawdzenie wypełnienia wszystkich pól i dodanie lub aktualizacja wiersza
     if (liczbaPojazdow && rodzajPojazdu && level2 && level3 && sposobZasilania && zuzyciePaliwa && jednostka) {
-        if (editedRow) {
+        if (currentEditRow) {
             // Aktualizacja istniejącego wiersza
-            editedRow.cells[0].textContent = liczbaPojazdow;
-            editedRow.cells[1].textContent = rodzajPojazdu;
-            editedRow.cells[2].textContent = level2;
-            editedRow.cells[3].textContent = level3;
-            editedRow.cells[4].textContent = sposobZasilania;
-            editedRow.cells[5].textContent = zuzyciePaliwa;
-            editedRow.cells[6].textContent = jednostka;
-            editedRow = null; // Resetowanie zmiennej po edycji
+            console.log('Aktualizuję istniejący wiersz:', currentEditRow);
+            currentEditRow.cells[0].textContent = liczbaPojazdow;
+            currentEditRow.cells[1].textContent = rodzajPojazdu;
+            currentEditRow.cells[2].textContent = level2;
+            currentEditRow.cells[3].textContent = level3;
+            currentEditRow.cells[4].textContent = sposobZasilania;
+            currentEditRow.cells[5].textContent = zuzyciePaliwa;
+            currentEditRow.cells[6].textContent = jednostka;
+            currentEditRow = null; // Resetowanie zmiennej po zakończeniu edycji
         } else {
             // Dodanie nowego wiersza do tabeli
+            console.log('Dodaję nowy wiersz z wartościami:', { liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka });
             addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka);
         }
-        clearMobilneEmisjeForm(); // Czyści formularz po zapisaniu
         console.log('Dane zostały zapisane, modal zamknięty');
+        $('#mobilneEmisjeModal').modal('hide'); // Zamknięcie modala
     } else {
         alert("Proszę wypełnić wszystkie pola!");
     }
@@ -389,25 +408,6 @@ function handleSaveEmission() {
         });
 }
 
-
-// Funkcja do aktualizacji istniejącego wiersza mobilnego
-function updateExistingRowMobile(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka) {
-    console.log("Aktualizacja danych w istniejącym wierszu mobilnym...");
-
-    editedRow.cells[0].textContent = liczbaPojazdow;
-    editedRow.cells[1].textContent = rodzajPojazdu;
-    editedRow.cells[2].textContent = level2;
-    editedRow.cells[3].textContent = level3;
-    editedRow.cells[4].textContent = sposobZasilania;
-    editedRow.cells[5].textContent = zuzyciePaliwa;
-    editedRow.cells[6].textContent = jednostka;
-
-    // Wyświetlenie modala z zaktualizowanymi obliczeniami po edycji wiersza
-    showEmissionCalculationsModal();
-}
-
-
-// Funkcja do zapisywania danych mobilnych emisji
 function handleSaveMobileEmission() {
     var liczbaPojazdow = parseFloat($('#liczba_pojazdow_modal').val());
     var rodzajPojazdu = $('#rodzaj_pojazdu_modal').val();
@@ -441,31 +441,19 @@ function handleSaveMobileEmission() {
         .then((data) => {
             console.log('Otrzymane wskaźniki emisji dla mobilnych:', data);
 
-            // Sprawdzenie, czy edytujemy istniejący wiersz
-            if (editedRow) {
-                // Aktualizacja istniejącego wiersza
-                updateExistingRowMobile(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka);
-            } else {
-                // Dodanie nowego wiersza do tabeli
-                addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka);
-            }
-
-            // Resetowanie zmiennej edycji
-            editedRow = null;
-
-            // Zamknięcie modala po operacji
+            // Dodanie obliczeń do wspólnej tablicy i aktualizacja modala
+            addEmissionCalculation(data, zuzyciePaliwa, `${rodzajPojazdu} - ${level2} - ${level3}`, jednostka);
             $('#mobilneEmisjeModal').modal('hide');
         })
         .catch((error) => {
             console.error('Błąd przy pobieraniu wskaźników emisji:', error);
             alert('Wystąpił błąd przy pobieraniu wskaźników emisji.');
         });
+
+            // Wyświetlenie wyników w oknie modalnym
+            $('#mobilneEmisjeModal').modal('hide');
+    showEmissionCalculationsModal();
 }
-
-
-
-
-
 
 
 // Obsługa przycisku "Zapisz" - jedno miejsce do obsługi zapisów i edycji
@@ -724,7 +712,7 @@ $('#kt_docs_repeater_energia_elektryczna').repeater({
 // Funkcja czyszcząca formularz energii elektrycznej
 function clearEnergiaElektrycznaForm() {
     $('#energia_elektryczna_form').trigger("reset"); // Resetuje cały formularz
-    editedRow = null; // Resetuje zmienną edycji
+    currentEditRow = null; // Resetuje zmienną edycji
 }
 
 
@@ -742,13 +730,13 @@ $('#zapisz_energia_elektryczna_btn').on('click', function() {
     const jednostka = $('#jednostka_energia_elektryczna').val();
 
     if (pochodzenie && dostawca && zuzycie && jednostka) {
-        if (editedRow) {
+        if (currentEditRow) {
             // Aktualizacja istniejącego wiersza
-            editedRow.find('td:eq(0)').text(pochodzenie === 'oze' ? 'OZE' : 'nie OZE');
-            editedRow.find('td:eq(1)').text(dostawca);
-            editedRow.find('td:eq(2)').text(zuzycie);
-            editedRow.find('td:eq(3)').text(jednostka);
-            editedRow = null; // Resetowanie zmiennej po edycji
+            currentEditRow.find('td:eq(0)').text(pochodzenie === 'oze' ? 'OZE' : 'nie OZE');
+            currentEditRow.find('td:eq(1)').text(dostawca);
+            currentEditRow.find('td:eq(2)').text(zuzycie);
+            currentEditRow.find('td:eq(3)').text(jednostka);
+            currentEditRow = null; // Resetowanie zmiennej po edycji
         } else {
             // Dodanie nowego wiersza do tabeli
             $('#energia_elektryczna_table tbody').append(`
@@ -781,13 +769,13 @@ $('#energia_elektryczna_table').on('click', '.remove-entry', function() {
 // Obsługa przycisku "Edytuj" dla energii elektrycznej
 $('#energia_elektryczna_table').on('click', '.edit-entry', function() {
     clearEnergiaElektrycznaForm(); // Czyści formularz przed edycją
-    editedRow = $(this).closest('tr'); // Przechowuje aktualnie edytowany wiersz
+    currentEditRow = $(this).closest('tr'); // Przechowuje aktualnie edytowany wiersz
 
     // Pobieranie wartości z edytowanego wiersza
-    const pochodzenie = editedRow.find('td:eq(0)').text() === 'OZE' ? 'oze' : 'nie_oze';
-    const dostawca = editedRow.find('td:eq(1)').text();
-    const zuzycie = editedRow.find('td:eq(2)').text();
-    const jednostka = editedRow.find('td:eq(3)').text();
+    const pochodzenie = currentEditRow.find('td:eq(0)').text() === 'OZE' ? 'oze' : 'nie_oze';
+    const dostawca = currentEditRow.find('td:eq(1)').text();
+    const zuzycie = currentEditRow.find('td:eq(2)').text();
+    const jednostka = currentEditRow.find('td:eq(3)').text();
 
     // Ustawianie wartości w formularzu
     $(`input[name="pochodzenie_energii"][value="${pochodzenie}"]`).prop('checked', true);
@@ -817,7 +805,7 @@ $('#kt_docs_repeater_energia_cieplna').repeater({
 // Funkcja czyszcząca formularz energii cieplnej
 function clearEnergiaCieplnaForm() {
     $('#energia_cieplna_form').trigger("reset"); // Resetuje cały formularz
-    editedRow = null; // Resetuje zmienną edycji
+    currentEditRow = null; // Resetuje zmienną edycji
 }
 
 
@@ -834,12 +822,12 @@ $('#zapisz_energia_cieplna_btn').on('click', function() {
     const jednostka = $('#jednostka_energia_cieplna').val();
 
     if (dostawca && zuzycie && jednostka) {
-        if (editedRow) {
+        if (currentEditRow) {
             // Aktualizacja istniejącego wiersza
-            editedRow.find('td:eq(0)').text(dostawca);
-            editedRow.find('td:eq(1)').text(zuzycie);
-            editedRow.find('td:eq(2)').text(jednostka);
-            editedRow = null; // Resetowanie zmiennej po edycji
+            currentEditRow.find('td:eq(0)').text(dostawca);
+            currentEditRow.find('td:eq(1)').text(zuzycie);
+            currentEditRow.find('td:eq(2)').text(jednostka);
+            currentEditRow = null; // Resetowanie zmiennej po edycji
         } else {
             // Dodanie nowego wiersza do tabeli
             $('#energia_cieplna_table tbody').append(`
@@ -871,12 +859,12 @@ $('#energia_cieplna_table').on('click', '.remove-entry', function() {
 // Obsługa przycisku "Edytuj" dla energii cieplnej
 $('#energia_cieplna_table').on('click', '.edit-entry', function() {
     clearEnergiaCieplnaForm(); // Czyści formularz przed edycją
-    editedRow = $(this).closest('tr'); // Przechowuje aktualnie edytowany wiersz
+    currentEditRow = $(this).closest('tr'); // Przechowuje aktualnie edytowany wiersz
 
     // Pobieranie wartości z edytowanego wiersza
-    const dostawca = editedRow.find('td:eq(0)').text();
-    const zuzycie = editedRow.find('td:eq(1)').text();
-    const jednostka = editedRow.find('td:eq(2)').text();
+    const dostawca = currentEditRow.find('td:eq(0)').text();
+    const zuzycie = currentEditRow.find('td:eq(1)').text();
+    const jednostka = currentEditRow.find('td:eq(2)').text();
 
     // Ustawianie wartości w formularzu
     $('#dostawca_energia_cieplna').val(dostawca);
@@ -954,11 +942,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 });
-// Funkcja czyszcząca formularz mobilnych emisji
-function clearMobilneEmisjeForm() {
-    document.getElementById('mobilne_emisje_form').reset(); // Resetuje wszystkie pola formularza
-    editedRow = null; // Resetuje zmienną edycji (jeśli będziemy jej później używać)
-}
+
 
 document.addEventListener('DOMContentLoaded', function () {
     const modal = new bootstrap.Modal(document.getElementById('mobilneEmisjeModal'));
@@ -1131,73 +1115,60 @@ function loadNextLevel(level, data, targetSelect) {
         }
     }
 
-    // Event listener na przycisk "Dodaj pojazd"
-    document.getElementById('dodaj_mobilne_btn').addEventListener('click', function () {
-        clearMobilneEmisjeForm();
-        populateModalOptions();
-        modal.show();
+//currentEditRow = null;
+// Funkcja czyszcząca formularz mobilnych emisji
+function clearMobilneEmisjeForm() {
+    console.log('Przed resetowaniem formularza, currentEditRow:', currentEditRow);
+    document.getElementById('mobilne_emisje_form').reset(); // Resetowanie pól formularza
+    // currentEditRow = null; // Skomentowane dla testów, aby sprawdzić, gdzie zmienna się resetuje
+    console.log('Po resetowaniu formularza, currentEditRow:', currentEditRow);
+}
+
+// Event listener na przycisk "Dodaj pojazd"
+document.getElementById('dodaj_mobilne_btn').addEventListener('click', function () {
+    console.log('Przed otwarciem modala, currentEditRow:', currentEditRow);
+    clearMobilneEmisjeForm();
+    populateModalOptions();
+    modal.show();
+    console.log('Modal otwarty, currentEditRow:', currentEditRow);
+});
+
+
+
+
+
+
+
+
+
+    // Event listener do usuwania wierszy
+    mobilneEmisjeTableBody.addEventListener('click', function (event) {
+        if (event.target.classList.contains('remove-vehicle')) {
+            event.target.closest('tr').remove();
+        }
     });
 
 
-
-
-
-
-// Event listener do usuwania wierszy
-mobilneEmisjeTableBody.addEventListener('click', function (event) {
-    if (event.target.classList.contains('remove-vehicle')) {
-        const rowToRemove = event.target.closest('tr');
-        const rowIndex = Array.from(mobilneEmisjeTableBody.children).indexOf(rowToRemove);
-
-        // Usuwamy element z tablicy obliczeń, jeśli istnieje
-        emissionCalculations.splice(rowIndex, 1);
-        rowToRemove.remove();
-
-        // Aktualizacja modala z obliczeniami po usunięciu wiersza
-        if (emissionCalculations.length > 0) {
-            showEmissionCalculationsModal();
-        } else {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('emissionCalculationsModal'));
-            if (modal) modal.hide();
-        }
-    }
-});
-
-// Obsługa przycisku "Edytuj"
+// Obsługa przycisku "Edytuj" dla mobilnych
 mobilneEmisjeTableBody.addEventListener('click', function (event) {
     if (event.target.classList.contains('edit-vehicle')) {
-        editedRow = event.target.closest('tr'); // Pobiera edytowany wiersz
+        currentEditRow = event.target.closest('tr'); // Ustawienie zmiennej na edytowany wiersz
+        console.log('Edytowany wiersz ustawiony:', currentEditRow);
 
         // Pobieranie wartości z edytowanego wiersza i ustawianie w formularzu
-        const liczbaPojazdow = editedRow.cells[0].textContent;
-        const rodzajPojazdu = editedRow.cells[1].textContent;
-        const level2 = editedRow.cells[2].textContent;
-        const level3 = editedRow.cells[3].textContent;
-        const sposobZasilania = editedRow.cells[4].textContent;
-        const zuzyciePaliwa = editedRow.cells[5].textContent;
-        const jednostka = editedRow.cells[6].textContent;
+        document.getElementById('liczba_pojazdow_modal').value = currentEditRow.cells[0].textContent;
+        document.getElementById('rodzaj_pojazdu_modal').value = currentEditRow.cells[1].textContent;
+        document.getElementById('level2_modal').value = currentEditRow.cells[2].textContent;
+        document.getElementById('level3_modal').value = currentEditRow.cells[3].textContent;
+        document.getElementById('sposob_zasilania_modal').value = currentEditRow.cells[4].textContent;
+        document.getElementById('zuzycie_paliwa_modal').value = currentEditRow.cells[5].textContent;
+        document.getElementById('jednostka_modal').value = currentEditRow.cells[6].textContent;
 
-        // Ustawianie wartości w formularzu modala
-        document.getElementById('liczba_pojazdow_modal').value = liczbaPojazdow;
-        document.getElementById('rodzaj_pojazdu_modal').value = rodzajPojazdu;
-        document.getElementById('level2_modal').value = level2;
-        document.getElementById('level3_modal').value = level3;
-        document.getElementById('sposob_zasilania_modal').value = sposobZasilania;
-        document.getElementById('zuzycie_paliwa_modal').value = zuzyciePaliwa;
-        document.getElementById('jednostka_modal').value = jednostka;
-
-        // Ustawienie wybranych opcji w formularzu
-        setSelectedOption(document.getElementById('rodzaj_pojazdu_modal'), rodzajPojazdu);
-        setSelectedOption(document.getElementById('level2_modal'), level2);
-        setSelectedOption(document.getElementById('level3_modal'), level3);
-        setSelectedOption(document.getElementById('sposob_zasilania_modal'), sposobZasilania);
-        setSelectedOption(document.getElementById('jednostka_modal'), jednostka);
-
-        modal.show(); // Otwieranie modala do edycji
+        // Otwarcie modalnego okna do edycji
+        $('#mobilneEmisjeModal').modal('show');
         console.log('Otwieram modal do edycji wiersza');
     }
 });
-
 
 // Usuwanie tła modala po jego zamknięciu
 $('#emissionCalculationsModal').on('hidden.bs.modal', function () {
