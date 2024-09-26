@@ -275,7 +275,7 @@ function addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasi
         <td>
             <div class="d-flex justify-content-start gap-2">
                 <button type="button" class="btn btn-warning btn-sm edit-vehicle">Edytuj</button>
-                <button type="button" class="btn btn-danger btn-sm remove-vehicle">Usuń</button>
+                <button type="button" class="btn btn-danger btn-sm delete-btn">Usuń</button>
             </div>
         </td>
     `;
