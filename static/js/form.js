@@ -187,9 +187,7 @@ let emissionCalculations = [];
 
 
 
-// Funkcja do obliczania emisji i aktualizacji modala dla mobilnych źródeł emisji
-// Dla mobilnych
-// Funkcja do obliczania emisji i aktualizacji modala dla mobilnych źródeł emisji
+// Funkcja do dodawania obliczeń dla mobilnych źródeł emisji
 function addEmissionCalculationForMobile(results, zuzycie, paliwo, jednostka) {
     const CO2e = zuzycie * results.CO2e;
     const CO2 = zuzycie * results.CO2;
@@ -197,11 +195,10 @@ function addEmissionCalculationForMobile(results, zuzycie, paliwo, jednostka) {
     const N2O = zuzycie * results.N2O;
     const totalEmission = CO2e + CO2 + CH4 + N2O;
 
-    // Sprawdzenie, czy aktualizujemy istniejący rekord
     if (currentEditIndex >= 0) {
         // Zaktualizuj istniejący wpis
         emissionCalculations[currentEditIndex] = {
-            type: 'mobile',
+            type: 'mobile', // Upewnij się, że typ jest poprawnie przypisany
             paliwo: paliwo,
             zuzycie: zuzycie,
             jednostka: jednostka,
@@ -211,12 +208,11 @@ function addEmissionCalculationForMobile(results, zuzycie, paliwo, jednostka) {
             N2O: N2O.toFixed(2),
             totalEmission: totalEmission.toFixed(2),
         };
-        console.log('Zaktualizowano istniejący wpis:', emissionCalculations[currentEditIndex]);
         currentEditIndex = -1; // Resetowanie indeksu po zakończeniu edycji
     } else {
         // Dodanie nowego wpisu, jeśli nie jest to edycja
         emissionCalculations.push({
-            type: 'mobile',
+            type: 'mobile', // Upewnij się, że typ jest poprawnie przypisany
             paliwo: paliwo,
             zuzycie: zuzycie,
             jednostka: jednostka,
@@ -226,11 +222,11 @@ function addEmissionCalculationForMobile(results, zuzycie, paliwo, jednostka) {
             N2O: N2O.toFixed(2),
             totalEmission: totalEmission.toFixed(2),
         });
-        console.log('Dodano nowy wpis:', emissionCalculations[emissionCalculations.length - 1]);
     }
 
     updateModalWithCalculations(); // Zaktualizuj modal
 }
+
 
     // Funkcja do dynamicznego ładowania jednostek na podstawie paliwa
     function updateUnitsForFuel(selectedFuel) {
@@ -534,14 +530,13 @@ function updateExistingRow(paliwo, zuzycie, jednostka, data) {
     showEmissionCalculationsModal();
 }
 
-// Funkcja aktualizująca modal z obliczeniami
+// Funkcja do aktualizacji treści modala z wynikami
 function updateModalWithCalculations() {
     let totalEmissions = 0;
     let resultsHtml = `<h6>Obliczenia dla każdego dodanego źródła emisji:</h6>`;
 
-    // Iteracja przez wszystkie obliczenia i tworzenie HTML
     emissionCalculations.forEach((calc, index) => {
-        const sourceType = calc.type === 'mobile' ? 'Mobilne źródło emisji' : 'Stacjonarne źródło emisji';
+        const sourceType = calc.type === 'mobile' ? 'Mobilne źródło emisji' : 'Stacjonarne źródło emisji'; // Rozróżnienie źródła emisji
         totalEmissions += parseFloat(calc.totalEmission);
 
         resultsHtml += `
@@ -555,16 +550,14 @@ function updateModalWithCalculations() {
         `;
     });
 
-    // Dodanie sumarycznego śladu węglowego dla wszystkich pozycji
     resultsHtml += `<p>Sumaryczny ślad węglowy wszystkich pozycji: ${totalEmissions.toFixed(2)} kg CO2e</p>`;
 
     // Wyświetlenie wyników w oknie modalnym
     $('#emissionResults').html(resultsHtml);
-
-    // Sprawdzenie, czy istnieje instancja modala i wyświetlenie go
-    const modal = bootstrap.Modal.getInstance(document.getElementById('emissionCalculationsModal')) || new bootstrap.Modal(document.getElementById('emissionCalculationsModal'));
+    const modal = new bootstrap.Modal(document.getElementById('emissionCalculationsModal'));
     modal.show();
 }
+
 
 
 
@@ -663,8 +656,12 @@ function showEmissionCalculationsModal() {
         // Iteracja przez wszystkie obliczenia i tworzenie HTML
         emissionCalculations.forEach((calc, index) => {
             totalOverallEmission += parseFloat(calc.totalEmission);
+
+            // Dodanie typu źródła emisji na podstawie właściwości `type`
+            const sourceType = calc.type === 'mobile' ? 'Mobilne źródło emisji' : 'Stacjonarne źródło emisji';
+
             resultsHtml += `
-                <h6>Pozycja ${index + 1}: ${calc.paliwo}</h6>
+                <h6>${sourceType} - Pozycja ${index + 1}: ${calc.paliwo}</h6>
                 <p>Zużycie: ${calc.zuzycie} ${calc.jednostka}</p>
                 <p>CO2e (ogólne): ${calc.CO2e} kg CO2e</p>
                 <p>CO2 (CO2 na jednostkę): ${calc.CO2} kg CO2e</p>
@@ -683,6 +680,7 @@ function showEmissionCalculationsModal() {
         modal.show();
     }
 }
+
 
 
 
