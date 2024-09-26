@@ -165,9 +165,14 @@ $(document).ready(function() {
 // Repeater
 
 
+// Globalne zmienne
 
     const mobilneEmisjeTableBody = document.querySelector('#mobilne_emisje_table tbody');
-        let currentEditRow = null;  // Przechowywanie aktualnie edytowanego wiersza
+    let currentEditRow = null;  // Przechowywanie aktualnie edytowanego wiersza
+    let currentEditIndex = -1; // Inicjalizujemy indeks jako -1, co oznacza brak edycji
+
+
+
 $(document).ready(function() {
     console.log("Skrypt załadowany");
     // Zmienna globalna przechowująca aktualnie edytowany wiersz
@@ -183,6 +188,8 @@ let emissionCalculations = [];
 
 
 // Funkcja do obliczania emisji i aktualizacji modala dla mobilnych źródeł emisji
+// Dla mobilnych
+// Funkcja do obliczania emisji i aktualizacji modala dla mobilnych źródeł emisji
 function addEmissionCalculationForMobile(results, zuzycie, paliwo, jednostka) {
     const CO2e = zuzycie * results.CO2e;
     const CO2 = zuzycie * results.CO2;
@@ -190,20 +197,41 @@ function addEmissionCalculationForMobile(results, zuzycie, paliwo, jednostka) {
     const N2O = zuzycie * results.N2O;
     const totalEmission = CO2e + CO2 + CH4 + N2O;
 
-    // Dodaj wyniki do tablicy przechowującej obliczenia
-    emissionCalculations.push({
-        paliwo: paliwo,
-        zuzycie: zuzycie,
-        jednostka: jednostka,
-        CO2e: CO2e.toFixed(2),
-        CO2: CO2.toFixed(2),
-        CH4: CH4.toFixed(2),
-        N2O: N2O.toFixed(2),
-        totalEmission: totalEmission.toFixed(2),
-    });
+    // Sprawdzenie, czy aktualizujemy istniejący rekord
+    if (currentEditIndex >= 0) {
+        // Zaktualizuj istniejący wpis
+        emissionCalculations[currentEditIndex] = {
+            type: 'mobile',
+            paliwo: paliwo,
+            zuzycie: zuzycie,
+            jednostka: jednostka,
+            CO2e: CO2e.toFixed(2),
+            CO2: CO2.toFixed(2),
+            CH4: CH4.toFixed(2),
+            N2O: N2O.toFixed(2),
+            totalEmission: totalEmission.toFixed(2),
+        };
+        console.log('Zaktualizowano istniejący wpis:', emissionCalculations[currentEditIndex]);
+        currentEditIndex = -1; // Resetowanie indeksu po zakończeniu edycji
+    } else {
+        // Dodanie nowego wpisu, jeśli nie jest to edycja
+        emissionCalculations.push({
+            type: 'mobile',
+            paliwo: paliwo,
+            zuzycie: zuzycie,
+            jednostka: jednostka,
+            CO2e: CO2e.toFixed(2),
+            CO2: CO2.toFixed(2),
+            CH4: CH4.toFixed(2),
+            N2O: N2O.toFixed(2),
+            totalEmission: totalEmission.toFixed(2),
+        });
+        console.log('Dodano nowy wpis:', emissionCalculations[emissionCalculations.length - 1]);
+    }
 
     updateModalWithCalculations(); // Zaktualizuj modal
 }
+
     // Funkcja do dynamicznego ładowania jednostek na podstawie paliwa
     function updateUnitsForFuel(selectedFuel) {
         console.log('Wybrane paliwo:', selectedFuel);
@@ -264,6 +292,7 @@ function addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasi
 // Obsługa przycisku "Zapisz" w modalu
 document.getElementById('zapisz_mobilne_btn').addEventListener('click', function () {
     console.log('Klawisz Zapisz 1 Stan currentEditRow przed zapisaniem:', currentEditRow);
+
     const liczbaPojazdow = document.getElementById('liczba_pojazdow_modal').value;
     const rodzajPojazdu = document.getElementById('rodzaj_pojazdu_modal').value;
     const level2 = document.getElementById('level2_modal').value;
@@ -273,7 +302,6 @@ document.getElementById('zapisz_mobilne_btn').addEventListener('click', function
     const jednostka = document.getElementById('jednostka_modal').value;
 
     console.log('Klawisz Zapisz 2 Stan currentEditRow przed zapisaniem:', currentEditRow);
-
 
     // Przesyłanie danych do backendu
     fetch('/fetch_emission_factors_mobilne', {
@@ -307,31 +335,41 @@ document.getElementById('zapisz_mobilne_btn').addEventListener('click', function
         console.error('Błąd przy pobieraniu wskaźników emisji:', error);
     });
 
-
     // Sprawdzenie wypełnienia wszystkich pól i dodanie lub aktualizacja wiersza
     if (liczbaPojazdow && rodzajPojazdu && level2 && level3 && sposobZasilania && zuzyciePaliwa && jednostka) {
-        if (currentEditRow) {
+        if (currentEditRow && currentEditRow.length) {
             // Aktualizacja istniejącego wiersza
             console.log('Aktualizuję istniejący wiersz:', currentEditRow);
-            currentEditRow.cells[0].textContent = liczbaPojazdow;
-            currentEditRow.cells[1].textContent = rodzajPojazdu;
-            currentEditRow.cells[2].textContent = level2;
-            currentEditRow.cells[3].textContent = level3;
-            currentEditRow.cells[4].textContent = sposobZasilania;
-            currentEditRow.cells[5].textContent = zuzyciePaliwa;
-            currentEditRow.cells[6].textContent = jednostka;
-            currentEditRow = null; // Resetowanie zmiennej po zakończeniu edycji
+            currentEditRow.find('td:eq(0)').text(liczbaPojazdow);
+            currentEditRow.find('td:eq(1)').text(rodzajPojazdu);
+            currentEditRow.find('td:eq(2)').text(level2);
+            currentEditRow.find('td:eq(3)').text(level3);
+            currentEditRow.find('td:eq(4)').text(sposobZasilania);
+            currentEditRow.find('td:eq(5)').text(zuzyciePaliwa);
+            currentEditRow.find('td:eq(6)').text(jednostka);
+
+            // Resetowanie currentEditRow po aktualizacji
+            currentEditRow = null;
         } else {
-            // Dodanie nowego wiersza do tabeli
-            console.log('Dodaję nowy wiersz z wartościami:', { liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka });
+            // Dodanie nowego wiersza tylko wtedy, gdy currentEditRow jest null
+            console.log('Dodaję nowy wiersz z wartościami:', {
+                liczbaPojazdow,
+                rodzajPojazdu,
+                level2,
+                level3,
+                sposobZasilania,
+                zuzyciePaliwa,
+                jednostka
+            });
             addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasilania, zuzyciePaliwa, jednostka);
         }
         console.log('Dane zostały zapisane, modal zamknięty');
-        $('#mobilneEmisjeModal').modal('hide'); // Zamknięcie modala
     } else {
         alert("Proszę wypełnić wszystkie pola!");
     }
 });
+
+
 
 
 
@@ -508,11 +546,12 @@ function updateModalWithCalculations() {
     let totalEmissions = 0;
     let resultsHtml = `<h6>Obliczenia dla każdego dodanego źródła emisji:</h6>`;
 
-    // Iteracja przez wszystkie obliczenia i tworzenie HTML
     emissionCalculations.forEach((calc, index) => {
-        totalEmissions += parseFloat(calc.totalEmission); // Sumujemy emisję każdej pozycji
+        const sourceType = calc.type === 'mobile' ? 'Mobilne źródło emisji' : 'Stacjonarne źródło emisji';
+        totalEmissions += parseFloat(calc.totalEmission);
+
         resultsHtml += `
-            <h6>Pozycja ${index + 1}: ${calc.paliwo}</h6>
+            <h6>${sourceType} - Pozycja ${index + 1}: ${calc.paliwo}</h6>
             <p>Zużycie: ${calc.zuzycie} ${calc.jednostka}</p>
             <p>CO2e (ogólne): ${calc.CO2e} kg CO2e</p>
             <p>CO2 (CO2 na jednostkę): ${calc.CO2} kg CO2e</p>
@@ -522,17 +561,17 @@ function updateModalWithCalculations() {
         `;
     });
 
-    // Dodanie sumarycznego śladu węglowego dla wszystkich pozycji
     resultsHtml += `<p>Sumaryczny ślad węglowy wszystkich pozycji: ${totalEmissions.toFixed(2)} kg CO2e</p>`;
 
-    // Wyświetlenie wyników w oknie modalnym
     $('#emissionResults').html(resultsHtml);
     const modal = new bootstrap.Modal(document.getElementById('emissionCalculationsModal'));
     modal.show();
 }
 
 
+
 // Funkcja do dodawania obliczeń do listy i aktualizacji modala
+// Dla stacjonarnych
 function addEmissionCalculation(results, ilosc, paliwo, jednostka) {
     const CO2e = ilosc * results.CO2e;
     const CO2 = ilosc * results.CO2;
@@ -540,11 +579,11 @@ function addEmissionCalculation(results, ilosc, paliwo, jednostka) {
     const N2O = ilosc * results.N2O;
     const totalEmission = CO2e + CO2 + CH4 + N2O;
 
-    // Dodajemy wyniki do tablicy przechowującej obliczenia
     emissionCalculations.push({
+        type: 'stationary', // Dodaj typ 'stationary'
         paliwo: paliwo,
         zuzycie: ilosc,
-        jednostka: jednostka, // Zapisujemy jednostkę
+        jednostka: jednostka,
         CO2e: CO2e.toFixed(2),
         CO2: CO2.toFixed(2),
         CH4: CH4.toFixed(2),
@@ -552,7 +591,7 @@ function addEmissionCalculation(results, ilosc, paliwo, jednostka) {
         totalEmission: totalEmission.toFixed(2),
     });
 
-    updateModalWithCalculations(); // Zaktualizuj modal
+    updateModalWithCalculations();
 }
 
 
@@ -587,6 +626,34 @@ function updateEmissionCalculation(index, results, ilosc, paliwo, jednostka) {
     updateModalWithCalculations(); // Zaktualizuj modal
 }
 
+// Funkcja do aktualizacji obliczeń w tablicy po edycji dla mobilnych
+function updateMobileEmissionCalculation(index, results, zuzycie, paliwo, jednostka) {
+    const CO2e = zuzycie * results.CO2e;
+    const CO2 = zuzycie * results.CO2;
+    const CH4 = zuzycie * results.CH4;
+    const N2O = zuzycie * results.N2O;
+    const totalEmission = CO2e + CO2 + CH4 + N2O;
+
+    if (emissionCalculations[index]) {
+        // Aktualizacja obliczeń w istniejącym indeksie
+        emissionCalculations[index] = {
+            paliwo: paliwo,
+            zuzycie: zuzycie,
+            jednostka: jednostka,
+            CO2e: CO2e.toFixed(2),
+            CO2: CO2.toFixed(2),
+            CH4: CH4.toFixed(2),
+            N2O: N2O.toFixed(2),
+            totalEmission: totalEmission.toFixed(2),
+        };
+
+        console.log('Zaktualizowano obliczenia mobilne:', emissionCalculations[index]);
+    } else {
+        console.error('Błąd: próba aktualizacji nieistniejącego rekordu mobilnych!');
+    }
+
+    updateModalWithCalculations(); // Zaktualizuj modal
+}
 
 
 // Funkcja do aktualizacji treści modala z wynikami i wyświetlania go
@@ -1153,7 +1220,9 @@ document.getElementById('dodaj_mobilne_btn').addEventListener('click', function 
 mobilneEmisjeTableBody.addEventListener('click', function (event) {
     if (event.target.classList.contains('edit-vehicle')) {
         currentEditRow = event.target.closest('tr'); // Ustawienie zmiennej na edytowany wiersz
-        console.log('Edytowany wiersz ustawiony:', currentEditRow);
+        currentEditIndex = Array.from(mobilneEmisjeTableBody.children).indexOf(currentEditRow); // Znalezienie indeksu edytowanego wiersza
+
+        console.log('Edytowany wiersz ustawiony:', currentEditRow, 'Index:', currentEditIndex);
 
         // Pobieranie wartości z edytowanego wiersza i ustawianie w formularzu
         document.getElementById('liczba_pojazdow_modal').value = currentEditRow.cells[0].textContent;
@@ -1164,11 +1233,11 @@ mobilneEmisjeTableBody.addEventListener('click', function (event) {
         document.getElementById('zuzycie_paliwa_modal').value = currentEditRow.cells[5].textContent;
         document.getElementById('jednostka_modal').value = currentEditRow.cells[6].textContent;
 
-        // Otwarcie modalnego okna do edycji
         $('#mobilneEmisjeModal').modal('show');
         console.log('Otwieram modal do edycji wiersza');
     }
 });
+
 
 // Usuwanie tła modala po jego zamknięciu
 $('#emissionCalculationsModal').on('hidden.bs.modal', function () {
