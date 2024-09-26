@@ -534,11 +534,12 @@ function updateExistingRow(paliwo, zuzycie, jednostka, data) {
     showEmissionCalculationsModal();
 }
 
-// Funkcja do aktualizacji treści modala z wynikami
+// Funkcja aktualizująca modal z obliczeniami
 function updateModalWithCalculations() {
     let totalEmissions = 0;
     let resultsHtml = `<h6>Obliczenia dla każdego dodanego źródła emisji:</h6>`;
 
+    // Iteracja przez wszystkie obliczenia i tworzenie HTML
     emissionCalculations.forEach((calc, index) => {
         const sourceType = calc.type === 'mobile' ? 'Mobilne źródło emisji' : 'Stacjonarne źródło emisji';
         totalEmissions += parseFloat(calc.totalEmission);
@@ -554,10 +555,14 @@ function updateModalWithCalculations() {
         `;
     });
 
+    // Dodanie sumarycznego śladu węglowego dla wszystkich pozycji
     resultsHtml += `<p>Sumaryczny ślad węglowy wszystkich pozycji: ${totalEmissions.toFixed(2)} kg CO2e</p>`;
 
+    // Wyświetlenie wyników w oknie modalnym
     $('#emissionResults').html(resultsHtml);
-    const modal = new bootstrap.Modal(document.getElementById('emissionCalculationsModal'));
+
+    // Sprawdzenie, czy istnieje instancja modala i wyświetlenie go
+    const modal = bootstrap.Modal.getInstance(document.getElementById('emissionCalculationsModal')) || new bootstrap.Modal(document.getElementById('emissionCalculationsModal'));
     modal.show();
 }
 
@@ -716,17 +721,32 @@ $('#stacjonarne_emisje_table').on('click', '.edit-btn', function(e) {
 });
 
 
-// Obsługa usuwania
-$('#stacjonarne_emisje_table').on('click', '.delete-btn', function(e) {
+// Obsługa usuwania dla stacjonarnych i mobilnych źródeł emisji
+$(document).on('click', '.delete-btn', function(e) {
     e.preventDefault();
-    const rowIndex = $(this).closest('tr').index();
-    // Usuń element z tablicy obliczeń
-    emissionCalculations.splice(rowIndex, 1);
-    $(this).closest('tr').remove();
+
+    // Ustal indeks i typ źródła (stacjonarne lub mobilne)
+    const row = $(this).closest('tr');
+    const rowIndex = row.index();
+
+    // Usuń element z tablicy obliczeń w oparciu o typ źródła
+    if (emissionCalculations[rowIndex] && emissionCalculations[rowIndex].type === 'stationary') {
+        console.log('Usuwanie stacjonarnego źródła emisji:', emissionCalculations[rowIndex]);
+        emissionCalculations.splice(rowIndex, 1);
+        row.remove();
+    } else if (emissionCalculations[rowIndex] && emissionCalculations[rowIndex].type === 'mobile') {
+        console.log('Usuwanie mobilnego źródła emisji:', emissionCalculations[rowIndex]);
+        emissionCalculations.splice(rowIndex, 1);
+        row.remove();
+    } else {
+        console.error('Nieznany typ źródła emisji lub błąd przy usuwaniu.');
+        return;
+    }
 
     // Sprawdzenie, czy są jakieś obliczenia po usunięciu wiersza
     if (emissionCalculations.length > 0) {
-        showEmissionCalculationsModal(); // Aktualizuj modal tylko, jeśli są obliczenia
+        // Aktualizuj modal z wynikami po usunięciu wiersza
+        updateModalWithCalculations();
     } else {
         // Ukryj modal, jeśli nie ma żadnych emisji
         const modal = bootstrap.Modal.getInstance(document.getElementById('emissionCalculationsModal'));
