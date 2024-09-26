@@ -275,7 +275,7 @@ function addRowToTable(liczbaPojazdow, rodzajPojazdu, level2, level3, sposobZasi
         <td>
             <div class="d-flex justify-content-start gap-2">
                 <button type="button" class="btn btn-warning btn-sm edit-vehicle">Edytuj</button>
-                <button type="button" class="btn btn-danger btn-sm remove-vehicle">Usuń</button>
+                <button type="button" class="btn btn-danger btn-sm delete-btn">Usuń</button>
             </div>
         </td>
     `;
@@ -720,69 +720,73 @@ $('#stacjonarne_emisje_table').on('click', '.edit-btn', function(e) {
 });
 
 
-// Obsługa usuwania wierszy z tabeli dla stacjonarnych źródeł emisji
-$('#stacjonarne_emisje_table').on('click', '.delete-btn', function (e) {
+// Obsługa usuwania wierszy z tabeli dla stacjonarnych i mobilnych źródeł emisji
+$('#stacjonarne_emisje_table, #mobilne_emisje_table').on('click', '.delete-btn', function (e) {
     e.preventDefault();
+    console.log("Kliknięto przycisk Usuń."); // Sprawdzenie, czy kliknięcie jest rejestrowane
 
     // Znalezienie indeksu wiersza do usunięcia
     const rowIndex = $(this).closest('tr').index();
+    const isMobile = $(this).closest('table').attr('id') === 'mobilne_emisje_table';
+    console.log(`Indeks wiersza: ${rowIndex}, IsMobile: ${isMobile}`); // Logowanie informacji o wierszu
 
-    // Usuwanie stacjonarnego wpisu
-    const stationaryCalculations = emissionCalculations.filter(calc => calc.type === 'stationary');
-    const calculationToRemove = stationaryCalculations[rowIndex];
+    // Znalezienie odpowiedniego wpisu w `emissionCalculations` do usunięcia
+    let indexToRemove = -1;
 
-    // Usunięcie konkretnego wpisu
-    emissionCalculations = emissionCalculations.filter(calc => calc !== calculationToRemove);
+    if (isMobile) {
+        console.log("Usuwanie mobilnego wpisu."); // Potwierdzenie, że usuwamy mobilne
+        // Usuwanie mobilnego wpisu
+        for (let i = 0; i < emissionCalculations.length; i++) {
+            if (emissionCalculations[i].type === 'mobile') {
+                if (rowIndex === 0) {
+                    indexToRemove = i;
+                    break;
+                }
+                rowIndex--;
+            }
+        }
+    } else {
+        console.log("Usuwanie stacjonarnego wpisu."); // Potwierdzenie, że usuwamy stacjonarne
+        // Usuwanie stacjonarnego wpisu
+        for (let i = 0; i < emissionCalculations.length; i++) {
+            if (emissionCalculations[i].type === 'stationary') {
+                if (rowIndex === 0) {
+                    indexToRemove = i;
+                    break;
+                }
+                rowIndex--;
+            }
+        }
+    }
+
+    console.log(`Index do usunięcia: ${indexToRemove}`); // Sprawdzenie, który element będzie usunięty
+
+    // Usunięcie odpowiedniego wpisu z `emissionCalculations`
+    if (indexToRemove !== -1) {
+        console.log(`Usuwam element z emissionCalculations:`, emissionCalculations[indexToRemove]);
+        emissionCalculations.splice(indexToRemove, 1);
+    } else {
+        console.error('Nie udało się znaleźć wpisu do usunięcia.');
+    }
 
     // Usunięcie wiersza z tabeli
     $(this).closest('tr').remove();
+    console.log("Wiersz usunięty z tabeli.");
 
     // Aktualizacja modala
     if (emissionCalculations.length > 0) {
+        console.log("Aktualizuję modal z nowymi obliczeniami.");
         updateModalWithCalculations(); // Aktualizuj modal, jeśli są jeszcze obliczenia
     } else {
         // Ukrycie modala, jeśli nie ma żadnych danych
         const modal = bootstrap.Modal.getInstance(document.getElementById('emissionCalculationsModal'));
-        if (modal) modal.hide();
-    }
-});
-
-// Obsługa usuwania wierszy z tabeli dla mobilnych źródeł emisji
-$('#mobilne_emisje_table').on('click', '.delete-btn', function (e) {
-    e.preventDefault();
-
-    // Znalezienie indeksu wiersza do usunięcia
-    const rowIndex = $(this).closest('tr').index();
-    console.log(`Usuwam mobilne źródło emisji, index wiersza: ${rowIndex}`);
-
-    // Usuwanie mobilnego wpisu
-    const mobileCalculations = emissionCalculations.filter(calc => calc.type === 'mobile');
-    console.log('Lista mobilnych wpisów przed usunięciem:', mobileCalculations);
-
-    if (rowIndex >= 0 && rowIndex < mobileCalculations.length) {
-        const calculationToRemove = mobileCalculations[rowIndex];
-        console.log('Wpis do usunięcia:', calculationToRemove);
-
-        // Usunięcie konkretnego wpisu z głównej listy obliczeń
-        emissionCalculations = emissionCalculations.filter(calc => calc !== calculationToRemove);
-        console.log('Lista obliczeń po usunięciu wpisu:', emissionCalculations);
-
-        // Usunięcie wiersza z tabeli
-        $(this).closest('tr').remove();
-
-        // Aktualizacja modala
-        if (emissionCalculations.length > 0) {
-            console.log('Aktualizacja modala z pozostałymi wpisami...');
-            updateModalWithCalculations(); // Aktualizuj modal, jeśli są jeszcze obliczenia
-        } else {
-            console.log('Brak wpisów do wyświetlenia, ukrywam modal.');
-            const modal = bootstrap.Modal.getInstance(document.getElementById('emissionCalculationsModal'));
-            if (modal) modal.hide();
+        if (modal) {
+            console.log("Ukrywam modal, brak obliczeń.");
+            modal.hide();
         }
-    } else {
-        console.error('Nie znaleziono wpisu do usunięcia na podstawie indeksu.');
     }
 });
+
 
 
 
