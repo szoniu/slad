@@ -6,7 +6,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 
 from database import engine_company, engine_excel, CompanyProfile, StationaryEmission, MobileEmission, \
-    ElectricityEmission, HeatEmission, get_emission_factors, get_emission_factors_mobilne
+    ElectricityEmission, HeatEmission, get_emission_factors, get_emission_factors_mobilne, create_tables, load_excel_data
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
 

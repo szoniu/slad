@@ -315,6 +315,23 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     $(".next-step").on("click", function () {
+
+        //sprawdzanie
+        const inputs = document.getElementById("stepper-form").children[currentStep-1].getElementsByTagName('input')
+        const selects = document.getElementById("stepper-form").children[currentStep-1].getElementsByTagName('select')
+        
+        for(let i = 0; i < inputs.length; i++){
+            if(inputs[i].validity.valid == false){
+                return;
+            }
+        }
+        for(let i = 0; i < selects.length; i++){
+                if(selects[i].validity.valid == false){
+                    return;
+                }
+        }
+
+        //funkcja next-step
         currentStep++;
         showStep(currentStep);
     });
@@ -1228,6 +1245,39 @@ document.addEventListener("DOMContentLoaded", function () {
 
         $("#energiaCieplnaModal").modal("show"); // Otwieranie modala do edycji
     });
+
+
+    $("#stepper-form").on("change", function (event) {
+
+        event.preventDefault();
+        //currentStep
+        console.log(currentStep)
+        const inputs = document.getElementById("stepper-form").children[currentStep-1].getElementsByTagName('input')
+        
+        const selects = document.getElementById("stepper-form").children[currentStep-1].getElementsByTagName('select')
+        
+
+        for(let i = 0; i < inputs.length; i++){
+            
+            console.log(inputs[i].name + ": " + inputs[i].validity.valid)
+
+            if(inputs[i].validity.valid == false){
+                inputs[i].style.borderColor = "red"
+            }   else    {
+                
+                inputs[i].style.borderColor = "unset"
+            }
+
+        }
+
+        for(let i = 0; i < selects.length; i++){
+
+            console.log(selects[i].name + ": " + selects[i].validity.valid)
+                selects[i].style.borderColor = "red"
+
+        }
+
+    })
 
     // Tutaj dodajemy logowanie przed wysłaniem formularza:
     $("#stepper-form").on("submit", function (event) {
