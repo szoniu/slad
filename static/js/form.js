@@ -354,18 +354,18 @@ document.addEventListener("DOMContentLoaded", function () {
             case 2:
 
                 if(document.getElementById("mobilne_emisje_table").children[1].childElementCount == 0){
-                    document.getElementById("dodaj_mobilne_btn").style.borderColor = "red";
+                    document.getElementById("dodaj_mobilne_btn").classList.add("btn-danger")
                 }   else    {
-                    document.getElementById("dodaj_mobilne_btn").style.borderColor = "unset";
+                    document.getElementById("dodaj_mobilne_btn").classList.remove("btn-danger")
                 }
 
 
                 if(document.getElementById("zuzycie").validity.valid){
-                    document.getElementById("dodaj_stacjonarne_btn").style.borderColor = "unset";
+                    document.getElementById("dodaj_stacjonarne_btn").classList.add("btn-danger")
                     document.getElementById("zuzycie").style.borderColor = "unset";
            
                 }   else    {
-                    document.getElementById("dodaj_stacjonarne_btn").style.borderColor = "red";
+                    document.getElementById("dodaj_stacjonarne_btn").classList.remove("btn-danger")
                     document.getElementById("zuzycie").style.borderColor = "red";
                     valid = false;
                 }
@@ -396,6 +396,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     showStep(currentStep);
                     return;
                     }
+
+            case 3:
+                
         
         }
 
