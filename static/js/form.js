@@ -315,26 +315,104 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     $(".next-step").on("click", function () {
-
+        let valid = true;
+        let inputs;
+        let selects;
         //sprawdzanie
-        const inputs = document.getElementById("stepper-form").children[currentStep-1].getElementsByTagName('input')
-        const selects = document.getElementById("stepper-form").children[currentStep-1].getElementsByTagName('select')
-        
-        for(let i = 0; i < inputs.length; i++){
-            if(inputs[i].validity.valid == false){
-                return;
-            }
-        }
-        for(let i = 0; i < selects.length; i++){
-                if(selects[i].validity.valid == false){
-                    return;
+
+
+
+
+        switch(currentStep){
+
+            case 1:
+                inputs = document.getElementById("stepper-form").children[0].getElementsByTagName('input')
+                selects = document.getElementById("stepper-form").children[0].getElementsByTagName('select')
+                for(let i = 0; i < inputs.length; i++){
+                    if(inputs[i].validity.valid == false){
+                        inputs[i].style.borderColor = "red"
+                    }   else    {                   
+                        inputs[i].style.borderColor = "unset"
+                    }
+                    if(inputs[i].validity.valid == false){
+                        valid = false;
+                    }
                 }
+                 for(let i = 0; i < selects.length; i++){
+                        if(selects[i].validity.valid == false){
+                            selects[i].style.borderColor = "red"
+                            valid = false;
+                        }
+                }
+
+                        //funkcja next-step
+                if(valid){
+                currentStep++;
+                showStep(currentStep);
+                return;
+                }
+            case 2:
+
+                if(document.getElementById("mobilne_emisje_table").children[1].childElementCount == 0){
+                    document.getElementById("dodaj_mobilne_btn").style.borderColor = "red";
+                }   else    {
+                    document.getElementById("dodaj_mobilne_btn").style.borderColor = "unset";
+                }
+
+
+                if(document.getElementById("zuzycie").validity.valid){
+                    document.getElementById("dodaj_stacjonarne_btn").style.borderColor = "unset";
+                    document.getElementById("zuzycie").style.borderColor = "unset";
+           
+                }   else    {
+                    document.getElementById("dodaj_stacjonarne_btn").style.borderColor = "red";
+                    document.getElementById("zuzycie").style.borderColor = "red";
+                    valid = false;
+                }
+                
+                inputs = document.getElementById("mobilne_emisje_form").getElementsByTagName("input");
+                selects = document.getElementById("mobilne_emisje_form").getElementsByTagName("select")
+                for(let i = 0; i < inputs.length; i++){
+                    if(inputs[i].validity.valid == false){
+                        valid = false;
+                    }
+                }
+                for(let i = 0; i < selects.length; i++){
+                    if(selects[i].validity.valid == false){
+                        valid = false;
+                    }
+                }
+                
+                for(i = 0; i < document.getElementById("mobilne_emisje_table").children[1].childElementCount; i++){
+                    document.getElementById("mobilne_emisje_table").children[1].children[i].lastElementChild.children[0].firstElementChild.style.borderColor = "transparent";
+               
+                }
+             
+                document.getElementById("mobilne_emisje_table").children[1].children[document.getElementById("mobilne_emisje_table").children[1].childElementCount-1].lastElementChild.children[0].firstElementChild.style.borderColor = valid ? "unset" : "red";
+                //document.getElementById("mobilne_emisje_table").children[1].children[document.getElementById("mobilne_emisje_table").childElementCount-1].style.borderColor = valid ? "unset" : "red";
+
+                if(valid){
+                    currentStep++;
+                    showStep(currentStep);
+                    return;
+                    }
+        
         }
 
-        //funkcja next-step
-        currentStep++;
-        showStep(currentStep);
+
+ 
+                
+     
+        
+
     });
+
+
+
+
+
+
+
 
     $(".prev-step").on("click", function () {
         currentStep--;
@@ -1247,7 +1325,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
-    $("#stepper-form").on("change", function (event) {
+/*     $("#stepper-form").on("change", function (event) {
 
         event.preventDefault();
         //currentStep
@@ -1277,7 +1355,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
 
-    })
+    }) */
 
     // Tutaj dodajemy logowanie przed wysłaniem formularza:
     $("#stepper-form").on("submit", function (event) {
